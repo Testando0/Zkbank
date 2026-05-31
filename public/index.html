@@ -1,439 +1,507 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ghost Bank</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <style>
-        /* CSS FINAL - ESTILO GHOST BANK */
-        :root { --bg: #050505; --panel: #0a0a0f; --primary: #8a2be2; --accent: #00ff41; --text: #fff; --gray: #888; --border: #1f1f2e; }
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; }
-        
-        /* Telas */
-        #screen-login { display: flex; height: 100%; justify-content: center; align-items: center; background: radial-gradient(circle at center, #1a0b2e 0%, #000 100%); z-index: 100; position: absolute; width: 100%; top: 0; }
-        #screen-app { display: none; height: 100%; flex-direction: column; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ghost Bank</title>
+<script src="/socket.io/socket.io.js"></script>
+<style>
+/* --- CSS GERAL & VARIÁVEIS --- */
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+:root { --bg: #050505; --card: #0d0d14; --purple: #8a2be2; --green: #00ff41; --red: #ff3333; --gray: #888; --border: #1a1a2e; }
+body { background: var(--bg); color: #fff; min-height: 100vh; overflow-x: hidden; }
+button { cursor: pointer; border: none; font-size: 16px; transition: 0.2s; }
+button:active { transform: scale(0.96); }
+input, select { font-size: 16px; outline: none; }
 
-        /* Componentes Gerais */
-        .box { background: var(--panel); border: 1px solid var(--primary); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(138,43,226,0.3); text-align: center; }
-        input, select { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; font-size: 16px; }
-        button { width: 100%; background: var(--primary); color: #fff; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 5px; transition: 0.2s; }
-        button:active { transform: scale(0.95); opacity: 0.8; }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); margin-top: 10px; }
-        .btn-green { background: var(--accent); color: #000; }
-        .btn-red { background: #ff3333; color: white; }
-        .btn-copy { background: #333; font-size: 12px; padding: 5px 10px; width: auto; display: inline-block; margin-left: 10px; }
+/* --- TELA DE LOGIN --- */
+#loginScreen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; background: radial-gradient(circle at center, #1a0a2e 0%, #000 80%); position: absolute; width: 100%; z-index: 100; top: 0; }
+.loginBox { background: var(--card); border: 1px solid var(--purple); border-radius: 20px; padding: 30px 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 0 50px rgba(138,43,226,0.2); }
+.loginBox h1 { color: var(--purple); font-size: 28px; margin-bottom: 5px; text-shadow: 0 0 15px var(--purple); letter-spacing: 2px; }
+.loginBox p { color: var(--gray); font-size: 12px; margin-bottom: 25px; letter-spacing: 1px; }
+.loginBox input { width: 100%; padding: 15px; background: #000; border: 1px solid var(--border); border-radius: 12px; color: #fff; margin-bottom: 15px; }
+.loginBox input:focus { border-color: var(--purple); }
+.btnPrimary { width: 100%; padding: 15px; background: var(--purple); color: #fff; border-radius: 12px; font-weight: bold; font-size: 17px; box-shadow: 0 4px 15px rgba(138,43,226,0.4); }
+.btnOutline { width: 100%; padding: 15px; background: transparent; color: var(--purple); border: 1px solid var(--purple); border-radius: 12px; font-weight: bold; font-size: 15px; margin-top: 10px; }
+.btnGreen { width: 100%; padding: 15px; background: var(--green); color: #000; border-radius: 12px; font-weight: bold; font-size: 17px; box-shadow: 0 4px 15px rgba(0,255,65,0.3); }
 
-        /* App Layout */
-        header { background: var(--panel); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 10; }
-        .logo { font-weight: 900; color: var(--primary); letter-spacing: 1px; font-size: 1.2em; text-shadow: 0 0 10px var(--primary); }
-        .user-badge { font-size: 0.8em; color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 10px; }
+/* --- APP LAYOUT --- */
+#appScreen { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 80px; }
+.appHeader { background: rgba(13,13,20,0.95); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(10px); }
+.logo { color: var(--purple); font-weight: 900; font-size: 18px; letter-spacing: 1px; text-shadow: 0 0 10px var(--purple); }
+.badge { font-size: 11px; color: var(--green); border: 1px solid var(--green); padding: 4px 10px; border-radius: 20px; background: rgba(0,255,65,0.1); }
 
-        /* Navegação */
-        .nav-bar { display: flex; overflow-x: auto; background: var(--panel); padding: 10px; gap: 10px; border-bottom: 1px solid var(--border); scrollbar-width: none; }
-        .nav-bar::-webkit-scrollbar { display: none; }
-        .nav-item { padding: 10px 20px; border: 1px solid var(--border); border-radius: 20px; white-space: nowrap; font-size: 0.9em; cursor: pointer; color: var(--gray); transition: 0.3s; background: #000; }
-        .nav-item.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
-        .nav-item.owner { border-color: var(--accent); color: var(--accent); }
+/* NAVEGAÇÃO INFERIOR (Mobile Friendly) */
+.bottomNav { position: fixed; bottom: 0; width: 100%; background: #0a0a0f; border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 100; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+.navItem { display: flex; flex-direction: column; align-items: center; color: var(--gray); font-size: 10px; background: none; width: auto; padding: 5px; }
+.navItem span { font-size: 20px; margin-bottom: 4px; }
+.navItem.active { color: var(--purple); }
+.navItem.ownerNav { color: var(--green); display: none; }
 
-        /* Conteúdo */
-        .content-area { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; background: radial-gradient(circle at top right, #11051b 0%, #050505 40%); }
-        .view-section { display: none; animation: fadeIn 0.3s; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+/* CONTEÚDO */
+.mainContent { padding: 20px; flex: 1; }
+.section { display: none; animation: fadeIn 0.3s ease; }
+.section.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Dashboard Cards */
-        .stat-card { background: rgba(16, 16, 24, 0.9); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; backdrop-filter: blur(10px); }
-        .stat-val { font-size: 2.5em; font-weight: bold; margin: 10px 0; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
-        .coins-text { color: var(--accent); }
-        /* Loja Grid */
-        .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-        .product-card { background: #0f0f16; border: 1px solid var(--border); border-radius: 10px; padding: 15px; text-align: center; position: relative; transition: 0.3s; }
-        .product-card:hover { border-color: var(--primary); transform: translateY(-5px); }
-        .product-img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
-        .rarity-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
-        .r-lendario { background: gold; color: black; box-shadow: 0 0 8px gold; }
-        .r-raro { background: #007bff; color: white; }
-        .r-comum { background: #555; color: white; }
+/* DASHBOARD & CARTÃO */
+.credit-card { background: linear-gradient(135deg, #1a1a1a, #000); border: 1px solid #333; border-radius: 16px; padding: 20px; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.credit-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(138,43,226,0.1) 0%, transparent 60%); }
+.card-chip { width: 40px; height: 30px; background: #d4af37; border-radius: 6px; margin-bottom: 20px; position: relative; }.card-number { font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; font-family: monospace; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+.card-info { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; }
+.balance-box { text-align: center; margin-bottom: 20px; }
+.balance-label { color: var(--gray); font-size: 12px; letter-spacing: 1px; }
+.balance-val { font-size: 36px; font-weight: 900; margin: 5px 0; }
+.coins-val { color: var(--green); font-size: 20px; font-weight: bold; }
 
-        /* Admin */
-        .admin-box { border: 1px solid var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; background: rgba(0, 255, 65, 0.05); }
-        .req-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #333; }
-        .code-display { background: #000; padding: 10px; border: 1px dashed var(--accent); color: var(--accent); font-family: monospace; font-size: 1.2em; margin: 10px 0; word-break: break-all; }
+/* LOJA GRID */
+.storeGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.prodCard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 15px 10px; text-align: center; position: relative; }
+.prodCard img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.1)); }
+.prodName { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.prodPrice { color: var(--green); font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+.badgeRarity { position: absolute; top: 10px; right: 10px; font-size: 9px; padding: 3px 6px; border-radius: 4px; font-weight: bold; text-transform: uppercase; }
+.r-lendario { background: gold; color: #000; box-shadow: 0 0 8px gold; }
+.r-raro { background: #007bff; color: #fff; }
+.r-comum { background: #555; color: #fff; }
 
-        .hidden { display: none !important; }
-    </style>
+/* ADMIN & FORMS */
+.adminBox { background: rgba(0,255,65,0.03); border: 1px solid var(--green); border-radius: 14px; padding: 18px; margin-bottom: 20px; }
+.adminBox h3 { color: var(--green); font-size: 16px; margin-bottom: 15px; border-bottom: 1px solid rgba(0,255,65,0.2); padding-bottom: 8px; }
+.inputGroup { margin-bottom: 12px; }
+.inputGroup input, .inputGroup select { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); border-radius: 10px; color: #fff; }
+.reqItem { display: flex; justify-content: space-between; align-items: center; background: #111; border: 1px solid var(--border); border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+.reqInfo div:first-child { font-weight: bold; color: #fff; }
+.reqInfo div:last-child { font-size: 12px; color: var(--gray); }
+.btnSmall { padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; margin-left: 5px; }
+.btnApprove { background: var(--green); color: #000; }
+.btnDeny { background: var(--red); color: #fff; }
+
+/* MODAL AIRDROP */
+.modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 200; display: none; align-items: center; justify-content: center; flex-direction: column; }
+.airdropAnim { font-size: 80px; animation: bounce 1s infinite; margin-bottom: 20px; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+.airdropText { font-size: 24px; color: var(--green); font-weight: bold; margin-bottom: 10px; }
+.airdropSub { color: var(--gray); margin-bottom: 30px; }
+
+/* WHATSAPP FLOAT */
+.whatsapp-float { position: fixed; bottom: 90px; right: 20px; background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); z-index: 90; text-decoration: none; }
+
+.hidden { display: none !important; }
+</style>
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
-    <div id="screen-login">
-        <div class="box">
-            <h1 style="color:var(--primary); margin-bottom: 5px;">GHOST BANK</h1>
-            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">O BANCO DO FUTURO</p>
-            
-            <div id="form-login">
-                <input type="text" id="in-user" placeholder="Usuário">
-                <input type="password" id="in-pass" placeholder="Senha">
-                <button onclick="app.login()">ENTRAR</button>
-                <button class="btn-outline" onclick="app.toggleRegMode()">CRIAR CONTA</button>
-            </div>
-
-            <div id="form-register" class="hidden">
-                <input type="text" id="reg-user" placeholder="Novo Usuário">
-                <input type="password" id="reg-pass" placeholder="Nova Senha">
-                <button class="btn-green" onclick="app.register()">REGISTRAR</button>
-                <button class="btn-outline" onclick="app.toggleRegMode()">VOLTAR</button>
-            </div>
+<!-- LOGIN -->
+<div id="loginScreen">
+    <div class="loginBox">
+        <h1>👻 GHOST BANK</h1>
+        <p>INVISÍVEL. SEGURO. SEU.</p>        <div id="formLogin">
+            <input type="text" id="inUser" placeholder="Usuário" autocomplete="off">
+            <input type="password" id="inPass" placeholder="Senha">
+            <button class="btnPrimary" onclick="app.login()">ENTRAR</button>
+            <button class="btnOutline" onclick="app.toggleReg()">CRIAR CONTA</button>
+        </div>
+        <div id="formReg" class="hidden">
+            <input type="text" id="regUser" placeholder="Novo Usuário" autocomplete="off">
+            <input type="password" id="regPass" placeholder="Nova Senha">
+            <button class="btnGreen" onclick="app.register()">REGISTRAR</button>
+            <button class="btnOutline" onclick="app.toggleReg()">VOLTAR</button>
         </div>
     </div>
+</div>
 
-    <!-- TELA DO APP -->
-    <div id="screen-app">
-        <header>
-            <div class="logo">GHOST BANK</div>
-            <div id="header-user" class="user-badge">USER</div>
-        </header>
-        
-        <div class="nav-bar">            <div class="nav-item active" onclick="app.nav('dash', this)">DASHBOARD</div>
-            <div class="nav-item" onclick="app.nav('store', this)">LOJA</div>
-            <div class="nav-item" onclick="app.nav('wallet', this)">CARTEIRA</div>
-            <div class="nav-item owner hidden" id="nav-owner" onclick="app.nav('owner', this)">OWNER</div>
-            <div class="nav-item" style="border-color: #ff3333; color: #ff3333; margin-left: auto;" onclick="app.logout()">SAIR</div>
+<!-- APP -->
+<div id="appScreen">
+    <div class="appHeader">
+        <div class="logo">GHOST BANK</div>
+        <div class="badge" id="headerBadge">USER</div>
+    </div>
+
+    <div class="mainContent">
+        <!-- DASHBOARD -->
+        <div id="sec-dash" class="section active">
+            <div class="credit-card">
+                <div class="card-chip"></div>
+                <div class="card-number">**** **** **** 1337</div>
+                <div class="card-info">
+                    <span id="cardName">GHOST PLAYER</span>
+                    <span>MASTER</span>
+                </div>
+            </div>
+            
+            <div class="balance-box">
+                <div class="balance-label">SALDO TOTAL</div>
+                <div class="balance-val">R$ <span id="dBalance">0,00</span></div>
+                <div class="balance-label" style="margin-top:10px">GHOST COINS</div>
+                <div class="coins-val"><span id="dCoins">0</span> GC</div>
+            </div>
+
+            <button class="btnGreen" onclick="app.openAirdrop()" style="padding: 18px; font-size: 18px; margin-bottom: 10px;">🎁 AIRDROP DIÁRIO</button>
+            <button class="btnOutline" onclick="app.nav('buycoins')" style="border-color: var(--green); color: var(--green);">💠 COMPRAR COINS (PIX)</button>
         </div>
 
-        <div class="content-area">
-            
-            <!-- DASHBOARD -->
-            <div id="view-dash" class="view-section active">
-                <div class="stat-card">
-                    <div style="color:#888; font-size: 0.9em;">SALDO TOTAL</div>
-                    <div class="stat-val">R$ <span id="val-balance">0,00</span></div>
-                    <div style="color:#888; font-size: 0.9em; margin-top: 15px;">GHOST COINS</div>
-                    <div class="stat-val coins-text"><span id="val-coins">0</span> GC</div>
-                </div>
+        <!-- LOJA -->
+        <div id="sec-store" class="section">
+            <h2 style="margin-bottom: 15px; font-size: 20px;">🛒 Loja Misteriosa</h2>
+            <div id="storeGrid" class="storeGrid"></div>
+        </div>
+        <!-- COMPRAR COINS (PIX) -->
+        <div id="sec-buycoins" class="section">
+            <h2 style="margin-bottom: 15px; color: var(--green);">💠 Comprar Coins</h2>
+            <div class="adminBox" style="border-color: var(--purple);">
+                <h3 style="color: var(--purple);">Pagamento via Pix</h3>
+                <p style="font-size: 13px; color: #aaa; margin-bottom: 15px;">Escolha o pacote e gere o código Pix. O Master aprovará manualmente.</p>
                 
-                <button class="btn-green" style="padding: 20px; font-size: 1.1em;" onclick="app.airdrop()">🎁 AIRDROP DIÁRIO</button>
-                <p style="text-align: center; color: #555; font-size: 0.8em; margin-top: 10px;">Sistema 100% Seguro</p>
-            </div>
-
-            <!-- LOJA -->
-            <div id="view-store" class="view-section">
-                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 10px;">LOJA MISTERIOSA</h2>
-                <div id="store-container" class="store-grid">
-                    <!-- Produtos entram aqui via JS -->
+                <div class="inputGroup">
+                    <select id="pixPackage">
+                        <option value="1000">1.000 GC - R$ 10,00</option>
+                        <option value="5000">5.000 GC - R$ 50,00</option>
+                        <option value="10000">10.000 GC - R$ 100,00</option>
+                    </select>
                 </div>
+                <button class="btnPrimary" onclick="app.buyPix()">GERAR PIX</button>
             </div>
+        </div>
 
-            <!-- CARTEIRA -->
-            <div id="view-wallet" class="view-section">
-                <div class="stat-card" style="text-align: left;">
-                    <h3>Resgatar Código</h3>
-                    <p style="font-size: 0.8em; color: #888;">Insira o código gerado pelo Master.</p>
-                    <input type="text" id="wallet-code" placeholder="GHOST-XXXXXX" style="text-transform: uppercase;">
-                    <button onclick="app.redeem()">RESGATAR COINS</button>
-                </div>
-
-                <div class="stat-card" style="text-align: left;">
-                    <h3>Solicitar Crédito</h3>
-                    <p style="font-size: 0.8em; color: #888;">Peça coins ao administrador.</p>
-                    <input type="number" id="wallet-req-amount" placeholder="Quantidade">
-                    <button class="btn-outline" onclick="app.requestCredit()">SOLICITAR</button>
-                </div>
+        <!-- CARTEIRA -->
+        <div id="sec-wallet" class="section">
+            <div class="adminBox" style="border-color: var(--purple);">
+                <h3 style="color: var(--purple);">💎 Resgatar Código</h3>
+                <div class="inputGroup"><input type="text" id="walletCode" placeholder="GHOST-XXXXXX" style="text-transform:uppercase"></div>
+                <button class="btnPrimary" onclick="app.redeem()">RESGATAR</button>
             </div>
+            <div class="adminBox">
+                <h3>📩 Solicitar Crédito Grátis</h3>
+                <p style="font-size: 12px; color: #888; margin-bottom: 10px;">Explique o motivo.</p>
+                <div class="inputGroup"><input type="number" id="walletReq" placeholder="Quantidade de Coins"></div>
+                <button class="btnOutline" onclick="app.requestCredit()">SOLICITAR</button>
+            </div>
+        </div>
 
-            <!-- OWNER (ADMIN) -->
-            <div id="view-owner" class="view-section">
-                <h2 style="color: var(--accent);">PAINEL OWNER 👑</h2>                
-                <div class="admin-box">
-                    <h4>1. Adicionar Produto na Loja</h4>
-                    <input type="text" id="prod-name" placeholder="Nome do Produto">
-                    <input type="number" id="prod-price" placeholder="Preço em Coins">
-                    <select id="prod-rarity">
+        <!-- OWNER (ADMIN) -->
+        <div id="sec-owner" class="section">
+            <h2 style="color: var(--green); margin-bottom: 20px;">👑 PAINEL OWNER</h2>
+            
+            <div class="adminBox">
+                <h3>📦 Novo Produto</h3>
+                <div class="inputGroup"><input type="text" id="pName" placeholder="Nome"></div>
+                <div class="inputGroup"><input type="number" id="pPrice" placeholder="Preço (Coins)"></div>
+                <div class="inputGroup">
+                    <select id="pRarity">
                         <option value="comum">Comum</option>
                         <option value="raro">Raro</option>
                         <option value="lendario">Lendário</option>
                     </select>
-                    <input type="text" id="prod-img" placeholder="Link da Imagem (Telegraph/Imgur)">
-                    <button class="btn-green" onclick="app.addProduct()">PUBLICAR PRODUTO</button>
                 </div>
+                <div class="inputGroup"><input type="text" id="pImage" placeholder="Link da Imagem (URL)"></div>                <button class="btnGreen" onclick="app.addProduct()">PUBLICAR</button>
+            </div>
 
-                <div class="admin-box">
-                    <h4>2. Gerar Código de Recarga</h4>
-                    <input type="number" id="gen-val" placeholder="Valor em Coins">
-                    <button onclick="app.genCode()">GERAR CÓDIGO</button>
-                    <div id="gen-result-area" class="hidden">
-                        <div class="code-display" id="gen-code-text"></div>
-                        <button class="btn-copy" onclick="app.copyCode()">COPIAR</button>
-                    </div>
-                </div>
-
-                <div class="admin-box">
-                    <h4>3. Aprovar Solicitações</h4>
-                    <div id="admin-req-list">
-                        <p style="color:#666; font-size:0.8em;">Nenhuma solicitação pendente.</p>
-                    </div>
+            <div class="adminBox">
+                <h3>🔑 Gerar Código</h3>
+                <div class="inputGroup"><input type="number" id="gValue" placeholder="Valor"></div>
+                <button class="btnGreen" onclick="app.genCode()">GERAR</button>
+                <div id="codeArea" class="hidden" style="margin-top: 15px; text-align: center;">
+                    <div style="background: #000; padding: 10px; border: 1px dashed var(--green); color: var(--green); font-family: monospace; font-size: 20px; margin-bottom: 10px;" id="codeText"></div>
+                    <button class="btnOutline" style="width: auto; padding: 8px 20px;" onclick="app.copyCode()">COPIAR</button>
                 </div>
             </div>
 
+            <div class="adminBox">
+                <h3>📋 Aprovações Pendentes</h3>
+                <div id="reqList"></div>
+            </div>
         </div>
     </div>
 
-    <script>
-        const socket = io();
+    <!-- NAVEGAÇÃO -->
+    <div class="bottomNav">
+        <button class="navItem active" onclick="app.nav('dash', this)"><span>📊</span>Início</button>
+        <button class="navItem" onclick="app.nav('store', this)"><span>🛒</span>Loja</button>
+        <button class="navItem" onclick="app.nav('wallet', this)"><span>💳</span>Carteira</button>
+        <button class="navItem ownerNav" id="navOwnerBtn" onclick="app.nav('owner', this)"><span>👑</span>Owner</button>
+    </div>
+
+    <!-- WHATSAPP -->
+    <a href="https://wa.me/5511999999999" target="_blank" class="whatsapp-float">💬</a>
+</div>
+
+<!-- MODAL AIRDROP -->
+<div id="airdropModal" class="modalOverlay">
+    <div class="airdropAnim">🎁</div>
+    <div class="airdropText" id="airdropMsg">ABRINDO...</div>
+    <div class="airdropSub" id="airdropSub">Processando sistema Ghost...</div>
+    <button class="btnPrimary" style="width: 200px;" onclick="document.getElementById('airdropModal').style.display='none'">FECHAR</button>
+</div>
+
+<script>
+const socket = io();
+const app = {
+    user: JSON.parse(localStorage.getItem('gb_user')) || null,
+    products: [],
+
+    init: function() {
+        if (this.user) this.showApp();
         
-        const app = {
-            user: JSON.parse(localStorage.getItem('ghost_user')) || null,
-            products: [],
+        socket.on('refresh_data', (data) => {            this.products = data.products || [];
+            this.renderStore();
+            if (this.user && this.user.role === 'admin') this.loadRequests(data.requests);
+        });
+    },
 
-            init: function() {
-                if (this.user) {
-                    this.showApp();
-                }
-                
-                // Socket para atualizar loja em tempo real
-                socket.on('refresh_store', (prods) => {
-                    this.products = prods;                    this.renderStore();
-                });
-            },
+    toggleReg: function() {
+        document.getElementById('formLogin').classList.toggle('hidden');
+        document.getElementById('formReg').classList.toggle('hidden');
+    },
 
-            // --- AUTH ---
-            toggleRegMode: function() {
-                document.getElementById('form-login').classList.toggle('hidden');
-                document.getElementById('form-register').classList.toggle('hidden');
-            },
+    login: async function() {
+        const u = document.getElementById('inUser').value.trim();
+        const p = document.getElementById('inPass').value;
+        if(!u || !p) return alert('Preencha tudo.');
+        
+        const r = await fetch('/api/login', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: u, password: p})
+        });
+        const d = await r.json();
+        if (d.ok) {
+            this.user = d.user;
+            localStorage.setItem('gb_user', JSON.stringify(this.user));
+            this.showApp();
+        } else alert(d.msg);
+    },
 
-            login: async function() {
-                const u = document.getElementById('in-user').value;
-                const p = document.getElementById('in-pass').value;
-                const res = await fetch('/api/login', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username: u, password: p})
-                });
-                const data = await res.json();
-                if (data.success) {
-                    this.user = data.user;
-                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
-                    this.showApp();
-                } else {
-                    alert(data.message);
-                }
-            },
+    register: async function() {
+        const u = document.getElementById('regUser').value.trim();
+        const p = document.getElementById('regPass').value;
+        if(!u || !p) return alert('Preencha tudo.');
+        
+        const r = await fetch('/api/register', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({username: u, password: p})
+        });
+        const d = await r.json();
+        alert(d.msg);
+        if(d.ok) this.toggleReg();
+    },
 
-            register: async function() {
-                const u = document.getElementById('reg-user').value;
-                const p = document.getElementById('reg-pass').value;
-                if(!u || !p) return alert('Preencha tudo');
-                
-                const res = await fetch('/api/register', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({username: u, password: p})
-                });
-                const data = await res.json();
-                alert(data.message);
-                if(data.success) this.toggleRegMode();
-            },
+    showApp: function() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appScreen').style.display = 'flex';
+        document.getElementById('headerBadge').innerText = this.user.username.toUpperCase();
+        document.getElementById('cardName').innerText = this.user.username.toUpperCase();
+        
+        if (this.user.role === 'admin') {
+            document.getElementById('navOwnerBtn').style.display = 'flex';        }
+        this.updateDash();
+        this.loadProducts();
+    },
 
-            logout: function() {
-                localStorage.removeItem('ghost_user');
-                location.reload();
-            },
+    nav: function(view, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById('sec-' + view).classList.add('active');
+        document.querySelectorAll('.navItem').forEach(b => b.classList.remove('active'));
+        if(btn) btn.classList.add('active');
+        if(view === 'owner') this.loadRequests();
+    },
 
-            showApp: function() {
-                document.getElementById('screen-login').style.display = 'none';
-                document.getElementById('screen-app').style.display = 'flex';
-                document.getElementById('header-user').innerText = this.user.username + (this.user.role === 'admin' ? ' [MASTER]' : '');                
-                if (this.user.role === 'admin') {
-                    document.getElementById('nav-owner').classList.remove('hidden');
-                    this.loadAdminRequests();
-                }
+    updateDash: function() {
+        if(!this.user) return;
+        document.getElementById('dBalance').innerText = this.user.balance.toFixed(2);
+        document.getElementById('dCoins').innerText = this.user.coins;
+    },
 
+    saveUser: function() {
+        localStorage.setItem('gb_user', JSON.stringify(this.user));
+    },
+
+    // --- LOJA ---
+    loadProducts: async function() {
+        const r = await fetch('/api/products');
+        const d = await r.json();
+        this.products = d;
+        this.renderStore();
+    },
+
+    renderStore: function() {
+        const grid = document.getElementById('storeGrid');
+        grid.innerHTML = '';
+        if(!this.products.length) {
+            grid.innerHTML = '<p style="color:#666; grid-column:1/-1; text-align:center; padding:20px;">Loja vazia.</p>';
+            return;
+        }
+        this.products.forEach(p => {
+            grid.innerHTML += `
+                <div class="prodCard">
+                    <span class="badgeRarity r-${p.rarity}">${p.rarity}</span>
+                    <img src="${p.image}" onerror="this.src='https://via.placeholder.com/80?text=Ghost'">
+                    <div class="prodName">${p.name}</div>
+                    <div class="prodPrice">${p.price} GC</div>
+                    <button class="btnPrimary" style="padding:10px; font-size:14px;" onclick="app.buy(${p.id})">COMPRAR</button>
+                </div>`;
+        });
+    },
+    buy: async function(id) {
+        const r = await fetch('/api/buy', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({userId: this.user.id, productId: id})
+        });
+        const d = await r.json();
+        if(d.ok) {
+            this.user.coins = d.coins;
+            this.saveUser();
+            this.updateDash();
+            alert('✅ Compra realizada: ' + d.name);
+        } else alert('❌ ' + d.msg);
+    },
+
+    // --- AIRDROP ---
+    openAirdrop: async function() {
+        const modal = document.getElementById('airdropModal');
+        const msg = document.getElementById('airdropMsg');
+        const sub = document.getElementById('airdropSub');
+        
+        modal.style.display = 'flex';
+        msg.innerText = 'ABRINDO...';
+        sub.innerText = 'Conectando ao servidor Ghost...';
+        msg.style.color = 'var(--green)';
+
+        const r = await fetch('/api/airdrop', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({userId: this.user.id})
+        });
+        const d = await r.json();
+
+        setTimeout(() => {
+            if(d.ok) {
+                msg.innerText = `+${d.reward} GC`;
+                sub.innerText = 'Airdrop resgatado com sucesso!';
+                this.user.coins = d.coins;
+                this.saveUser();
                 this.updateDash();
-                // Carregar produtos iniciais
-                fetch('/api/admin/requests').then(r=>r.json()).then(p => {}); // dummy fetch to wake up server if needed
-                // Forçar render inicial
-                this.renderStore(); 
-            },
-
-            // --- NAVIGATION ---
-            nav: function(viewId, btnElement) {
-                // Esconder todas as views
-                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-                // Mostrar a selecionada
-                document.getElementById('view-' + viewId).classList.add('active');
-                
-                // Atualizar botões
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                if(btnElement) btnElement.classList.add('active');
-
-                if(viewId === 'owner') this.loadAdminRequests();
-            },
-
-            updateDash: function() {
-                document.getElementById('val-balance').innerText = this.user.balance.toFixed(2);
-                document.getElementById('val-coins').innerText = this.user.coins;
-            },
-
-            // --- STORE ---
-            renderStore: function() {
-                const container = document.getElementById('store-container');
-                container.innerHTML = '';
-                if(this.products.length === 0) {
-                    container.innerHTML = '<p style="color:#666; grid-column: 1/-1; text-align:center;">Loja vazia no momento.</p>';
-                    return;
-                }
-                this.products.forEach(p => {
-                    container.innerHTML += `
-                        <div class="product-card">
-                            <span class="rarity-badge r-${p.rarity}">${p.rarity}</span>
-                            <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/80?text=Ghost'">
-                            <div style="font-weight:bold; margin: 10px 0;">${p.name}</div>
-                            <div style="color:var(--accent); font-weight:bold; margin-bottom: 10px;">${p.price} GC</div>
-                            <button style="padding: 8px; font-size: 0.9em;" onclick="app.buy(${p.id})">COMPRAR</button>
-                        </div>
-                    `;                });
-            },
-
-            buy: async function(id) {
-                const res = await fetch('/api/buy', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId: this.user.id, productId: id})
-                });
-                const data = await res.json();
-                if (data.success) {
-                    this.user.coins = data.newCoins;
-                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
-                    this.updateDash();
-                    alert('Compra realizada: ' + data.itemName);
-                } else {
-                    alert(data.message);
-                }
-            },
-
-            // --- WALLET ---
-            airdrop: async function() {
-                const res = await fetch('/api/airdrop', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId: this.user.id})
-                });
-                const data = await res.json();
-                if (data.success) {
-                    this.user.coins = data.newCoins;
-                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
-                    this.updateDash();
-                    alert('Airdrop recebido: +' + data.reward + ' GC');
-                } else {
-                    alert(data.message);
-                }
-            },
-
-            redeem: async function() {
-                const code = document.getElementById('wallet-code').value.trim();
-                if(!code) return;
-                const res = await fetch('/api/redeem', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId: this.user.id, code: code})
-                });
-                const data = await res.json();
-                if (data.success) {
-                    this.user.coins = data.newCoins;
-                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
-                    this.updateDash();
-                    alert('Código resgatado com sucesso!');
-                    document.getElementById('wallet-code').value = '';                } else {
-                    alert(data.message);
-                }
-            },
-
-            requestCredit: async function() {
-                const amount = document.getElementById('wallet-req-amount').value;
-                if(!amount) return;
-                const res = await fetch('/api/request-credit', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({userId: this.user.id, username: this.user.username, amount: amount})
-                });
-                const data = await res.json();
-                alert(data.message);
-                document.getElementById('wallet-req-amount').value = '';
-            },
-
-            // --- ADMIN (OWNER) ---
-            addProduct: async function() {
-                const name = document.getElementById('prod-name').value;
-                const price = document.getElementById('prod-price').value;
-                const rarity = document.getElementById('prod-rarity').value;
-                const image = document.getElementById('prod-img').value;
-                
-                if(!name || !price || !image) return alert('Preencha tudo');
-
-                await fetch('/api/admin/add-product', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({name, price, rarity, image})
-                });
-                alert('Produto publicado na loja!');
-                // Limpar campos
-                document.getElementById('prod-name').value = '';
-                document.getElementById('prod-price').value = '';
-                document.getElementById('prod-img').value = '';
-            },
-
-            genCode: async function() {
-                const val = document.getElementById('gen-val').value;
-                if(!val) return;
-                const res = await fetch('/api/admin/gen-code', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({value: val})
-                });
-                const data = await res.json();
-                document.getElementById('gen-result-area').classList.remove('hidden');
-                document.getElementById('gen-code-text').innerText = data.code;
-            },
-
-            copyCode: function() {                const code = document.getElementById('gen-code-text').innerText;
-                navigator.clipboard.writeText(code).then(() => {
-                    alert('Código copiado: ' + code);
-                });
-            },
-
-            loadAdminRequests: async function() {
-                const res = await fetch('/api/admin/requests');
-                const reqs = await res.json();
-                const list = document.getElementById('admin-req-list');
-                list.innerHTML = '';
-                
-                if(reqs.length === 0) {
-                    list.innerHTML = '<p style="color:#666; font-size:0.8em;">Nenhuma solicitação pendente.</p>';
-                    return;
-                }
-
-                reqs.forEach(r => {
-                    list.innerHTML += `
-                        <div class="req-row">
-                            <div>
-                                <div style="font-weight:bold; color:var(--accent)">${r.username}</div>
-                                <div style="font-size:0.8em; color:#888">Pediu: ${r.amount} GC</div>
-                            </div>
-                            <div>
-                                <button class="btn-green" style="width:auto; padding:5px 10px; margin:0;" onclick="app.handleReq(${r.id}, 'approve')">✔</button>
-                                <button class="btn-red" style="width:auto; padding:5px 10px; margin:0 0 0 5px;" onclick="app.handleReq(${r.id}, 'deny')">✖</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            },
-
-            handleReq: async function(id, action) {
-                await fetch('/api/admin/handle-request', {
-                    method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({reqId: id, action: action})
-                });
-                this.loadAdminRequests(); // Recarrega lista
+            } else {
+                msg.innerText = 'FALHA';
+                msg.style.color = 'var(--red)';
+                sub.innerText = d.msg;
             }
-        };
+        }, 1500); // Delay dramático
+    },
 
-        // Iniciar App
-        app.init();
-    </script>
+    // --- PIX & CRÉDITO ---
+    buyPix: async function() {
+        const pkg = document.getElementById('pixPackage');
+        const coins = pkg.value;        const price = pkg.options[pkg.selectedIndex].text.split('-')[1].trim();
+        
+        if(confirm(`Pacote: ${coins} GC\nValor: ${price}\n\nAo confirmar, você será redirecionado para o Pix (Simulado) e o Master aprovará.`)) {
+            const r = await fetch('/api/request_credit', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({userId: this.user.id, username: this.user.username, amount: coins, type: 'pix'})
+            });
+            const d = await r.json();
+            alert('✅ Pedido de Pix enviado! Aguarde a aprovação do Master na aba Carteira/Início.');
+        }
+    },
+
+    redeem: async function() {
+        const code = document.getElementById('walletCode').value.trim().toUpperCase();
+        if(!code) return;
+        const r = await fetch('/api/redeem', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({userId: this.user.id, code: code})
+        });
+        const d = await r.json();
+        if(d.ok) {
+            this.user.coins = d.coins;
+            this.saveUser();
+            this.updateDash();
+            document.getElementById('walletCode').value = '';
+            alert('✅ Código resgatado!');
+        } else alert('❌ ' + d.msg);
+    },
+
+    requestCredit: async function() {
+        const amount = document.getElementById('walletReq').value;
+        if(!amount) return;
+        const r = await fetch('/api/request_credit', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({userId: this.user.id, username: this.user.username, amount: amount, type: 'credit'})
+        });
+        const d = await r.json();
+        alert(d.msg);
+        document.getElementById('walletReq').value = '';
+    },
+
+    // --- ADMIN ---
+    addProduct: async function() {
+        const name = document.getElementById('pName').value;
+        const price = document.getElementById('pPrice').value;
+        const rarity = document.getElementById('pRarity').value;
+        const image = document.getElementById('pImage').value;
+        if(!name || !price || !image) return alert('Preencha tudo.');
+        
+        await fetch('/api/admin/product', {            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({name, price, rarity, image})
+        });
+        alert('✅ Produto publicado!');
+        document.getElementById('pName').value = '';
+        document.getElementById('pPrice').value = '';
+        document.getElementById('pImage').value = '';
+    },
+
+    genCode: async function() {
+        const val = document.getElementById('gValue').value;
+        if(!val) return;
+        const r = await fetch('/api/admin/code', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({value: val})
+        });
+        const d = await r.json();
+        document.getElementById('codeArea').classList.remove('hidden');
+        document.getElementById('codeText').innerText = d.code;
+    },
+
+    copyCode: function() {
+        const code = document.getElementById('codeText').innerText;
+        navigator.clipboard.writeText(code).then(() => alert('Copiado!'));
+    },
+
+    loadRequests: async function(preloaded) {
+        let list = preloaded;
+        if(!list) {
+            const r = await fetch('/api/admin/requests');
+            list = await r.json();
+        }
+        const div = document.getElementById('reqList');
+        div.innerHTML = '';
+        if(!list.length) {
+            div.innerHTML = '<p style="color:#666; font-size:13px;">Nada pendente.</p>';
+            return;
+        }
+        list.forEach(req => {
+            const isPix = req.type === 'pix';
+            div.innerHTML += `
+                <div class="reqItem">
+                    <div class="reqInfo">
+                        <div>${req.username} ${isPix ? '(PIX)' : ''}</div>
+                        <div>${req.amount} GC</div>
+                    </div>
+                    <div>
+                        <button class="btnSmall btnApprove" onclick="app.handleReq(${req.id}, 'approve')">✔</button>
+                        <button class="btnSmall btnDeny" onclick="app.handleReq(${req.id}, 'deny')">✖</button>
+                    </div>                </div>`;
+        });
+    },
+
+    handleReq: async function(id, action) {
+        await fetch('/api/admin/request_action', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({reqId: id, action})
+        });
+        this.loadRequests();
+    }
+};
+
+app.init();
+</script>
 </body>
     </html>
