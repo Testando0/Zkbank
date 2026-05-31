@@ -1,140 +1,180 @@
 const express = require('express');
+const http = require('http');
+const { Server } = require('socket.io');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 const path = require('path');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: "*" } });
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- BANCO DE DADOS EM MEMÓRIA (Simulado) ---
-// Nota: No Render Free, se o app dormir, os dados resetam. 
-// Para persistência real sem DB, precisaríamos de um arquivo JSON, mas a memória é mais rápida para demo.
+// --- BANCO DE DADOS EM ARQUIVO (Persistência) ---
+const DB_FILE = 'db.json';
+let db = {
+    users: [
+        { id: 1, username: 'master', password: 'master', role: 'admin', balance: 0, coins: 999999, lastAirdrop: 0 },
+        { id: 2, username: 'user', password: '123', role: 'user', balance: 15750, coins: 8250, lastAirdrop: 0 }
+    ],
+    products: [],
+    codes: [],
+    requests: []
+};
 
-let users = [
-    { id: 1, username: 'master', password: 'master', role: 'admin', balance: 999999, coins: 50000, history: [] },
-    { id: 2, username: 'Ghost_Player', password: '123', role: 'user', balance: 15750.00, coins: 8250, history: [] }
-];
+// Carregar ou Criar DB
+if (fs.existsSync(DB_FILE)) {
+    db = JSON.parse(fs.readFileSync(DB_FILE));
+} else {
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+}
 
-let products = [
-    { id: 1, name: 'Ghost Card Black', price: 500, rarity: 'lendario', image: 'https://cdn-icons-png.flaticon.com/512/6124/6124997.png' },
-    { id: 2, name: 'Pacote Coins x1000', price: 100, rarity: 'comum', image: 'https://cdn-icons-png.flaticon.com/512/1292/1292744.png' }
-];
+function saveDB() {
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+}
 
-let rechargeCodes = []; // { code: 'XYZ', value: 100, used: false }
-let creditRequests = []; // { id, userId, username, amount, status: 'pending' }
+// --- SOCKET.IO (Tempo Real) ---
+io.on('connection', (socket) => {
+    console.log('Usuário conectado:', socket.id);
+    
+    // Envia estado inicial
+    socket.emit('init_data', { products: db.products });
 
-// --- ROTAS ---
+    socket.on('disconnect', () => {});
+});
+
+function broadcastUpdate() {    io.emit('update_all', { products: db.products });
+}
+
+// --- ROTAS API ---
 
 // Login
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = db.users.find(u => u.username === username && u.password === password);
     if (user) {
-        // Não envie a senha de volta
         const { password, ...safeUser } = user;
         res.json({ success: true, user: safeUser });
     } else {
-        res.json({ success: false, message: 'Credenciais inválidas' });
+        res.json({ success: false, message: 'Erro: Usuário ou senha inválidos.' });
     }
 });
 
 // Registro
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
-    if (users.find(u => u.username === username)) {
-        return res.json({ success: false, message: 'Usuário já existe' });
+    if (db.users.find(u => u.username === username)) {
+        return res.json({ success: false, message: 'Usuário já existe.' });
     }
-    const newUser = { 
-        id: Date.now(),         username, 
-        password, 
-        role: 'user', 
-        balance: 0, 
-        coins: 100, // Bônus de boas-vindas
-        history: [] 
-    };
-    users.push(newUser);
-    res.json({ success: true, message: 'Conta criada!' });
+    const newUser = { id: Date.now(), username, password, role: 'user', balance: 0, coins: 100, lastAirdrop: 0 };
+    db.users.push(newUser);
+    saveDB();
+    res.json({ success: true });
 });
 
-// Dados da Loja
-app.get('/api/products', (req, res) => res.json(products));
+// --- FUNÇÕES DA LOJA & ADMIN ---
 
-// Admin: Adicionar Produto
-app.post('/api/products', (req, res) => {
+// Admin: Criar Produto
+app.post('/api/admin/product', (req, res) => {
     const { name, price, rarity, image } = req.body;
-    products.push({ id: Date.now(), name, price, rarity, image });
+    db.products.push({ id: Date.now(), name, price: Number(price), rarity, image });
+    saveDB();
+    broadcastUpdate();
     res.json({ success: true });
 });
 
 // Admin: Gerar Código
-app.post('/api/generate-code', (req, res) => {
+app.post('/api/admin/code', (req, res) => {
     const { value } = req.body;
     const code = 'GHOST-' + Math.random().toString(36).substring(2, 8).toUpperCase();
-    rechargeCodes.push({ code, value: parseInt(value), used: false });
+    db.codes.push({ code, value: Number(value), used: false });
+    saveDB();
     res.json({ success: true, code });
 });
 
-// Usuário: Resgatar Código
-app.post('/api/redeem-code', (req, res) => {
-    const { userId, code } = req.body;
-    const codeObj = rechargeCodes.find(c => c.code === code && !c.used);
-    if (codeObj) {
-        codeObj.used = true;
-        const user = users.find(u => u.id === userId);
-        if (user) {
-            user.coins += codeObj.value;
-            res.json({ success: true, message: `Sucesso! +${codeObj.value} Ghost Coins` });
-        }
-    } else {
-        res.json({ success: false, message: 'Código inválido ou já usado' });
-    }
+// Admin: Listar Pedidosapp.get('/api/admin/requests', (req, res) => {
+    res.json(db.requests.filter(r => r.status === 'pending'));
 });
 
-// Usuário: Solicitar Crédito
-app.post('/api/request-credit', (req, res) => {
-    const { userId, username, amount } = req.body;
-    creditRequests.push({ id: Date.now(), userId, username, amount, status: 'pending' });
-    res.json({ success: true, message: 'Solicitação enviada ao Master.' });});
-
-// Admin: Listar Pedidos
-app.get('/api/requests', (req, res) => res.json(creditRequests));
-
 // Admin: Aprovar/Recusar
-app.post('/api/handle-request', (req, res) => {
-    const { reqId, action } = req.body; // action: 'approve' or 'deny'
-    const reqObj = creditRequests.find(r => r.id === reqId);
+app.post('/api/admin/request', (req, res) => {
+    const { reqId, action } = req.body;
+    const reqObj = db.requests.find(r => r.id === reqId);
     if (reqObj) {
         reqObj.status = action;
         if (action === 'approve') {
-            const user = users.find(u => u.id === reqObj.userId);
-            if (user) user.coins += parseInt(reqObj.amount);
+            const user = db.users.find(u => u.id === reqObj.userId);
+            if (user) user.coins += Number(reqObj.amount);
         }
+        saveDB();
         res.json({ success: true });
     }
 });
 
-// Usuário: Airdrop Diário
-app.post('/api/airdrop', (req, res) => {
-    const { userId } = req.body;
-    const user = users.find(u => u.id === userId);
-    if (user) {
-        const reward = Math.floor(Math.random() * 50) + 10;
-        user.coins += reward;
-        res.json({ success: true, reward });
+// --- FUNÇÕES DO USUÁRIO ---
+
+// Usuário: Resgatar Código
+app.post('/api/redeem', (req, res) => {
+    const { userId, code } = req.body;
+    const codeObj = db.codes.find(c => c.code === code && !c.used);
+    if (codeObj) {
+        codeObj.used = true;
+        const user = db.users.find(u => u.id === userId);
+        if (user) {
+            user.coins += codeObj.value;
+            saveDB();
+            res.json({ success: true, newBalance: user.coins });
+        }
+    } else {
+        res.json({ success: false, message: 'Código inválido.' });
     }
 });
 
-// Atualizar usuário (genérico)
-app.post('/api/update-user', (req, res) => {
-    const { user } = req.body;
-    const index = users.findIndex(u => u.id === user.id);
-    if (index !== -1) {
-        users[index] = { ...users[index], ...user };
-        res.json({ success: true, user: users[index] });
+// Usuário: Comprar Produto
+app.post('/api/buy', (req, res) => {
+    const { userId, productId } = req.body;
+    const product = db.products.find(p => p.id === productId);
+    const user = db.users.find(u => u.id === userId);
+    
+    if (user && product) {
+        if (user.coins >= product.price) {
+            user.coins -= product.price;
+            saveDB();
+            res.json({ success: true, newBalance: user.coins, item: product.name });
+        } else {            res.json({ success: false, message: 'Saldo insuficiente.' });
+        }
+    }
+});
+
+// Usuário: Solicitar Crédito
+app.post('/api/request', (req, res) => {
+    const { userId, username, amount } = req.body;
+    db.requests.push({ id: Date.now(), userId, username, amount, status: 'pending' });
+    saveDB();
+    res.json({ success: true });
+});
+
+// Usuário: Airdrop
+app.post('/api/airdrop', (req, res) => {
+    const { userId } = req.body;
+    const user = db.users.find(u => u.id === userId);
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    if (now - user.lastAirdrop > oneDay) {
+        const reward = Math.floor(Math.random() * 500) + 100;
+        user.coins += reward;
+        user.lastAirdrop = now;
+        saveDB();
+        res.json({ success: true, reward, newBalance: user.coins });
+    } else {
+        res.json({ success: false, message: 'Airdrop apenas uma vez a cada 24h.' });
     }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`Ghost Bank rodando na porta ${PORT}`));
+server.listen(PORT, () => console.log(`Ghost Bank Online na porta ${PORT}`));
