@@ -3,311 +3,437 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ghost Bank | System</title>
+    <title>Ghost Bank</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
-        /* CSS OTIMIZADO PARA MOBILE E DESKTOP */
+        /* CSS FINAL - ESTILO GHOST BANK */
         :root { --bg: #050505; --panel: #0a0a0f; --primary: #8a2be2; --accent: #00ff41; --text: #fff; --gray: #888; --border: #1f1f2e; }
-        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); font-family: 'Courier New', Courier, monospace; margin: 0; padding: 0; overflow-x: hidden; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; user-select: none; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; }
         
-        /* Layout */
-        #app { display: none; height: 100vh; flex-direction: column; }
-        #login-screen { display: flex; height: 100vh; justify-content: center; align-items: center; background: radial-gradient(circle, #1a0b2e 0%, #000 100%); }
-        
-        /* Componentes */
-        .box { background: var(--panel); border: 1px solid var(--primary); padding: 20px; border-radius: 10px; width: 90%; max-width: 400px; box-shadow: 0 0 20px rgba(138,43,226,0.2); text-align: center; }
-        input, select { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; margin-bottom: 10px; border-radius: 5px; font-size: 16px; }
-        button { width: 100%; background: var(--primary); color: #fff; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 5px; }
-        button:active { transform: scale(0.98); }
-        .btn-outline { background: transparent; border: 1px solid var(--primary); }
-        .btn-green { background: var(--accent); color: #000; }
-        .btn-red { background: #ff3333; }
+        /* Telas */
+        #screen-login { display: flex; height: 100%; justify-content: center; align-items: center; background: radial-gradient(circle at center, #1a0b2e 0%, #000 100%); z-index: 100; position: absolute; width: 100%; top: 0; }
+        #screen-app { display: none; height: 100%; flex-direction: column; }
 
-        /* Header & Nav */
-        header { background: var(--panel); padding: 15px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .nav-bar { display: flex; overflow-x: auto; background: var(--panel); padding: 10px; gap: 10px; border-bottom: 1px solid var(--border); }
-        .nav-item { padding: 8px 15px; border: 1px solid var(--border); border-radius: 20px; white-space: nowrap; font-size: 0.9em; cursor: pointer; }
-        .nav-item.active { background: var(--primary); border-color: var(--primary); }
+        /* Componentes Gerais */
+        .box { background: var(--panel); border: 1px solid var(--primary); padding: 30px; border-radius: 15px; width: 90%; max-width: 350px; box-shadow: 0 0 30px rgba(138,43,226,0.3); text-align: center; }
+        input, select { width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 15px; margin-bottom: 15px; border-radius: 8px; font-size: 16px; }
+        button { width: 100%; background: var(--primary); color: #fff; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 5px; transition: 0.2s; }
+        button:active { transform: scale(0.95); opacity: 0.8; }
+        .btn-outline { background: transparent; border: 1px solid var(--primary); margin-top: 10px; }
+        .btn-green { background: var(--accent); color: #000; }
+        .btn-red { background: #ff3333; color: white; }
+        .btn-copy { background: #333; font-size: 12px; padding: 5px 10px; width: auto; display: inline-block; margin-left: 10px; }
+
+        /* App Layout */
+        header { background: var(--panel); padding: 15px 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 10; }
+        .logo { font-weight: 900; color: var(--primary); letter-spacing: 1px; font-size: 1.2em; text-shadow: 0 0 10px var(--primary); }
+        .user-badge { font-size: 0.8em; color: var(--accent); border: 1px solid var(--accent); padding: 2px 8px; border-radius: 10px; }
+
+        /* Navegação */
+        .nav-bar { display: flex; overflow-x: auto; background: var(--panel); padding: 10px; gap: 10px; border-bottom: 1px solid var(--border); scrollbar-width: none; }
+        .nav-bar::-webkit-scrollbar { display: none; }
+        .nav-item { padding: 10px 20px; border: 1px solid var(--border); border-radius: 20px; white-space: nowrap; font-size: 0.9em; cursor: pointer; color: var(--gray); transition: 0.3s; background: #000; }
+        .nav-item.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .nav-item.owner { border-color: var(--accent); color: var(--accent); }
 
         /* Conteúdo */
-        .content { padding: 20px; flex: 1; overflow-y: auto; padding-bottom: 80px; }
-        .card { background: var(--panel); border: 1px solid var(--border); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        
+        .content-area { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; background: radial-gradient(circle at top right, #11051b 0%, #050505 40%); }
+        .view-section { display: none; animation: fadeIn 0.3s; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Dashboard Cards */
+        .stat-card { background: rgba(16, 16, 24, 0.9); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-bottom: 20px; text-align: center; backdrop-filter: blur(10px); }
+        .stat-val { font-size: 2.5em; font-weight: bold; margin: 10px 0; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+        .coins-text { color: var(--accent); }
         /* Loja Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-        .product { background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; position: relative; }
-        .product img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
-        .badge { position: absolute; top: 5px; right: 5px; font-size: 10px; padding: 2px 5px; border-radius: 4px; }
-        .r-lendario { background: gold; color: #000; box-shadow: 0 0 5px gold; }
-        .r-raro { background: #007bff; color: #fff; }
-        .r-comum { background: #555; color: #fff; }
+        .store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+        .product-card { background: #0f0f16; border: 1px solid var(--border); border-radius: 10px; padding: 15px; text-align: center; position: relative; transition: 0.3s; }
+        .product-card:hover { border-color: var(--primary); transform: translateY(-5px); }
+        .product-img { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2)); }
+        .rarity-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; font-weight: bold; }
+        .r-lendario { background: gold; color: black; box-shadow: 0 0 8px gold; }
+        .r-raro { background: #007bff; color: white; }
+        .r-comum { background: #555; color: white; }
 
         /* Admin */
-        .admin-panel { border: 1px solid var(--accent); padding: 10px; margin-bottom: 20px; border-radius: 5px; }
-        .req-item { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 10px; margin-bottom: 5px; border-radius: 5px; }
+        .admin-box { border: 1px solid var(--accent); padding: 15px; border-radius: 8px; margin-bottom: 20px; background: rgba(0, 255, 65, 0.05); }
+        .req-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #333; }
+        .code-display { background: #000; padding: 10px; border: 1px dashed var(--accent); color: var(--accent); font-family: monospace; font-size: 1.2em; margin: 10px 0; word-break: break-all; }
 
-        .hidden { display: none !important; }        .money { color: var(--accent); font-size: 1.2em; font-weight: bold; }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN -->
-    <div id="login-screen">
+    <!-- TELA DE LOGIN -->
+    <div id="screen-login">
         <div class="box">
-            <h1 style="color:var(--primary); text-shadow: 0 0 10px var(--primary);">GHOST BANK</h1>
-            <p style="font-size: 12px; color: #666;">SISTEMA SEGURO v2.0</p>
-            <input type="text" id="l-user" placeholder="Usuário">
-            <input type="password" id="l-pass" placeholder="Senha">
-            <button onclick="doLogin()">ENTRAR</button>
-            <button class="btn-outline" onclick="toggleReg()" style="margin-top:10px">CRIAR CONTA</button>
+            <h1 style="color:var(--primary); margin-bottom: 5px;">GHOST BANK</h1>
+            <p style="font-size: 12px; color: #666; margin-bottom: 20px;">O BANCO DO FUTURO</p>
+            
+            <div id="form-login">
+                <input type="text" id="in-user" placeholder="Usuário">
+                <input type="password" id="in-pass" placeholder="Senha">
+                <button onclick="app.login()">ENTRAR</button>
+                <button class="btn-outline" onclick="app.toggleRegMode()">CRIAR CONTA</button>
+            </div>
+
+            <div id="form-register" class="hidden">
+                <input type="text" id="reg-user" placeholder="Novo Usuário">
+                <input type="password" id="reg-pass" placeholder="Nova Senha">
+                <button class="btn-green" onclick="app.register()">REGISTRAR</button>
+                <button class="btn-outline" onclick="app.toggleRegMode()">VOLTAR</button>
+            </div>
         </div>
     </div>
 
-    <!-- APP -->
-    <div id="app">
+    <!-- TELA DO APP -->
+    <div id="screen-app">
         <header>
-            <div style="font-weight:bold; color:var(--primary)">GHOST BANK</div>
-            <div id="user-info" style="font-size:12px; color:var(--accent)"></div>
+            <div class="logo">GHOST BANK</div>
+            <div id="header-user" class="user-badge">USER</div>
         </header>
         
-        <div class="nav-bar">
-            <div class="nav-item active" onclick="nav('dash')">Dashboard</div>
-            <div class="nav-item" onclick="nav('store')">Loja</div>
-            <div class="nav-item" onclick="nav('wallet')">Carteira</div>
-            <div class="nav-item hidden" id="nav-admin" onclick="nav('admin')">OWNER</div>
-            <div class="nav-item" style="border-color:red; color:red" onclick="logout()">Sair</div>
+        <div class="nav-bar">            <div class="nav-item active" onclick="app.nav('dash', this)">DASHBOARD</div>
+            <div class="nav-item" onclick="app.nav('store', this)">LOJA</div>
+            <div class="nav-item" onclick="app.nav('wallet', this)">CARTEIRA</div>
+            <div class="nav-item owner hidden" id="nav-owner" onclick="app.nav('owner', this)">OWNER</div>
+            <div class="nav-item" style="border-color: #ff3333; color: #ff3333; margin-left: auto;" onclick="app.logout()">SAIR</div>
         </div>
 
-        <div class="content">
+        <div class="content-area">
+            
             <!-- DASHBOARD -->
-            <div id="view-dash">
-                <div class="card" style="text-align:center; padding: 30px;">
-                    <div style="color:#888">SALDO TOTAL</div>
-                    <h1 style="font-size: 2.5em; margin: 10px 0;">R$ <span id="d-balance">0,00</span></h1>
-                    <div style="color:#888">GHOST COINS</div>
-                    <h2 class="money"><span id="d-coins">0</span> GC</h2>
+            <div id="view-dash" class="view-section active">
+                <div class="stat-card">
+                    <div style="color:#888; font-size: 0.9em;">SALDO TOTAL</div>
+                    <div class="stat-val">R$ <span id="val-balance">0,00</span></div>
+                    <div style="color:#888; font-size: 0.9em; margin-top: 15px;">GHOST COINS</div>
+                    <div class="stat-val coins-text"><span id="val-coins">0</span> GC</div>
                 </div>
-                <button class="btn-green" onclick="getAirdrop()">🎁 RESGATAR AIRDROP DIÁRIO</button>
+                
+                <button class="btn-green" style="padding: 20px; font-size: 1.1em;" onclick="app.airdrop()">🎁 AIRDROP DIÁRIO</button>
+                <p style="text-align: center; color: #555; font-size: 0.8em; margin-top: 10px;">Sistema 100% Seguro</p>
             </div>
 
             <!-- LOJA -->
-            <div id="view-store" class="hidden">
-                <h3>LOJA GHOST</h3>
-                <div id="store-grid" class="grid"></div>
+            <div id="view-store" class="view-section">
+                <h2 style="border-bottom: 1px solid var(--border); padding-bottom: 10px;">LOJA MISTERIOSA</h2>
+                <div id="store-container" class="store-grid">
+                    <!-- Produtos entram aqui via JS -->
+                </div>
             </div>
+
             <!-- CARTEIRA -->
-            <div id="view-wallet" class="hidden">
-                <div class="card">
+            <div id="view-wallet" class="view-section">
+                <div class="stat-card" style="text-align: left;">
                     <h3>Resgatar Código</h3>
-                    <input type="text" id="code-input" placeholder="GHOST-XXXXXX">
-                    <button onclick="redeemCode()">RESGATAR</button>
+                    <p style="font-size: 0.8em; color: #888;">Insira o código gerado pelo Master.</p>
+                    <input type="text" id="wallet-code" placeholder="GHOST-XXXXXX" style="text-transform: uppercase;">
+                    <button onclick="app.redeem()">RESGATAR COINS</button>
                 </div>
-                <div class="card">
+
+                <div class="stat-card" style="text-align: left;">
                     <h3>Solicitar Crédito</h3>
-                    <input type="number" id="req-amount" placeholder="Quantidade de Coins">
-                    <button class="btn-outline" onclick="sendRequest()">SOLICITAR AO MASTER</button>
+                    <p style="font-size: 0.8em; color: #888;">Peça coins ao administrador.</p>
+                    <input type="number" id="wallet-req-amount" placeholder="Quantidade">
+                    <button class="btn-outline" onclick="app.requestCredit()">SOLICITAR</button>
                 </div>
             </div>
 
-            <!-- ADMIN -->
-            <div id="view-admin" class="hidden">
-                <h2 style="color:var(--accent)">PAINEL OWNER</h2>
-                
-                <div class="admin-panel">
-                    <h4>Adicionar Produto</h4>
-                    <input type="text" id="p-name" placeholder="Nome">
-                    <input type="number" id="p-price" placeholder="Preço (Coins)">
-                    <select id="p-rarity"><option value="comum">Comum</option><option value="raro">Raro</option><option value="lendario">Lendário</option></select>
-                    <input type="text" id="p-img" placeholder="Link da Imagem (Telegraph/Imgur)">
-                    <button class="btn-green" onclick="addProduct()">PUBLICAR</button>
+            <!-- OWNER (ADMIN) -->
+            <div id="view-owner" class="view-section">
+                <h2 style="color: var(--accent);">PAINEL OWNER 👑</h2>                
+                <div class="admin-box">
+                    <h4>1. Adicionar Produto na Loja</h4>
+                    <input type="text" id="prod-name" placeholder="Nome do Produto">
+                    <input type="number" id="prod-price" placeholder="Preço em Coins">
+                    <select id="prod-rarity">
+                        <option value="comum">Comum</option>
+                        <option value="raro">Raro</option>
+                        <option value="lendario">Lendário</option>
+                    </select>
+                    <input type="text" id="prod-img" placeholder="Link da Imagem (Telegraph/Imgur)">
+                    <button class="btn-green" onclick="app.addProduct()">PUBLICAR PRODUTO</button>
                 </div>
 
-                <div class="admin-panel">
-                    <h4>Gerar Código</h4>
-                    <input type="number" id="c-val" placeholder="Valor">
-                    <button onclick="genCode()">GERAR</button>
-                    <p id="gen-result" style="color:var(--accent); font-weight:bold; margin-top:5px"></p>
+                <div class="admin-box">
+                    <h4>2. Gerar Código de Recarga</h4>
+                    <input type="number" id="gen-val" placeholder="Valor em Coins">
+                    <button onclick="app.genCode()">GERAR CÓDIGO</button>
+                    <div id="gen-result-area" class="hidden">
+                        <div class="code-display" id="gen-code-text"></div>
+                        <button class="btn-copy" onclick="app.copyCode()">COPIAR</button>
+                    </div>
                 </div>
 
-                <h4>Solicitações Pendentes</h4>
-                <div id="req-list"></div>
+                <div class="admin-box">
+                    <h4>3. Aprovar Solicitações</h4>
+                    <div id="admin-req-list">
+                        <p style="color:#666; font-size:0.8em;">Nenhuma solicitação pendente.</p>
+                    </div>
+                </div>
             </div>
+
         </div>
     </div>
 
     <script>
         const socket = io();
-        let me = JSON.parse(localStorage.getItem('ghost_user'));
-        let products = [];
+        
+        const app = {
+            user: JSON.parse(localStorage.getItem('ghost_user')) || null,
+            products: [],
 
-        // Inicialização
-        if (me) initApp();
+            init: function() {
+                if (this.user) {
+                    this.showApp();
+                }
+                
+                // Socket para atualizar loja em tempo real
+                socket.on('refresh_store', (prods) => {
+                    this.products = prods;                    this.renderStore();
+                });
+            },
 
-        // Socket Listeners
-        socket.on('update_all', (data) => {            products = data.products;
-            renderStore();
-        });
-        socket.on('init_data', (data) => {
-            products = data.products;
-            renderStore();
-        });
+            // --- AUTH ---
+            toggleRegMode: function() {
+                document.getElementById('form-login').classList.toggle('hidden');
+                document.getElementById('form-register').classList.toggle('hidden');
+            },
 
-        // --- AUTH ---
-        function toggleReg() {
-            const isReg = document.querySelector('button[onclick="doRegister()"]');
-            if(isReg) {
-                document.querySelector('button[onclick="doRegister()"]').outerHTML = '<button onclick="doLogin()">ENTRAR</button><button class="btn-outline" onclick="toggleReg()" style="margin-top:10px">CRIAR CONTA</button>';
-            } else {
-                document.querySelector('button[onclick="doLogin()"]').outerHTML = '<button onclick="doRegister()">REGISTRAR</button><button class="btn-outline" onclick="toggleReg()" style="margin-top:10px">VOLTAR</button>';
-            }
-        }
+            login: async function() {
+                const u = document.getElementById('in-user').value;
+                const p = document.getElementById('in-pass').value;
+                const res = await fetch('/api/login', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: u, password: p})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.user = data.user;
+                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
+                    this.showApp();
+                } else {
+                    alert(data.message);
+                }
+            },
 
-        async function doLogin() {
-            const u = document.getElementById('l-user').value;
-            const p = document.getElementById('l-pass').value;
-            const res = await fetch('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p}) });
-            const data = await res.json();
-            if(data.success) {
-                me = data.user;
-                localStorage.setItem('ghost_user', JSON.stringify(me));
-                initApp();
-            } else alert(data.message);
-        }
+            register: async function() {
+                const u = document.getElementById('reg-user').value;
+                const p = document.getElementById('reg-pass').value;
+                if(!u || !p) return alert('Preencha tudo');
+                
+                const res = await fetch('/api/register', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: u, password: p})
+                });
+                const data = await res.json();
+                alert(data.message);
+                if(data.success) this.toggleRegMode();
+            },
 
-        async function doRegister() {
-            const u = document.getElementById('l-user').value;
-            const p = document.getElementById('l-pass').value;
-            const res = await fetch('/api/register', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({username:u, password:p}) });
-            const data = await res.json();
-            if(data.success) { alert('Conta criada! Faça login.'); toggleReg(); }
-            else alert(data.message);
-        }
+            logout: function() {
+                localStorage.removeItem('ghost_user');
+                location.reload();
+            },
 
-        function logout() {
-            localStorage.removeItem('ghost_user');
-            location.reload();
-        }
+            showApp: function() {
+                document.getElementById('screen-login').style.display = 'none';
+                document.getElementById('screen-app').style.display = 'flex';
+                document.getElementById('header-user').innerText = this.user.username + (this.user.role === 'admin' ? ' [MASTER]' : '');                
+                if (this.user.role === 'admin') {
+                    document.getElementById('nav-owner').classList.remove('hidden');
+                    this.loadAdminRequests();
+                }
 
-        function initApp() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            document.getElementById('user-info').innerText = me.username + (me.role==='admin'?' [MASTER]':'');
-            updateDash();
-            if(me.role === 'admin') {                document.getElementById('nav-admin').classList.remove('hidden');
-                loadAdmin();
-            }
-            nav('dash');
-        }
+                this.updateDash();
+                // Carregar produtos iniciais
+                fetch('/api/admin/requests').then(r=>r.json()).then(p => {}); // dummy fetch to wake up server if needed
+                // Forçar render inicial
+                this.renderStore(); 
+            },
 
-        function updateDash() {
-            document.getElementById('d-balance').innerText = me.balance.toFixed(2);
-            document.getElementById('d-coins').innerText = me.coins;
-        }
+            // --- NAVIGATION ---
+            nav: function(viewId, btnElement) {
+                // Esconder todas as views
+                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                // Mostrar a selecionada
+                document.getElementById('view-' + viewId).classList.add('active');
+                
+                // Atualizar botões
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                if(btnElement) btnElement.classList.add('active');
 
-        function nav(view) {
-            document.querySelectorAll('.content > div').forEach(d => d.classList.add('hidden'));
-            document.getElementById('view-'+view).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            // Simples highlight logic
-        }
+                if(viewId === 'owner') this.loadAdminRequests();
+            },
 
-        // --- LOJA ---
-        function renderStore() {
-            const grid = document.getElementById('store-grid');
-            grid.innerHTML = '';
-            products.forEach(p => {
-                grid.innerHTML += `
-                    <div class="product">
-                        <span class="badge r-${p.rarity}">${p.rarity}</span>
-                        <img src="${p.image}" onerror="this.src='https://via.placeholder.com/80?text=IMG'">
-                        <div style="font-weight:bold; font-size:14px; margin-bottom:5px">${p.name}</div>
-                        <div class="money" style="font-size:14px">${p.price} GC</div>
-                        <button style="padding:5px; font-size:12px; margin-top:5px" onclick="buy(${p.id})">COMPRAR</button>
-                    </div>
-                `;
-            });
-        }
+            updateDash: function() {
+                document.getElementById('val-balance').innerText = this.user.balance.toFixed(2);
+                document.getElementById('val-coins').innerText = this.user.coins;
+            },
 
-        async function buy(id) {
-            const res = await fetch('/api/buy', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId: me.id, productId: id}) });
-            const data = await res.json();
-            if(data.success) {
-                me.coins = data.newBalance;
-                localStorage.setItem('ghost_user', JSON.stringify(me));
-                updateDash();
-                alert('Comprado: ' + data.item);
-            } else alert(data.message);
-        }
-
-        // --- CARTEIRA ---
-        async function getAirdrop() {
-            const res = await fetch('/api/airdrop', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId: me.id}) });
-            const data = await res.json();            if(data.success) {
-                me.coins = data.newBalance;
-                localStorage.setItem('ghost_user', JSON.stringify(me));
-                updateDash();
-                alert('Airdrop: +' + data.reward + ' GC');
-            } else alert(data.message);
-        }
-
-        async function redeemCode() {
-            const code = document.getElementById('code-input').value;
-            const res = await fetch('/api/redeem', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId: me.id, code}) });
-            const data = await res.json();
-            if(data.success) {
-                me.coins = data.newBalance;
-                localStorage.setItem('ghost_user', JSON.stringify(me));
-                updateDash();
-                alert('Sucesso!');
-            } else alert(data.message);
-        }
-
-        async function sendRequest() {
-            const amount = document.getElementById('req-amount').value;
-            await fetch('/api/request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({userId: me.id, username: me.username, amount}) });
-            alert('Solicitado!');
-        }
-
-        // --- ADMIN ---
-        async function loadAdmin() {
-            const res = await fetch('/api/admin/requests');
-            const reqs = await res.json();
-            const list = document.getElementById('req-list');
-            list.innerHTML = '';
-            reqs.forEach(r => {
-                list.innerHTML += `
-                    <div class="req-item">
-                        <span>${r.username} pede ${r.amount}</span>
-                        <div>
-                            <button class="btn-green" style="width:auto; padding:5px" onclick="handleReq(${r.id}, 'approve')">OK</button>
-                            <button class="btn-red" style="width:auto; padding:5px" onclick="handleReq(${r.id}, 'deny')">X</button>
+            // --- STORE ---
+            renderStore: function() {
+                const container = document.getElementById('store-container');
+                container.innerHTML = '';
+                if(this.products.length === 0) {
+                    container.innerHTML = '<p style="color:#666; grid-column: 1/-1; text-align:center;">Loja vazia no momento.</p>';
+                    return;
+                }
+                this.products.forEach(p => {
+                    container.innerHTML += `
+                        <div class="product-card">
+                            <span class="rarity-badge r-${p.rarity}">${p.rarity}</span>
+                            <img src="${p.image}" class="product-img" onerror="this.src='https://via.placeholder.com/80?text=Ghost'">
+                            <div style="font-weight:bold; margin: 10px 0;">${p.name}</div>
+                            <div style="color:var(--accent); font-weight:bold; margin-bottom: 10px;">${p.price} GC</div>
+                            <button style="padding: 8px; font-size: 0.9em;" onclick="app.buy(${p.id})">COMPRAR</button>
                         </div>
-                    </div>
-                `;
-            });
-        }
+                    `;                });
+            },
 
-        async function addProduct() {
-            const name = document.getElementById('p-name').value;
-            const price = document.getElementById('p-price').value;
-            const rarity = document.getElementById('p-rarity').value;
-            const image = document.getElementById('p-img').value;            await fetch('/api/admin/product', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name, price, rarity, image}) });
-            alert('Produto no ar!');
-            loadAdmin();
-        }
+            buy: async function(id) {
+                const res = await fetch('/api/buy', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId: this.user.id, productId: id})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.user.coins = data.newCoins;
+                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
+                    this.updateDash();
+                    alert('Compra realizada: ' + data.itemName);
+                } else {
+                    alert(data.message);
+                }
+            },
 
-        async function genCode() {
-            const val = document.getElementById('c-val').value;
-            const res = await fetch('/api/admin/code', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({value: val}) });
-            const data = await res.json();
-            document.getElementById('gen-result').innerText = data.code;
-        }
+            // --- WALLET ---
+            airdrop: async function() {
+                const res = await fetch('/api/airdrop', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId: this.user.id})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.user.coins = data.newCoins;
+                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
+                    this.updateDash();
+                    alert('Airdrop recebido: +' + data.reward + ' GC');
+                } else {
+                    alert(data.message);
+                }
+            },
 
-        async function handleReq(id, action) {
-            await fetch('/api/admin/request', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({reqId: id, action}) });
-            loadAdmin();
-        }
+            redeem: async function() {
+                const code = document.getElementById('wallet-code').value.trim();
+                if(!code) return;
+                const res = await fetch('/api/redeem', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId: this.user.id, code: code})
+                });
+                const data = await res.json();
+                if (data.success) {
+                    this.user.coins = data.newCoins;
+                    localStorage.setItem('ghost_user', JSON.stringify(this.user));
+                    this.updateDash();
+                    alert('Código resgatado com sucesso!');
+                    document.getElementById('wallet-code').value = '';                } else {
+                    alert(data.message);
+                }
+            },
+
+            requestCredit: async function() {
+                const amount = document.getElementById('wallet-req-amount').value;
+                if(!amount) return;
+                const res = await fetch('/api/request-credit', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({userId: this.user.id, username: this.user.username, amount: amount})
+                });
+                const data = await res.json();
+                alert(data.message);
+                document.getElementById('wallet-req-amount').value = '';
+            },
+
+            // --- ADMIN (OWNER) ---
+            addProduct: async function() {
+                const name = document.getElementById('prod-name').value;
+                const price = document.getElementById('prod-price').value;
+                const rarity = document.getElementById('prod-rarity').value;
+                const image = document.getElementById('prod-img').value;
+                
+                if(!name || !price || !image) return alert('Preencha tudo');
+
+                await fetch('/api/admin/add-product', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name, price, rarity, image})
+                });
+                alert('Produto publicado na loja!');
+                // Limpar campos
+                document.getElementById('prod-name').value = '';
+                document.getElementById('prod-price').value = '';
+                document.getElementById('prod-img').value = '';
+            },
+
+            genCode: async function() {
+                const val = document.getElementById('gen-val').value;
+                if(!val) return;
+                const res = await fetch('/api/admin/gen-code', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({value: val})
+                });
+                const data = await res.json();
+                document.getElementById('gen-result-area').classList.remove('hidden');
+                document.getElementById('gen-code-text').innerText = data.code;
+            },
+
+            copyCode: function() {                const code = document.getElementById('gen-code-text').innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('Código copiado: ' + code);
+                });
+            },
+
+            loadAdminRequests: async function() {
+                const res = await fetch('/api/admin/requests');
+                const reqs = await res.json();
+                const list = document.getElementById('admin-req-list');
+                list.innerHTML = '';
+                
+                if(reqs.length === 0) {
+                    list.innerHTML = '<p style="color:#666; font-size:0.8em;">Nenhuma solicitação pendente.</p>';
+                    return;
+                }
+
+                reqs.forEach(r => {
+                    list.innerHTML += `
+                        <div class="req-row">
+                            <div>
+                                <div style="font-weight:bold; color:var(--accent)">${r.username}</div>
+                                <div style="font-size:0.8em; color:#888">Pediu: ${r.amount} GC</div>
+                            </div>
+                            <div>
+                                <button class="btn-green" style="width:auto; padding:5px 10px; margin:0;" onclick="app.handleReq(${r.id}, 'approve')">✔</button>
+                                <button class="btn-red" style="width:auto; padding:5px 10px; margin:0 0 0 5px;" onclick="app.handleReq(${r.id}, 'deny')">✖</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            },
+
+            handleReq: async function(id, action) {
+                await fetch('/api/admin/handle-request', {
+                    method: 'POST', headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({reqId: id, action: action})
+                });
+                this.loadAdminRequests(); // Recarrega lista
+            }
+        };
+
+        // Iniciar App
+        app.init();
     </script>
 </body>
-                                                           </html>
+    </html>
