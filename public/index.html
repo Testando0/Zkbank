@@ -62,7 +62,7 @@ input,select{font-family:inherit;font-size:16px;outline:none}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── NAV ── */
-.bottomNav{position:sticky;bottom:0;width:100%;background:rgba(10,10,18,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0;padding-bottom:calc(10px + var(--safe-bottom));z-index:100;backdrop-filter:blur(20px);flex-shrink:0}
+.bottomNav{position:fixed;bottom:0;width:100%;background:rgba(10,10,18,.97);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0;padding-bottom:calc(10px + var(--safe-bottom));z-index:100;backdrop-filter:blur(20px);flex-shrink:0}
 .navItem{display:flex;flex-direction:column;align-items:center;color:var(--gray);font-size:10px;background:none;padding:6px 16px;border-radius:12px;gap:4px;font-weight:600;letter-spacing:.3px;transition:.2s;min-width:60px}
 .navItem .navIcon{font-size:22px;line-height:1}
 .navItem.active{color:var(--purple)}
@@ -145,7 +145,7 @@ input,select{font-family:inherit;font-size:16px;outline:none}
 .modalOverlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:500;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:24px;backdrop-filter:blur(12px)}
 .airdropContainer{display:flex;flex-direction:column;align-items:center;gap:24px;width:100%;max-width:320px}
 
-/* Chest */
+/* Chest Animation */
 .chestScene{position:relative;width:140px;height:140px;display:flex;align-items:center;justify-content:center}
 .chestGlow{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(245,197,24,.2) 0%,transparent 70%);opacity:0;transition:opacity .5s}
 .chestGlow.active{opacity:1;animation:glowPulse 1.2s ease-in-out infinite}
@@ -165,87 +165,76 @@ input,select{font-family:inherit;font-size:16px;outline:none}
 
 /* Airdrop status */
 .airdropStatus{text-align:center;min-height:80px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
-.loadingDots{display:flex;gap:8px;justify-content:center;margin-bottom:6px}
-.loadingDots span{width:10px;height:10px;border-radius:50%;background:var(--green);animation:dotPulse 1.2s ease-in-out infinite}
-.loadingDots span:nth-child(2){animation-delay:.2s}
-.loadingDots span:nth-child(3){animation-delay:.4s}
-@keyframes dotPulse{0%,80%,100%{transform:scale(.5);opacity:.4}40%{transform:scale(1);opacity:1}}
-.loadingMsg{color:var(--gray);font-size:14px;font-weight:600}
-.resultAmount{font-size:48px;font-weight:900;color:var(--green);text-shadow:0 0 30px var(--green),0 0 60px rgba(0,255,135,.4);animation:resultPop .4s cubic-bezier(.34,1.56,.64,1)}
-@keyframes resultPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-.resultMsg{color:var(--gray);font-size:14px}
+.loadingDots{display:flex;gap:8px;justify-content:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:dotBounce 1.4s infinite}
+.dot:nth-child(1){animation-delay:0s}
+.dot:nth-child(2){animation-delay:.2s}
+.dot:nth-child(3){animation-delay:.4s}
+@keyframes dotBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-10px)}}
+.resultAmount{font-size:32px;font-weight:900;color:var(--green)}
+.resultMsg{font-size:14px;color:var(--gray);margin-top:8px}
 .hidden{display:none!important}
-.statusResult{display:flex;flex-direction:column;align-items:center;gap:10px}
 
-/* ── STORE EMPTY ── */
-.emptyState{grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--gray)}
+/* ── EMPTY STATE ── */
+.emptyState{text-align:center;padding:40px 20px;color:var(--gray)}
 .emptyIcon{font-size:48px;margin-bottom:12px}
-.emptyText{font-size:15px;font-weight:600}
-.emptySub{font-size:12px;margin-top:4px;opacity:.7}
-
-/* ── PIX PACKAGES ── */
-.pkgGrid{display:grid;gap:10px;margin-bottom:16px}
-.pkgItem{display:flex;align-items:center;justify-content:space-between;padding:16px;background:#09090f;border:1.5px solid var(--border);border-radius:13px;cursor:pointer;transition:.2s}
-.pkgItem.selected{border-color:var(--purple);background:rgba(147,51,234,.08)}
-.pkgInfo .pkgCoins{font-weight:800;color:#fff;font-size:15px}
-.pkgInfo .pkgLabel{font-size:11px;color:var(--gray);margin-top:2px}
-.pkgPrice{color:var(--green);font-weight:900;font-size:16px}
+.emptyText{font-weight:700;font-size:16px;margin-bottom:4px}
+.emptySub{font-size:12px}
 
 /* ── SPINNER ── */
-.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ── */
+@media (max-width:480px){
+  .formGrid{grid-template-columns:1fr}
+  .storeGrid{grid-template-columns:1fr}
+  .balance-val{font-size:32px}
+  .quickBtns{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
 
-<!-- ─── LOGIN ─────────────────────────────────────────────── -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div class="loginBox">
     <div class="loginLogo">👻</div>
     <h1>GHOST BANK</h1>
-    <p>Invisível · Seguro · Seu</p>
-    <div id="formLogin">
-      <input type="text" id="inUser" placeholder="Usuário" autocomplete="off" autocorrect="off" spellcheck="false">
-      <input type="password" id="inPass" placeholder="Senha" autocomplete="current-password">
-      <button class="btnPrimary" id="loginBtn" onclick="app.login()">ENTRAR</button>
-      <button class="btnOutline" onclick="app.toggleReg()">CRIAR CONTA</button>
-    </div>
-    <div id="formReg" class="hidden">
-      <input type="text" id="regUser" placeholder="Novo Usuário" autocomplete="off" autocorrect="off" spellcheck="false">
-      <input type="password" id="regPass" placeholder="Nova Senha">
-      <button class="btnGreen" id="regBtn" onclick="app.register()">REGISTRAR</button>
-      <button class="btnOutline" onclick="app.toggleReg()">VOLTAR</button>
-    </div>
+    <p>Acesso Restrito</p>
+    <input type="text" id="inUser" placeholder="Usuário" autocomplete="off">
+    <input type="password" id="inPass" placeholder="Senha" autocomplete="off">
+    <button class="btnPrimary" id="loginBtn" onclick="app.login()">ENTRAR</button>
   </div>
 </div>
 
-<!-- ─── APP ───────────────────────────────────────────────── -->
+<!-- APP SCREEN -->
 <div id="appScreen">
+  <!-- HEADER -->
   <div class="appHeader">
-    <div class="logo"><span class="logo-ghost">👻</span> GHOST BANK</div>
+    <div class="logo"><span class="logo-ghost">👻</span>GHOST</div>
     <div class="headerRight">
-      <div class="badge" id="headerBadge">USER</div>
+      <span class="badge" id="headerBadge">USER</span>
       <button class="logoutBtn" onclick="app.logout()">SAIR</button>
     </div>
   </div>
 
+  <!-- MAIN CONTENT -->
   <div class="mainContent">
-
     <!-- DASHBOARD -->
     <div id="sec-dash" class="section active">
       <div class="credit-card">
         <div class="card-chip"></div>
-        <div class="card-number">**** **** **** 1337</div>
+        <div class="card-number">●●●● ●●●● ●●●● <span id="cardName">USER</span></div>
         <div class="card-info">
-          <span id="cardName">GHOST USER</span>
           <span>GHOST BANK</span>
+          <span id="cardDate">05/26</span>
         </div>
       </div>
       <div class="balance-box">
-        <div class="balance-label">SALDO DISPONÍVEL</div>
-        <div class="balance-val">R$ <span id="dBalance">0,00</span></div>
+        <div class="balance-label">Saldo</div>
+        <div class="balance-val" id="dBalance">0,00</div>
         <div class="coins-row">
-          <span class="coins-label">💠 GHOST COINS</span>
           <span class="coins-val" id="dCoins">0</span>
           <span class="coins-label">GC</span>
         </div>
@@ -253,245 +242,216 @@ input,select{font-family:inherit;font-size:16px;outline:none}
       <div class="quickBtns">
         <button class="quickBtn btnAirdrop" onclick="app.openAirdrop()">
           <span class="qIcon">🎁</span>
-          AIRDROP DIÁRIO
+          <span>CAIXA</span>
         </button>
-        <button class="quickBtn btnBuycoins" onclick="app.nav('buycoins')">
-          <span class="qIcon">💠</span>
-          COMPRAR COINS
+        <button class="quickBtn btnBuycoins" onclick="app.nav('wallet', this)">
+          <span class="qIcon">💳</span>
+          <span>CARTEIRA</span>
         </button>
       </div>
     </div>
 
     <!-- LOJA -->
     <div id="sec-store" class="section">
-      <div class="storeHeader">
-        <div class="sectionTitle">🛒 Loja</div>
-      </div>
+      <div class="sectionTitle">🛍️ LOJA</div>
       <div id="storeGrid" class="storeGrid"></div>
-    </div>
-
-    <!-- COMPRAR COINS -->
-    <div id="sec-buycoins" class="section">
-      <div class="sectionTitle">💠 Comprar Coins</div>
-      <div class="adminBox boxPurple">
-        <h3>💳 Pacotes via Pix</h3>
-        <div class="pkgGrid" id="pkgGrid">
-          <div class="pkgItem selected" data-coins="1000" data-price="R$ 10,00" onclick="app.selectPkg(this)">
-            <div class="pkgInfo"><div class="pkgCoins">1.000 GC</div><div class="pkgLabel">Pacote Starter</div></div>
-            <div class="pkgPrice">R$ 10</div>
-          </div>
-          <div class="pkgItem" data-coins="5000" data-price="R$ 50,00" onclick="app.selectPkg(this)">
-            <div class="pkgInfo"><div class="pkgCoins">5.000 GC</div><div class="pkgLabel">Pacote Pro</div></div>
-            <div class="pkgPrice">R$ 50</div>
-          </div>
-          <div class="pkgItem" data-coins="10000" data-price="R$ 100,00" onclick="app.selectPkg(this)">
-            <div class="pkgInfo"><div class="pkgCoins">10.000 GC</div><div class="pkgLabel">Pacote Elite</div></div>
-            <div class="pkgPrice">R$ 100</div>
-          </div>
-        </div>
-        <button class="btnGreen" id="pixBtn" onclick="app.buyPix()">SOLICITAR VIA PIX</button>
-        <p style="font-size:11px;color:var(--gray);text-align:center;margin-top:12px">O Master aprovará manualmente após o pagamento.</p>
-      </div>
     </div>
 
     <!-- CARTEIRA -->
     <div id="sec-wallet" class="section">
-      <div class="sectionTitle">💳 Carteira</div>
+      <div class="sectionTitle">💳 CARTEIRA</div>
       <div class="adminBox boxPurple">
-        <h3>🔑 Resgatar Código</h3>
+        <h3>🎟️ Resgatar Código</h3>
         <div class="inputGroup">
-          <input type="text" id="walletCode" placeholder="GHOST-XXXXXX" style="text-transform:uppercase;letter-spacing:2px">
+          <input type="text" id="walletCode" placeholder="Digite o código" autocomplete="off">
         </div>
-        <button class="btnPrimary" id="redeemBtn" onclick="app.redeem()">RESGATAR</button>
-      </div>
-      <div class="adminBox">
-        <h3>📩 Solicitar Crédito</h3>
-        <div class="inputGroup">
-          <label>Quantidade de Coins</label>
-          <input type="number" id="walletReq" placeholder="Ex: 500" inputmode="numeric">
-        </div>
-        <div class="inputGroup">
-          <label>Motivo</label>
-          <input type="text" id="walletReason" placeholder="Descreva o motivo...">
-        </div>
-        <button class="btnOutline" id="creditBtn" onclick="app.requestCredit()">ENVIAR SOLICITAÇÃO</button>
+        <button class="btnGreen" id="redeemBtn" onclick="app.redeem()" style="width:100%">RESGATAR</button>
       </div>
     </div>
 
-    <!-- OWNER -->
+    <!-- PAINEL MASTER -->
     <div id="sec-owner" class="section">
-      <div class="sectionTitle" style="color:var(--green)">👑 Painel Owner</div>
-
-      <!-- Aprovações -->
+      <div class="sectionTitle">👑 PAINEL MASTER</div>
+      
+      <!-- Criar Usuário -->
       <div class="adminBox">
-        <h3>📋 Aprovações Pendentes</h3>
-        <div id="reqList"><p style="color:var(--gray);font-size:13px">Carregando...</p></div>
-      </div>
-
-      <!-- Adicionar Produto -->
-      <div class="adminBox">
-        <h3>📦 Novo Produto</h3>
-        <div class="inputGroup"><label>Nome</label><input type="text" id="pName" placeholder="Ex: Ghost Card Black"></div>
-        <div class="formGrid">
-          <div class="inputGroup"><label>Preço (GC)</label><input type="number" id="pPrice" placeholder="5000" inputmode="numeric"></div>
-          <div class="inputGroup"><label>Raridade</label>
-            <select id="pRarity">
-              <option value="comum">Comum</option>
-              <option value="raro">Raro</option>
-              <option value="lendario">Lendário</option>
-            </select>
-          </div>
+        <h3>➕ Criar Usuário</h3>
+        <div class="inputGroup">
+          <input type="text" id="newUsr" placeholder="Usuário" autocomplete="off">
         </div>
-        <div class="inputGroup"><label>URL da Imagem</label><input type="url" id="pImage" placeholder="https://..."></div>
-        <button class="btnGreen" id="addProdBtn" onclick="app.addProduct()">PUBLICAR PRODUTO</button>
+        <div class="inputGroup">
+          <input type="password" id="newPwd" placeholder="Senha" autocomplete="off">
+        </div>
+        <button class="btnGreen" id="addUsrBtn" onclick="app.addUser()" style="width:100%">CRIAR</button>
       </div>
 
-      <!-- Produtos cadastrados -->
+      <!-- Publicar Produto -->
       <div class="adminBox">
-        <h3>🗑️ Gerenciar Produtos</h3>
-        <div id="productList"></div>
+        <h3>📦 Publicar Produto</h3>
+        <div class="inputGroup">
+          <input type="text" id="pName" placeholder="Nome do produto" autocomplete="off">
+        </div>
+        <div class="inputGroup">
+          <input type="number" id="pPrice" placeholder="Preço em GC" min="1" autocomplete="off">
+        </div>
+        <div class="inputGroup">
+          <select id="pRarity">
+            <option value="comum">Comum</option>
+            <option value="raro">Raro</option>
+            <option value="lendario">Lendário</option>
+          </select>
+        </div>
+        <div class="inputGroup">
+          <input type="text" id="pImage" placeholder="URL da imagem (opcional)" autocomplete="off">
+        </div>
+        <button class="btnGreen" id="addProdBtn" onclick="app.addProduct()" style="width:100%">PUBLICAR</button>
       </div>
 
       <!-- Gerar Código -->
       <div class="adminBox">
-        <h3>🔑 Gerar Código</h3>
-        <div class="inputGroup"><label>Valor em GC</label><input type="number" id="gValue" placeholder="Ex: 1000" inputmode="numeric"></div>
-        <button class="btnGreen" id="genCodeBtn" onclick="app.genCode()">GERAR</button>
-        <div id="codeArea" class="hidden codeDisplay">
-          <div class="codeText" id="codeText"></div>
-          <button class="btnCopy" onclick="app.copyCode()">📋 COPIAR</button>
+        <h3>🎟️ Gerar Código</h3>
+        <div class="inputGroup">
+          <input type="number" id="gValue" placeholder="Valor em GC" min="1" autocomplete="off">
+        </div>
+        <button class="btnGreen" id="genCodeBtn" onclick="app.genCode()" style="width:100%">GERAR</button>
+        <div id="codeArea" class="codeDisplay hidden">
+          <div class="codeText" id="codeText">GHOST-XXXXX</div>
+          <button class="btnCopy" onclick="app.copyCode()">COPIAR</button>
         </div>
       </div>
 
-      <!-- Adicionar Usuário -->
+      <!-- Solicitações Pendentes -->
       <div class="adminBox">
-        <h3>👤 Criar Usuário</h3>
-        <div class="formGrid">
-          <div class="inputGroup"><label>Usuário</label><input type="text" id="newUsr" placeholder="username" autocorrect="off"></div>
-          <div class="inputGroup"><label>Senha</label><input type="password" id="newPwd" placeholder="senha"></div>
-        </div>
-        <div class="inputGroup"><label>Coins Iniciais</label><input type="number" id="newCoins" placeholder="0" inputmode="numeric"></div>
-        <button class="btnGreen" id="addUsrBtn" onclick="app.addUser()">CRIAR USUÁRIO</button>
+        <h3>📋 Solicitações Pendentes</h3>
+        <div id="reqList"></div>
       </div>
 
-      <!-- Lista de Usuários -->
+      <!-- Histórico de Compras -->
       <div class="adminBox">
-        <h3>👥 Usuários Cadastrados</h3>
-        <div id="userList"><p style="color:var(--gray);font-size:13px">Carregando...</p></div>
+        <h3>🛒 Histórico de Compras</h3>
+        <div id="purchaseList"></div>
+      </div>
+
+      <!-- Histórico de Códigos -->
+      <div class="adminBox">
+        <h3>🎟️ Códigos Resgatados</h3>
+        <div id="codesList"></div>
+      </div>
+
+      <!-- Produtos -->
+      <div class="adminBox">
+        <h3>📦 Produtos Publicados</h3>
+        <div id="productList"></div>
+      </div>
+
+      <!-- Usuários -->
+      <div class="adminBox">
+        <h3>👥 Usuários</h3>
+        <div id="userList"></div>
       </div>
     </div>
+  </div>
 
-  </div><!-- /mainContent -->
-
-  <!-- NAVEGAÇÃO -->
+  <!-- BOTTOM NAV -->
   <div class="bottomNav">
-    <button class="navItem active" onclick="app.nav('dash',this)"><span class="navIcon">📊</span>Início</button>
-    <button class="navItem" onclick="app.nav('store',this)"><span class="navIcon">🛒</span>Loja</button>
-    <button class="navItem" onclick="app.nav('wallet',this)"><span class="navIcon">💳</span>Carteira</button>
-    <button class="navItem navOwner" id="navOwnerBtn" onclick="app.nav('owner',this)"><span class="navIcon">👑</span>Owner</button>
+    <button class="navItem active" onclick="app.nav('dash', this)"><span class="navIcon">🏠</span>Home</button>
+    <button class="navItem" onclick="app.nav('store', this)"><span class="navIcon">🛍️</span>Loja</button>
+    <button class="navItem navOwner" id="navOwnerBtn" onclick="app.nav('owner', this)"><span class="navIcon">👑</span>Master</button>
   </div>
 </div>
 
-<!-- ─── AIRDROP MODAL ──────────────────────────────────────── -->
+<!-- AIRDROP MODAL -->
 <div id="airdropModal" class="modalOverlay hidden">
   <div class="airdropContainer">
     <div class="chestScene">
-      <div class="chestGlow" id="chestGlow"></div>
-      <div class="chestWrapper" id="chestWrapper">
-        <div class="chestLid"></div>
+      <div id="chestGlow" class="chestGlow"></div>
+      <div id="chestWrapper" class="chestWrapper">
         <div class="chestBody"></div>
+        <div class="chestLid"></div>
       </div>
-      <div class="particleField" id="particleField"></div>
+      <div id="particleField" class="particleField"></div>
     </div>
     <div class="airdropStatus">
-      <div id="statusLoading">
-        <div class="loadingDots"><span></span><span></span><span></span></div>
-        <div class="loadingMsg">Conectando ao cofre...</div>
+      <div id="statusLoading" class="loadingDots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
       </div>
-      <div id="statusResult" class="hidden statusResult">
-        <div class="resultAmount" id="resultAmount">+0 GC</div>
+      <div id="statusResult" class="hidden">
+        <div class="resultAmount" id="resultAmount">+100 GC</div>
         <div class="resultMsg" id="resultMsg">Airdrop resgatado!</div>
-        <button class="btnPrimary" style="width:200px;margin-top:8px" onclick="app.closeAirdrop()">FECHAR</button>
       </div>
     </div>
+    <button class="btnOutline" onclick="app.closeAirdrop()" style="margin-top:12px">FECHAR</button>
   </div>
 </div>
 
-<script>
-const socket = io();
-const app = {
-  user: JSON.parse(localStorage.getItem('gb_user')) || null,
-  token: localStorage.getItem('gb_token') || null,
-  products: [],
-  selectedPkg: { coins: 1000, price: 'R$ 10,00' },
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
 
-  // ── UTILS ──────────────────────────────────────────────
-  authFetch(url, opts = {}) {
-    return fetch(url, {
-      ...opts,
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.token}`, ...(opts.headers || {}) }
+<script>
+const app = {
+  user: null,
+  token: null,
+  products: [],
+  socket: null,
+
+  init() {
+    const saved = localStorage.getItem('gb_user');
+    const token = localStorage.getItem('gb_token');
+    if (saved && token) {
+      this.user = JSON.parse(saved);
+      this.token = token;
+      this.showApp();
+      this.connectSocket();
+    }
+    document.getElementById('inPass').addEventListener('keypress', e => {
+      if (e.key === 'Enter') this.login();
     });
+  },
+
+  connectSocket() {
+    this.socket = io();
+    this.socket.on('refresh_data', (data) => {
+      this.products = data.products || [];
+      this.renderStore();
+    });
+  },
+
+  setLoading(id, loading) {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    btn.disabled = loading;
+    if (loading) btn.innerHTML = '<span class="spinner"></span>';
   },
 
   toast(msg, type = 'info') {
-    const t = document.createElement('div');
-    t.className = `toast toast-${type}`;
-    t.textContent = msg;
-    document.body.appendChild(t);
-    requestAnimationFrame(() => { requestAnimationFrame(() => t.classList.add('show')); });
-    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type} show`;
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
   },
 
-  setLoading(btnId, loading) {
-    const btn = document.getElementById(btnId);
-    if (!btn) return;
-    if (loading) { btn.dataset.original = btn.innerHTML; btn.innerHTML = '<span class="spinner"></span>'; btn.disabled = true; }
-    else { btn.innerHTML = btn.dataset.original || btn.innerHTML; btn.disabled = false; }
+  authFetch(url, opts = {}) {
+    opts.headers = opts.headers || {};
+    opts.headers['Authorization'] = `Bearer ${this.token}`;
+    return fetch(url, opts);
   },
 
-  // ── INIT ───────────────────────────────────────────────
-  init() {
-    if (this.user && this.token) this.showApp();
-    socket.on('refresh_data', (data) => {
-      this.products = data.products || [];
-      this.renderStore();
-      if (this.user?.role === 'admin') {
-        this.renderRequests(data.requests);
-        this.loadProductList();
-      }
-    });
-    // Enter key on login
-    document.getElementById('inPass').addEventListener('keydown', e => { if (e.key === 'Enter') this.login(); });
-    document.getElementById('inUser').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('inPass').focus(); });
-  },
-
-  toggleReg() {
-    document.getElementById('formLogin').classList.toggle('hidden');
-    document.getElementById('formReg').classList.toggle('hidden');
-  },
-
-  async register() {
-    const u = document.getElementById('regUser').value.trim();
-    const p = document.getElementById('regPass').value;
-    if (!u || !p) return this.toast('Preencha tudo.', 'warn');
-    this.setLoading('regBtn', true);
-    try {
-      const r = await fetch('/api/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
-      const d = await r.json();
-      this.toast(d.msg, d.ok ? 'success' : 'error');
-      if (d.ok) this.toggleReg();
-    } catch { this.toast('Erro de conexão.', 'error'); }
-    this.setLoading('regBtn', false);
-  },
-
-  // ── AUTH ───────────────────────────────────────────────
   async login() {
-    const u = document.getElementById('inUser').value.trim();
-    const p = document.getElementById('inPass').value;
-    if (!u || !p) return this.toast('Preencha usuário e senha.', 'warn');
+    const user = document.getElementById('inUser').value.trim();
+    const pass = document.getElementById('inPass').value;
+    if (!user || !pass) return this.toast('Preencha tudo.', 'warn');
     this.setLoading('loginBtn', true);
     try {
-      const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: u, password: p }) });
+      const r = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, password: pass })
+      });
       const d = await r.json();
       if (d.ok) {
         this.user = d.user;
@@ -499,10 +459,11 @@ const app = {
         localStorage.setItem('gb_user', JSON.stringify(d.user));
         localStorage.setItem('gb_token', d.token);
         this.showApp();
+        this.connectSocket();
       } else {
         this.toast(d.msg, 'error');
       }
-    } catch { this.toast('Erro de conexão com o servidor.', 'error'); }
+    } catch { this.toast('Erro de conexão.', 'error'); }
     this.setLoading('loginBtn', false);
   },
 
@@ -512,6 +473,7 @@ const app = {
     localStorage.removeItem('gb_token');
     this.user = null;
     this.token = null;
+    if (this.socket) this.socket.disconnect();
     document.getElementById('appScreen').style.display = 'none';
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('inUser').value = '';
@@ -541,7 +503,6 @@ const app = {
         this.updateDash();
       }
     } catch {}
-    this.updateDash();
   },
 
   updateDash() {
@@ -550,18 +511,16 @@ const app = {
     document.getElementById('dCoins').textContent = (this.user.coins || 0).toLocaleString('pt-BR');
   },
 
-  // ── NAV ────────────────────────────────────────────────
   nav(view, btn) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     const sec = document.getElementById('sec-' + view);
     if (sec) sec.classList.add('active');
     document.querySelectorAll('.navItem').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    if (view === 'owner') { this.loadRequests(); this.loadProductList(); this.loadUsers(); }
+    if (view === 'owner') { this.loadRequests(); this.loadProductList(); this.loadUsers(); this.loadPurchases(); this.loadCodes(); }
     window.scrollTo(0, 0);
   },
 
-  // ── LOJA ───────────────────────────────────────────────
   async loadProducts() {
     try {
       const r = await fetch('/api/products');
@@ -573,7 +532,7 @@ const app = {
   renderStore() {
     const grid = document.getElementById('storeGrid');
     if (!this.products.length) {
-      grid.innerHTML = `<div class="emptyState"><div class="emptyIcon">🛍️</div><div class="emptyText">Loja vazia</div><div class="emptySub">Nenhum produto disponível.</div></div>`;
+      grid.innerHTML = `<div class="emptyState" style="grid-column:1/-1"><div class="emptyIcon">🛍️</div><div class="emptyText">Loja vazia</div><div class="emptySub">Nenhum produto disponível.</div></div>`;
       return;
     }
     grid.innerHTML = this.products.map(p => `
@@ -606,7 +565,6 @@ const app = {
     btn.innerHTML = 'COMPRAR';
   },
 
-  // ── AIRDROP ────────────────────────────────────────────
   async openAirdrop() {
     const modal = document.getElementById('airdropModal');
     const wrapper = document.getElementById('chestWrapper');
@@ -621,8 +579,7 @@ const app = {
     resultEl.classList.add('hidden');
     document.getElementById('particleField').innerHTML = '';
 
-    // Start shaking
-    void wrapper.offsetWidth; // reflow
+    void wrapper.offsetWidth;
     wrapper.classList.add('shaking');
 
     let shakeInterval = setInterval(() => {
@@ -640,18 +597,14 @@ const app = {
       wrapper.classList.remove('shaking');
 
       if (d.ok) {
-        // Open chest
         glow.classList.add('active');
         wrapper.classList.add('open');
-        // Fire coins
         this.fireCoins();
         await new Promise(res => setTimeout(res, 500));
-        // Show result
         loadingEl.classList.add('hidden');
         resultEl.classList.remove('hidden');
         const amt = document.getElementById('resultAmount');
         document.getElementById('resultMsg').textContent = 'Airdrop resgatado com sucesso!';
-        // Animate counter
         let count = 0; const target = d.reward;
         const step = Math.max(1, Math.floor(target / 30));
         const counter = setInterval(() => {
@@ -667,7 +620,6 @@ const app = {
         loadingEl.classList.add('hidden');
         resultEl.classList.remove('hidden');
         document.getElementById('resultAmount').textContent = '❌';
-        document.getElementById('resultAmount').style.fontSize = '36px';
         document.getElementById('resultMsg').textContent = d.msg;
       }
     } catch {
@@ -698,33 +650,8 @@ const app = {
 
   closeAirdrop() {
     document.getElementById('airdropModal').classList.add('hidden');
-    document.getElementById('resultAmount').style.fontSize = '';
   },
 
-  // ── PIX ────────────────────────────────────────────────
-  selectPkg(el) {
-    document.querySelectorAll('.pkgItem').forEach(p => p.classList.remove('selected'));
-    el.classList.add('selected');
-    this.selectedPkg = { coins: el.dataset.coins, price: el.dataset.price };
-  },
-
-  async buyPix() {
-    const { coins, price } = this.selectedPkg;
-    this.setLoading('pixBtn', true);
-    try {
-      const r = await this.authFetch('/api/request_credit', {
-        method: 'POST',
-        body: JSON.stringify({ amount: coins, type: 'pix' })
-      });
-      if (r.status === 401) { this.logout(); return; }
-      const d = await r.json();
-      if (d.ok) this.toast(`Pedido de ${coins} GC via Pix enviado!`, 'success');
-      else this.toast(d.msg, 'error');
-    } catch { this.toast('Erro de conexão.', 'error'); }
-    this.setLoading('pixBtn', false);
-  },
-
-  // ── CARTEIRA ───────────────────────────────────────────
   async redeem() {
     const code = document.getElementById('walletCode').value.trim().toUpperCase();
     if (!code) return this.toast('Digite um código.', 'warn');
@@ -744,21 +671,6 @@ const app = {
     this.setLoading('redeemBtn', false);
   },
 
-  async requestCredit() {
-    const amount = document.getElementById('walletReq').value;
-    if (!amount || amount <= 0) return this.toast('Informe a quantidade.', 'warn');
-    this.setLoading('creditBtn', true);
-    try {
-      const r = await this.authFetch('/api/request_credit', { method: 'POST', body: JSON.stringify({ amount, type: 'credit' }) });
-      if (r.status === 401) { this.logout(); return; }
-      const d = await r.json();
-      this.toast(d.msg, d.ok ? 'success' : 'error');
-      if (d.ok) { document.getElementById('walletReq').value = ''; document.getElementById('walletReason').value = ''; }
-    } catch { this.toast('Erro de conexão.', 'error'); }
-    this.setLoading('creditBtn', false);
-  },
-
-  // ── ADMIN ──────────────────────────────────────────────
   async loadRequests() {
     try {
       const r = await this.authFetch('/api/admin/requests');
@@ -775,7 +687,7 @@ const app = {
     div.innerHTML = list.map(req => `
       <div class="reqItem">
         <div class="reqInfo">
-          <div class="reqName">${req.username} ${req.type === 'pix' ? '💳' : '📩'}</div>
+          <div class="reqName">${req.username}</div>
           <div class="reqDetail">${req.date || ''}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
@@ -852,6 +764,7 @@ const app = {
       if (d.ok) {
         document.getElementById('codeArea').classList.remove('hidden');
         document.getElementById('codeText').textContent = d.code;
+        document.getElementById('gValue').value = '';
         this.toast('Código gerado!', 'success');
       } else this.toast(d.msg, 'error');
     } catch { this.toast('Erro.', 'error'); }
@@ -866,17 +779,15 @@ const app = {
   async addUser() {
     const username = document.getElementById('newUsr').value.trim();
     const password = document.getElementById('newPwd').value;
-    const coins = document.getElementById('newCoins').value || 0;
     if (!username || !password) return this.toast('Usuário e senha obrigatórios.', 'warn');
     this.setLoading('addUsrBtn', true);
     try {
-      const r = await this.authFetch('/api/admin/user', { method: 'POST', body: JSON.stringify({ username, password, coins }) });
+      const r = await this.authFetch('/api/admin/create-user', { method: 'POST', body: JSON.stringify({ username, password }) });
       const d = await r.json();
       this.toast(d.msg, d.ok ? 'success' : 'error');
       if (d.ok) {
         document.getElementById('newUsr').value = '';
         document.getElementById('newPwd').value = '';
-        document.getElementById('newCoins').value = '';
         this.loadUsers();
       }
     } catch { this.toast('Erro.', 'error'); }
@@ -905,6 +816,39 @@ const app = {
       this.toast(`@${name} removido.`, 'info');
       this.loadUsers();
     } catch { this.toast('Erro.', 'error'); }
+  },
+
+  async loadPurchases() {
+    try {
+      const r = await this.authFetch('/api/admin/purchases');
+      if (!r.ok) return;
+      const purchases = await r.json();
+      const div = document.getElementById('purchaseList');
+      if (!div) return;
+      if (!purchases.length) { div.innerHTML = '<p style="color:var(--gray);font-size:13px">Nenhuma compra registrada.</p>'; return; }
+      div.innerHTML = purchases.map(p => `
+        <div class="userItem">
+          <div class="userInfo"><div class="uName">${p.buyerUsername}</div><div class="uCoins">${p.productName} · ${p.date}</div></div>
+          <div class="uCoins">-${Number(p.productPrice).toLocaleString('pt-BR')} GC</div>
+        </div>`).join('');
+    } catch {}
+  },
+
+  async loadCodes() {
+    try {
+      const r = await this.authFetch('/api/admin/codes');
+      if (!r.ok) return;
+      const codes = await r.json();
+      const div = document.getElementById('codesList');
+      if (!div) return;
+      const used = codes.filter(c => c.used);
+      if (!used.length) { div.innerHTML = '<p style="color:var(--gray);font-size:13px">Nenhum código resgatado.</p>'; return; }
+      div.innerHTML = used.map(c => `
+        <div class="userItem">
+          <div class="userInfo"><div class="uName">${c.code}</div><div class="uCoins">${c.usedBy} · ${c.usedAt}</div></div>
+          <div class="uCoins">+${Number(c.value).toLocaleString('pt-BR')} GC</div>
+        </div>`).join('');
+    } catch {}
   }
 };
 
