@@ -14,99 +14,89 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- BANCO DE DADOS EM ARQUIVO (Persistência) ---
 const DB_FILE = 'db.json';
 let db = {
     users: [
-        { id: 1, username: 'master', password: 'master', role: 'admin', balance: 0, coins: 999999, lastAirdrop: 0 },
+        { id: 1, username: 'master', password: 'master', role: 'admin', balance: 0, coins: 9999999, lastAirdrop: 0 },
         { id: 2, username: 'user', password: '123', role: 'user', balance: 15750, coins: 8250, lastAirdrop: 0 }
     ],
-    products: [],
+    products: [
+        { id: 101, name: 'Ghost Card', price: 500, rarity: 'lendario', image: 'https://telegra.ph/file/6b3c8f8f8f8f8f8f8.png' } 
+    ],
     codes: [],
     requests: []
 };
 
-// Carregar ou Criar DB
+// Carregar DB
 if (fs.existsSync(DB_FILE)) {
-    db = JSON.parse(fs.readFileSync(DB_FILE));
-} else {
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+    try { db = JSON.parse(fs.readFileSync(DB_FILE)); } catch(e) { console.log("Erro ao ler DB, resetando."); }
 }
 
 function saveDB() {
     fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
-// --- SOCKET.IO (Tempo Real) ---
+// Socket.io para atualizar loja em tempo real
 io.on('connection', (socket) => {
-    console.log('Usuário conectado:', socket.id);
-    
-    // Envia estado inicial
-    socket.emit('init_data', { products: db.products });
-
-    socket.on('disconnect', () => {});
+    socket.emit('refresh_store', db.products);
 });
 
-function broadcastUpdate() {    io.emit('update_all', { products: db.products });
+function broadcastStore() {
+    io.emit('refresh_store', db.products);
 }
 
-// --- ROTAS API ---
+// --- ROTAS ---
 
-// Login
-app.post('/api/login', (req, res) => {
+// Loginapp.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     const user = db.users.find(u => u.username === username && u.password === password);
     if (user) {
         const { password, ...safeUser } = user;
         res.json({ success: true, user: safeUser });
     } else {
-        res.json({ success: false, message: 'Erro: Usuário ou senha inválidos.' });
+        res.json({ success: false, message: 'Usuário ou senha incorretos.' });
     }
 });
 
-// Registro
+// Registro (SEMPRE cria como 'user', nunca 'admin')
 app.post('/api/register', (req, res) => {
     const { username, password } = req.body;
     if (db.users.find(u => u.username === username)) {
         return res.json({ success: false, message: 'Usuário já existe.' });
     }
-    const newUser = { id: Date.now(), username, password, role: 'user', balance: 0, coins: 100, lastAirdrop: 0 };
+    const newUser = { id: Date.now(), username, password, role: 'user', balance: 0, coins: 50, lastAirdrop: 0 };
     db.users.push(newUser);
     saveDB();
-    res.json({ success: true });
+    res.json({ success: true, message: 'Conta criada! Faça login.' });
 });
 
-// --- FUNÇÕES DA LOJA & ADMIN ---
+// --- ADMIN (MASTER) ---
 
-// Admin: Criar Produto
-app.post('/api/admin/product', (req, res) => {
+app.post('/api/admin/add-product', (req, res) => {
     const { name, price, rarity, image } = req.body;
     db.products.push({ id: Date.now(), name, price: Number(price), rarity, image });
     saveDB();
-    broadcastUpdate();
+    broadcastStore();
     res.json({ success: true });
 });
 
-// Admin: Gerar Código
-app.post('/api/admin/code', (req, res) => {
+app.post('/api/admin/gen-code', (req, res) => {
     const { value } = req.body;
     const code = 'GHOST-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     db.codes.push({ code, value: Number(value), used: false });
     saveDB();
-    res.json({ success: true, code });
+    res.json({ success: true, code: code });
 });
 
-// Admin: Listar Pedidosapp.get('/api/admin/requests', (req, res) => {
+app.get('/api/admin/requests', (req, res) => {
     res.json(db.requests.filter(r => r.status === 'pending'));
 });
 
-// Admin: Aprovar/Recusar
-app.post('/api/admin/request', (req, res) => {
+app.post('/api/admin/handle-request', (req, res) => {
     const { reqId, action } = req.body;
     const reqObj = db.requests.find(r => r.id === reqId);
     if (reqObj) {
-        reqObj.status = action;
-        if (action === 'approve') {
+        reqObj.status = action;        if (action === 'approve') {
             const user = db.users.find(u => u.id === reqObj.userId);
             if (user) user.coins += Number(reqObj.amount);
         }
@@ -115,26 +105,8 @@ app.post('/api/admin/request', (req, res) => {
     }
 });
 
-// --- FUNÇÕES DO USUÁRIO ---
+// --- USUÁRIO ---
 
-// Usuário: Resgatar Código
-app.post('/api/redeem', (req, res) => {
-    const { userId, code } = req.body;
-    const codeObj = db.codes.find(c => c.code === code && !c.used);
-    if (codeObj) {
-        codeObj.used = true;
-        const user = db.users.find(u => u.id === userId);
-        if (user) {
-            user.coins += codeObj.value;
-            saveDB();
-            res.json({ success: true, newBalance: user.coins });
-        }
-    } else {
-        res.json({ success: false, message: 'Código inválido.' });
-    }
-});
-
-// Usuário: Comprar Produto
 app.post('/api/buy', (req, res) => {
     const { userId, productId } = req.body;
     const product = db.products.find(p => p.id === productId);
@@ -144,37 +116,55 @@ app.post('/api/buy', (req, res) => {
         if (user.coins >= product.price) {
             user.coins -= product.price;
             saveDB();
-            res.json({ success: true, newBalance: user.coins, item: product.name });
-        } else {            res.json({ success: false, message: 'Saldo insuficiente.' });
+            res.json({ success: true, newCoins: user.coins, itemName: product.name });
+        } else {
+            res.json({ success: false, message: 'Saldo insuficiente!' });
         }
+    } else {
+        res.json({ success: false, message: 'Erro no produto.' });
     }
 });
 
-// Usuário: Solicitar Crédito
-app.post('/api/request', (req, res) => {
-    const { userId, username, amount } = req.body;
-    db.requests.push({ id: Date.now(), userId, username, amount, status: 'pending' });
-    saveDB();
-    res.json({ success: true });
+app.post('/api/redeem', (req, res) => {
+    const { userId, code } = req.body;
+    const codeObj = db.codes.find(c => c.code === code && !c.used);
+    if (codeObj) {
+        codeObj.used = true;
+        const user = db.users.find(u => u.id === userId);
+        if (user) {
+            user.coins += codeObj.value;
+            saveDB();
+            res.json({ success: true, newCoins: user.coins });
+        }
+    } else {
+        res.json({ success: false, message: 'Código inválido ou usado.' });
+    }
 });
 
-// Usuário: Airdrop
+app.post('/api/request-credit', (req, res) => {
+    const { userId, username, amount } = req.body;
+    db.requests.push({ id: Date.now(), userId, username, amount: Number(amount), status: 'pending' });
+    saveDB();
+    res.json({ success: true, message: 'Solicitação enviada!' });});
+
 app.post('/api/airdrop', (req, res) => {
     const { userId } = req.body;
     const user = db.users.find(u => u.id === userId);
     const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000;
+    // 24 horas em ms = 86400000. Para teste pode reduzir, mas deixei 1h para não travar testes (3600000)
+    // Vou deixar 10 segundos para você testar rápido: 10000
+    const cooldown = 10000; 
 
-    if (now - user.lastAirdrop > oneDay) {
-        const reward = Math.floor(Math.random() * 500) + 100;
+    if (now - user.lastAirdrop > cooldown) {
+        const reward = Math.floor(Math.random() * 100) + 50;
         user.coins += reward;
         user.lastAirdrop = now;
         saveDB();
-        res.json({ success: true, reward, newBalance: user.coins });
+        res.json({ success: true, reward, newCoins: user.coins });
     } else {
-        res.json({ success: false, message: 'Airdrop apenas uma vez a cada 24h.' });
+        res.json({ success: false, message: 'Aguarde o próximo airdrop.' });
     }
 });
 
 const PORT = process.env.PORT || 10000;
-server.listen(PORT, () => console.log(`Ghost Bank Online na porta ${PORT}`));
+server.listen(PORT, () => console.log(`Ghost Bank Rodando em ${PORT}`));
