@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#820ad1" />
+<meta name="theme-color" content="#1a1a1a" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="/icon.svg" />
 <title>Armin Bank</title>
 <style>
-:root{--p:#820ad1;--p2:#6a07ae;--p3:#f3e8fb;--bg:#f2f1f5;--card:#fff;--tx:#1d1a22;--mu:#76707f;--ln:#e9e6ee;--gr:#0e9f6e;--gr2:#e3f6ee;--rd:#d6334f;--rd2:#fdebee;--am:#b7791f;--am2:#fff4de;--r:16px;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+:root{--p:#820ad1;--p2:#6a07ae;--p3:#f3e8fb;--bg:#1a1a1a;--card:#2d2d2d;--tx:#ffffff;--mu:#a0a0a0;--ln:#404040;--gr:#0e9f6e;--gr2:#1a4d3a;--rd:#d6334f;--rd2:#4d1f2a;--am:#b7791f;--am2:#4d3d1f;--r:16px;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
 body{font-size:15px;line-height:1.4}
@@ -23,11 +23,11 @@ button:disabled{opacity:.55;cursor:default}
 svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .hidden{display:none!important}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-#root{height:100%;max-width:480px;margin:0 auto;position:relative;background:var(--bg);box-shadow:0 0 0 1px rgba(0,0,0,.04)}
-@media(min-width:520px){body{background:#e4e1ea}#root{height:min(100%,900px);margin-top:max(0px,calc((100dvh - 900px)/2));overflow:hidden;border-radius:0}}
+#root{height:100%;max-width:480px;margin:0 auto;position:relative;background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.04)}
+@media(min-width:520px){body{background:#0d0d0d}#root{height:min(100%,900px);margin-top:max(0px,calc((100vh - 900px)/2));overflow:hidden;border-radius:20px}}
 
 /* ---------- login ---------- */
-.auth{height:100%;overflow-y:auto;background:var(--p);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
+.auth{height:100%;overflow-y:auto;background:linear-gradient(135deg,#820ad1 0%,#6a07ae 100%);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
 .logo b{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--p);display:grid;place-items:center;font-size:19px;letter-spacing:0}
 .auth h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;margin:44px 0 8px}
@@ -36,27 +36,27 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .seg button{padding:10px;border-radius:9px;font-weight:700;color:rgba(255,255,255,.85)}
 .seg button.on{background:#fff;color:var(--p)}
 .auth .fld label{color:rgba(255,255,255,.9)}
-.auth input{background:#fff;color:var(--tx)}
+.auth input{background:#fff;color:#1a1a1a}
 .auth .btn{background:#fff;color:var(--p);margin-top:8px}
 .demo{margin-top:auto;padding-top:26px;font-size:12px;opacity:.9;text-align:center}
 .demo button{display:inline-block;margin:6px 4px 0;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:12px}
 
 /* ---------- campos e botões ---------- */
 .fld{margin:0 0 14px}
-.fld label{display:block;font-size:12.5px;font-weight:700;color:#5b5563;margin-bottom:6px}
-.fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:14px;background:#fff;outline:0;font-size:16px;transition:border-color .15s,box-shadow .15s}
-.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(130,10,209,.14)}
+.fld label{display:block;font-size:12.5px;font-weight:700;color:var(--mu);margin-bottom:6px}
+.fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:14px;background:#2d2d2d;color:var(--tx);outline:0;font-size:16px;transition:border-color .15s,box-shadow .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(130,10,209,.3)}
 .fld textarea{min-height:88px;resize:none}
 .fld small{display:block;color:var(--mu);margin-top:5px;font-size:12px}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border-radius:999px;background:var(--p);color:#fff;font-weight:700;font-size:15.5px;padding:0 22px}
 .btn:active:not(:disabled){filter:brightness(.92)}
-.btn.sec{background:var(--p3);color:var(--p)}
-.btn.out{background:#fff;color:var(--p);border:1.5px solid var(--p)}
+.btn.sec{background:#3d3d3d;color:var(--p)}
+.btn.out{background:#2d2d2d;color:var(--p);border:1.5px solid var(--p)}
 .btn.dng{background:var(--rd2);color:var(--rd)}
 .btn.sm{min-height:38px;font-size:13.5px;padding:0 16px;width:auto}
 .btns{display:grid;gap:10px;margin-top:6px}
 .btns.two{grid-template-columns:1fr 1fr}
-.link{color:var(--p);font-weight:700;font-size:13.5px}
+.lnk{color:var(--p);font-weight:700;font-size:13.5px}
 
 /* ---------- estrutura ---------- */
 .app{height:100%;display:flex;flex-direction:column}
@@ -73,25 +73,25 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .av{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
 .dot{position:absolute;top:7px;right:7px;min-width:17px;height:17px;border-radius:9px;background:#ff4d6d;color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid var(--p)}
 .wrap{padding:14px 14px 0;display:grid;gap:12px}
-.card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 2px rgba(30,10,50,.04)}
+.card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .card.flush{padding:0;overflow:hidden}
 .ttl{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
 .ttl h3{margin:0;font-size:15px}
 .mu{color:var(--mu)}.sm-t{font-size:12.5px}
 .big{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:2px 0}
-.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--ln);background:#fff}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--ln);background:#2d2d2d}
 .row:last-child{border-bottom:0}
-button.row:active{background:#faf8fc}
+button.row:active{background:#3a3a3a}
 .row .ic{width:40px;height:40px;border-radius:50%;background:var(--p3);color:var(--p);display:grid;place-items:center;flex:none}
-.row .ic.g{background:var(--gr2);color:var(--gr)}.row .ic.r{background:var(--rd2);color:var(--rd)}.row .ic.a{background:var(--am2);color:var(--am)}.row .ic.n{background:#efedf2;color:#5b5563}
+.row .ic.g{background:var(--gr2);color:var(--gr)}.row .ic.r{background:var(--rd2);color:var(--rd)}.row .ic.a{background:var(--am2);color:var(--am)}.row .ic.n{background:#4d4d4d;color:#a0a0a0}
 .row .mid{flex:1;min-width:0}
 .row .mid b{display:block;font-size:14.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .mid span{display:block;font-size:12.5px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .end{text-align:right;font-weight:700;font-size:14.5px;flex:none;max-width:44%}
 .row .end small{display:block;font-weight:500;font-size:11.5px;color:var(--mu)}
 .in{color:var(--gr)}.out{color:var(--tx)}
-.chev{color:#b4aebb;width:20px;height:20px}
-.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#efedf2;color:#5b5563}
+.chev{color:#6b6b6b;width:20px;height:20px}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#4d4d4d;color:#a0a0a0}
 .pill.g{background:var(--gr2);color:var(--gr)}.pill.a{background:var(--am2);color:var(--am)}.pill.r{background:var(--rd2);color:var(--rd)}.pill.p{background:var(--p3);color:var(--p)}
 .empty{text-align:center;color:var(--mu);padding:30px 18px;font-size:13.5px}
 .empty b{display:block;color:var(--tx);margin-bottom:4px;font-size:15px}
@@ -99,456 +99,342 @@ button.row:active{background:#faf8fc}
 .acts{display:flex;gap:10px;overflow-x:auto;padding:2px 14px 4px;margin:0 -14px;scrollbar-width:none}
 .acts::-webkit-scrollbar{display:none}
 .act{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:650;text-align:center}
-.act i{width:58px;height:58px;border-radius:50%;background:#fff;color:var(--p);display:grid;place-items:center;box-shadow:0 1px 2px rgba(30,10,50,.06)}
+.act i{width:58px;height:58px;border-radius:50%;background:#2d2d2d;color:var(--p);display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .act:active i{background:var(--p3)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:0 14px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:8px 14px;border-radius:999px;background:#fff;font-weight:700;font-size:13px;color:#5b5563;border:1.5px solid transparent}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:#2d2d2d;font-weight:700;font-size:13px;color:#a0a0a0;border:1.5px solid transparent}
 .chip.on{background:var(--p3);color:var(--p);border-color:var(--p)}
 .people{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none}.people::-webkit-scrollbar{display:none}
 .ppl{flex:0 0 64px;text-align:center;font-size:12px;font-weight:600}
 .ppl i{display:grid;place-items:center;width:52px;height:52px;margin:0 auto 5px;border-radius:50%;background:var(--p3);color:var(--p);font-style:normal;font-weight:800}
 .ppl span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar2{height:8px;border-radius:99px;background:#ece8f1;overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
+.bar2{height:8px;border-radius:99px;background:#4d4d4d;overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:14px}
 .kv:last-child{border-bottom:0}.kv span:first-child{color:var(--mu)}.kv span:last-child{font-weight:650;text-align:right;overflow-wrap:anywhere}
 
 /* ---------- cartão ---------- */
-.plastic{border-radius:20px;padding:20px;color:#fff;min-height:190px;background:linear-gradient(135deg,#9b2be8,#5b0a9a 70%,#3a0766);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 12px 28px rgba(106,7,174,.3)}
-.plastic:before{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.09)}
-.plastic.off{filter:grayscale(1) brightness(.75)}
-.plastic .nm{font-weight:800;letter-spacing:.14em;font-size:13px;display:flex;justify-content:space-between;align-items:center;position:relative}
-.plastic .num{font-size:19px;letter-spacing:.1em;font-weight:650;position:relative;font-variant-numeric:tabular-nums}
-.plastic .meta{display:flex;justify-content:space-between;font-size:12px;position:relative;gap:10px}
-.plastic .meta span{opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plastic{border-radius:20px;padding:20px;color:#fff;position:relative;overflow:hidden;aspect-ratio:1.6/1;background:linear-gradient(135deg,#820ad1 0%,#6a07ae 100%)}
+.plastic::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.15) 0,transparent 40%);pointer-events:none}
+.plastic .tp{position:absolute;top:20px;right:20px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.plastic .chip{position:absolute;top:20px;left:20px;width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#d4af37 0%,#f4d03f 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.plastic .num{position:absolute;left:20px;right:20px;bottom:44px;font-family:'Courier New',monospace;font-size:19px;letter-spacing:.12em;font-weight:700}
+.plastic .foot{position:absolute;left:20px;right:20px;bottom:20px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.plastic .brand{font-weight:800;letter-spacing:.05em;font-size:14px}
+.blocked{filter:grayscale(.8) brightness(.8)}
 
-/* ---------- navegação ---------- */
-.nav{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(6px + var(--bot));z-index:20}
-.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:11px;font-weight:650;color:#8c8695;border-radius:12px}
-.nav button.on{color:var(--p)}
-.nav button.on svg{stroke-width:2.2}
+/* ---------- navegação inferior ---------- */
+.tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:#2d2d2d;border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot))}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;font-size:11px;font-weight:700;color:var(--mu)}
+.tab.on{color:var(--p)}
+.tab i{width:26px;height:26px}
 
-/* ---------- sheet ---------- */
-.scrim{position:absolute;inset:0;background:rgba(18,8,28,.5);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
-.scrim.show{opacity:1;pointer-events:auto}
-.sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:22px 22px 0 0;max-height:92%;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1);padding-bottom:var(--bot)}
-.sheet.show{transform:none}
-.sheet .grab{width:40px;height:4px;border-radius:9px;background:#d9d5df;margin:9px auto 2px;flex:none}
-.sheet .sh{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 4px;flex:none}
-.sheet .sh h2{margin:0;font-size:19px;letter-spacing:-.02em}
-.sheet .sb{overflow-y:auto;padding:10px 18px 18px;-webkit-overflow-scrolling:touch}
-.x{width:36px;height:36px;border-radius:50%;background:#f0eef3;display:grid;place-items:center;color:#5b5563}
-.amt{display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--ln);padding:6px 0;margin:6px 0 4px}
-.amt:focus-within{border-color:var(--p)}
-.amt b{font-size:24px;color:var(--mu)}
-.amt input{border:0;outline:0;font-size:38px;font-weight:800;width:100%;min-width:0;letter-spacing:-.03em;background:none}
-.ok{width:76px;height:76px;border-radius:50%;background:var(--gr2);color:var(--gr);display:grid;place-items:center;margin:8px auto 14px;animation:pop .35s ease}
-.ok svg{width:38px;height:38px;stroke-width:2.6}
-@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
-.code{background:var(--p3);border-radius:12px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all;color:var(--p2);margin:10px 0}
+/* ---------- sheets ---------- */
+.sheet{position:absolute;bottom:0;left:0;right:0;background:#2d2d2d;border-radius:20px 20px 0 0;padding:0 18px calc(18px + var(--bot));box-shadow:0 -8px 24px rgba(0,0,0,.4);transform:translateY(100%);transition:transform .25s ease-out;z-index:10;max-height:85%;overflow-y:auto}
+.sheet.open{transform:translateY(0)}
+.sheet .grip{width:38px;height:4px;border-radius:2px;background:#4d4d4d;margin:10px auto 14px}
+.sheet h2{margin:0 0 14px;font-size:20px;letter-spacing:-.02em}
+.sheet .close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#4d4d4d;display:grid;place-items:center;color:var(--mu)}
+
+/* ---------- código Pix ---------- */
+.code{background:#1a1a1a;border:1.5px dashed var(--ln);border-radius:12px;padding:14px;font-family:'Courier New',monospace;font-size:12px;word-break:break-all;margin:14px 0;color:var(--tx)}
 
 /* ---------- chat ---------- */
-.chat{display:flex;flex-direction:column;gap:8px;padding:14px;min-height:50vh}
-.msg{max-width:82%;padding:10px 13px;border-radius:16px 16px 16px 4px;background:#fff;font-size:14px;align-self:flex-start;box-shadow:0 1px 2px rgba(30,10,50,.05);overflow-wrap:anywhere}
-.msg.me{align-self:flex-end;background:var(--p);color:#fff;border-radius:16px 16px 4px 16px}
-.msg small{display:block;font-size:10.5px;opacity:.7;margin-top:3px}
-.composer{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 12px calc(10px + var(--bot));background:var(--bg);border-top:1px solid var(--ln)}
-.composer input{flex:1;min-width:0;border:1.5px solid var(--ln);border-radius:999px;padding:12px 16px;font-size:16px;outline:0;background:#fff}
-.composer input:focus{border-color:var(--p)}
-.composer button{width:46px;height:46px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;flex:none}
+.chat{display:flex;flex-direction:column;gap:10px;padding:10px 0}
+.msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4}
+.msg.user{align-self:flex-end;background:var(--p);color:#fff;border-bottom-right-radius:4px}
+.msg.other{align-self:flex-start;background:#4d4d4d;color:var(--tx);border-bottom-left-radius:4px}
+.msg .who{display:block;font-size:11px;font-weight:700;opacity:.7;margin-bottom:3px}
+
+/* ---------- master ---------- */
+.stat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+.stat .b{background:#2d2d2d;border-radius:12px;padding:14px;text-align:center}
+.stat .b b{display:block;font-size:22px;font-weight:800;color:var(--p);margin-bottom:4px}
+.stat .b span{font-size:11px;color:var(--mu);font-weight:700}
 
 /* ---------- toast ---------- */
-.toast{position:absolute;left:14px;right:14px;top:calc(12px + var(--top));z-index:80;padding:13px 16px;border-radius:14px;background:#2a2230;color:#fff;font-weight:650;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);transform:translateY(-140%);transition:transform .25s;pointer-events:none}
-.toast.show{transform:none}.toast.ok2{background:#0b7a55}.toast.er{background:#b4233d}
-.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:sp .7s linear infinite}
-@keyframes sp{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.toast{position:fixed;top:calc(20px + var(--top));left:50%;transform:translateX(-50%) translateY(-100px);background:#2d2d2d;color:var(--tx);padding:12px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:100;transition:transform .3s;max-width:calc(100% - 40px);border:1.5px solid var(--ln)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--gr);color:var(--gr)}
+.toast.err{border-color:var(--rd);color:var(--rd)}
+
+/* ---------- spinner ---------- */
+.busy{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;z-index:200}
+.busy i{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></symbol>
-<symbol id="i-pix" viewBox="0 0 24 24"><path d="M12 2.8l4.2 4.2a2 2 0 010 2.8l-1.4 1.4M12 2.8L7.8 7a2 2 0 000 2.8l1.4 1.4M12 21.2L7.8 17a2 2 0 010-2.8l1.4-1.4M12 21.2l4.2-4.2a2 2 0 000-2.8l-1.4-1.4M3 12h4.5l2.2-2.2M21 12h-4.5l-2.2 2.2"/></symbol>
-<symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6 15h4"/></symbol>
-<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r=".6"/><circle cx="3.5" cy="12" r=".6"/><circle cx="3.5" cy="18" r=".6"/></symbol>
-<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
-<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 1112 0v6l1.5 2h-15z"/><path d="M10 21a2 2 0 004 0"/></symbol>
-<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
-<symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.6 9.6 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4M6.5 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 004.5-1.1M9.9 9.9a3 3 0 004.2 4.2"/></symbol>
-<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.4a2.9 2.9 0 115 2c-.9.8-2.2 1.2-2.2 2.6M12 17.3v.1"/></symbol>
-<symbol id="i-up" viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></symbol>
-<symbol id="i-down" viewBox="0 0 24 24"><path d="M17 7L7 17M16 17H7V8"/></symbol>
-<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16 7l3 3M14 9l2 2"/></symbol>
-<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 00-2.5-2.5H6A2.5 2.5 0 003.5 6v7A2.5 2.5 0 006 15.5h2.5"/></symbol>
-<symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
-<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
-<symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
-<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
-<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-<symbol id="i-pig" viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="8" ry="6"/><path d="M18.5 9l2-2.5M4.2 12H2.5M8 18.5V21M15 18.5V21M10 7.2c.6-.4 1.4-.6 2-.6"/><circle cx="16.5" cy="12" r=".6"/></symbol>
-<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.500" y="10.500" width="15" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 018 0v2.500"/></symbol>
-<symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4.500" y="10.500" width="15" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 017.600-1.700"/></symbol>
-<symbol id="i-out" viewBox="0 0 24 24"><path d="M9 4H5.500A2.500 2.500 0 003 6.500v11A2.500 2.500 0 005.500 20H9M16 8l4 4-4 4M20 12H9"/></symbol>
-<symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 011 1v10a1 1 0 01-1 1h-9l-5 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z"/></symbol>
-<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.700 5.600 6.100.8-4.500 4.200 1.100 6.100L12 16.800 6.600 19.700l1.100-6.100L3.200 9.400l6.100-.8z"/></symbol>
-<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9.500L12 4l9 5.500M5 10v8M9.500 10v8M14.500 10v8M19 10v8M3 20h18"/></symbol>
-<symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
-<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.500-3.300 8-8 9-4.700-1-8-4.500-8-9V6z"/><path d="M8.500 12l2.500 2.500 4.500-5"/></symbol>
-<symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7.500 7.500L12 3l4.500 4.500M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></symbol>
-<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
-<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.500" r="3.500"/><path d="M2.500 20c0-3.800 2.900-6 6.500-6s6.500 2.200 6.500 6M16 5.300a3.500 3.500 0 010 6.400M18 14.300c2.200.7 3.500 2.500 3.500 5.700"/></symbol>
-</defs></svg>
-
 <div id="root"></div>
 
-<script src="/socket.io/socket.io.js" onerror="window.__noWS=true"></script>
 <script>
 'use strict';
-/* =================== utilidades =================== */
-const $ = (s, r = document) => r.querySelector(s);
-const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const ico = (n, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
-const fmtBRL = (n) => Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-const initials = (name) => String(name || '?').trim().split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
-const parseMoney = (v) => {
-  let s = String(v ?? '').replace(/[^\d.,-]/g, '');
-  if (!s) return NaN;
-  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
-  else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
-  const n = Number(s); return Number.isFinite(n) ? Math.round(n * 100) / 100 : NaN;
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const fmtBRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const fmtDate = (d) => new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+const parseMoney = (s) => { const n = Number(String(s).replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
+
+const U = () => (S.st && S.st.user) || {};
+
+/* ---------- ícones SVG ---------- */
+const ICO = {
+  home: '<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>',
+  pix: '<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>',
+  card: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>',
+  pig: '<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>',
+  credit: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
+  bell: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>',
+  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>',
+  chevron: '<path d="M9 6l6 6-6 6"/>',
+  arrow: '<path d="M5 12h14M12 5l7 7-7 7"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  check: '<path d="M20 6L9 17l-5-5"/>',
+  close: '<path d="M18 6L6 18M6 6l12 12"/>',
+  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',
+  trash: '<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>',
+  lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
+  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  bonus: '<path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>',
+  logout: '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
+  refresh: '<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>',
 };
-const dShort = (iso) => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
-const tShort = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-const dLong = (iso) => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
-function dayLabel(iso) {
-  const d = new Date(iso), t = new Date(); const y = new Date(); y.setDate(t.getDate() - 1);
-  if (d.toDateString() === t.toDateString()) return 'Hoje';
-  if (d.toDateString() === y.toDateString()) return 'Ontem';
-  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-}
-let toastTimer;
-function toast(msg, kind = '') {
-  const t = $('#toast'); if (!t) return;
-  t.textContent = msg; t.className = `toast show ${kind === 'ok' ? 'ok2' : kind === 'err' ? 'er' : ''}`;
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.className = 'toast'; }, 3200);
-}
-async function api(url, { method = 'GET', body } = {}) {
-  const headers = {};
-  if (body !== undefined) headers['Content-Type'] = 'application/json';
-  if (S.token) headers.Authorization = `Bearer ${S.token}`;
-  let res;
-  try { res = await fetch(url, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined }); }
-  catch { throw new Error('Sem conexão com o servidor. Verifique sua internet.'); }
-  let data = {}; try { data = await res.json(); } catch {}
-  if (res.status === 401 && S.token && !url.includes('/api/login')) { doLocalLogout(); throw new Error('Sua sessão expirou. Entre novamente.'); }
-  if (!res.ok) throw new Error(data.message || 'Não foi possível concluir. Tente de novo.');
-  return data;
-}
-async function busy(btn, fn) {
-  const old = btn ? btn.innerHTML : ''; if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>'; }
-  try { return await fn(); } catch (e) { toast(e.message, 'err'); return null; }
-  finally { if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = old; } }
-}
-const copyText = async (text, msg = 'Copiado!') => {
-  try { await navigator.clipboard.writeText(text); toast(msg, 'ok'); }
-  catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(msg, 'ok'); } catch { toast(text); } ta.remove(); }
+const ico = (k) => `<svg class="i" viewBox="0 0 24 24">${ICO[k] || ''}</svg>`;
+
+/* ---------- estado ---------- */
+const S = {
+  token: localStorage.getItem('armin_token') || '',
+  st: null,
+  master: null,
+  page: 'home',
+  authTab: 'login',
+  socket: null,
+  card: null,
+  cardTimer: null,
+  pix: { step: 1, key: '', rec: null, amount: '', value: 0, note: '' },
+  toastTimer: null,
+  sheetEl: null,
 };
 
-/* =================== estado =================== */
-const S = { token: localStorage.getItem('armin_token') || '', st: null, page: 'home', back: 'home', hidden: localStorage.getItem('armin_hidden') === '1',
-  filter: 'all', authTab: 'login', master: null, card: null, cardTimer: 0, pix: null, socket: null, sheetKey: '' };
-const U = () => S.st.user;
-const mv = (n) => (S.hidden ? 'R$ ••••' : fmtBRL(n));
+/* ---------- API ---------- */
+async function api(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.token) headers.authorization = `Bearer ${S.token}`;
+  const r = await fetch(path, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : null });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) throw new Error((j && j.message) || 'Erro na requisição');
+  return j;
+}
+async function busy(el, fn) {
+  if (el) el.disabled = true;
+  const b = document.createElement('div'); b.className = 'busy'; b.innerHTML = '<i></i>'; document.body.appendChild(b);
+  try { return await fn(); } catch (e) { toast(e.message, 'err'); return null; } finally { document.body.removeChild(b); if (el) el.disabled = false; }
+}
+function toast(msg, type = '') {
+  clearTimeout(S.toastTimer);
+  let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
+  t.className = `toast show ${type}`; t.textContent = msg;
+  S.toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+function sheetOpen(html) {
+  sheetClose();
+  const s = document.createElement('div'); s.className = 'sheet open';
+  s.innerHTML = `<div class="grip"></div><button class="close" data-act="closeSheet">${ico('close')}</button>${html}`;
+  $('#root').appendChild(s); S.sheetEl = s;
+  s.addEventListener('click', (e) => { if (e.target === s) sheetClose(); });
+  return s;
+}
+function sheetClose() { if (S.sheetEl) { S.sheetEl.remove(); S.sheetEl = null; } }
 
-/* =================== telas =================== */
-function kindInfo(t) {
-  const m = { pix_in: ['down', 'g'], pix_out: ['up', ''], purchase: ['card', 'n'], invoice_pay: ['receipt', 'n'], savings_in: ['pig', 'a'], savings_out: ['pig', 'a'], savings_yield: ['pig', 'g'], reward: ['star', 'g'], credit_draw: ['bank', 'a'] };
-  return m[t.kind] || [t.amount >= 0 ? 'down' : 'up', ''];
-}
-function txRow(t) {
-  const [ic, cl] = kindInfo(t); const credit = t.method === 'credit';
-  return `<button class="row" data-act="receipt" data-id="${esc(t.id)}"><span class="ic ${cl}">${ico(ic)}</span><span class="mid"><b>${esc(t.title)}</b><span>${esc(t.detail || '')} · ${tShort(t.createdAt)}</span></span><span class="end ${t.amount > 0 ? 'in' : ''}">${t.amount > 0 ? '+' : '−'} ${fmtBRL(Math.abs(t.amount))}${credit ? '<small>no crédito</small>' : ''}</span></button>`;
-}
-function header({ title, sub, back, tools = '' }) {
-  return `<div class="hdr"><div class="bar">${back ? `<button class="ib" data-act="back" aria-label="Voltar">${ico('back')}</button>` : `<button class="av" data-act="nav" data-p="profile" aria-label="Perfil">${esc(initials(U().fullName))}</button>`}<div class="tools">${tools}</div></div>${title ? `<h1>${esc(title)}</h1>` : ''}${sub ? `<p>${esc(sub)}</p>` : ''}</div>`;
-}
-const unread = () => S.st.notifications.filter((n) => !n.read).length;
-function homeTools() {
-  const n = unread();
-  return `<button class="ib" data-act="toggleHide" aria-label="${S.hidden ? 'Mostrar valores' : 'Ocultar valores'}">${ico(S.hidden ? 'eyeoff' : 'eye')}</button><button class="ib" data-act="nav" data-p="support" aria-label="Ajuda">${ico('help')}</button><button class="ib" data-act="notifs" aria-label="Notificações">${ico('bell')}${n ? `<span class="dot">${n > 9 ? '9+' : n}</span>` : ''}</button>`;
-}
-
-function pageHome() {
-  const u = U(), inv = S.st.invoice, sv = S.st.savings, tx = S.st.transactions.slice(0, 5);
-  const first = u.fullName.split(' ')[0];
-  const dt = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-  return `${header({ title: `Olá, ${first}`, sub: dt, tools: homeTools() })}
-<div class="wrap" style="margin-top:-12px">
-  <button class="card row" style="border-radius:16px;border:0;flex-direction:column;align-items:stretch;gap:2px" data-act="nav" data-p="statement"><span class="sm-t mu" style="display:flex;justify-content:space-between;align-items:center"><b style="color:var(--tx);font-size:15px">Conta</b>${ico('chev', 'chev')}</span><span class="big">${mv(u.balance)}</span><span class="sm-t mu">Saldo disponível</span></button>
-  <div class="acts">
-    <button class="act" data-act="pix"><i>${ico('pix')}</i>Pix</button>
-    <button class="act" data-act="invoice"><i>${ico('receipt')}</i>Pagar fatura</button>
-    <button class="act" data-act="savings"><i>${ico('pig')}</i>Cofrinho</button>
-    <button class="act" data-act="charge"><i>${ico('down')}</i>Cobrar</button>
-    <button class="act" data-act="bonus"><i>${ico('star')}</i>Bônus</button>
-    <button class="act" data-act="creditReq"><i>${ico('bank')}</i>Crédito</button>
-  </div>
-  <button class="card row" style="border-radius:16px;border:0" data-act="nav" data-p="card"><span class="ic">${ico('card')}</span><span class="mid"><b>Cartão de crédito</b><span>Fatura atual</span><b style="font-size:20px;margin-top:2px;color:var(--p)">${mv(inv.used)}</b><span>Limite disponível ${mv(inv.available)}</span></span>${ico('chev', 'chev')}</button>
-  <button class="card row" style="border-radius:16px;border:0" data-act="savings"><span class="ic a">${ico('pig')}</span><span class="mid"><b>Cofrinho</b><span>Rende 1% ao mês</span><b style="font-size:20px;margin-top:2px">${mv(sv.balance)}</b></span>${ico('chev', 'chev')}</button>
-  <button class="card row" style="border-radius:16px;border:0" data-act="creditReq"><span class="ic g">${ico('shield')}</span><span class="mid"><b>Score ${u.score}</b><span>${u.score >= 800 ? 'Excelente — peça mais limite' : u.score >= 650 ? 'Bom histórico' : 'Pague a fatura em dia para subir'}</span></span>${ico('chev', 'chev')}</button>
-  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Últimas movimentações</h3><button class="link" data-act="nav" data-p="statement">Ver tudo</button></div>${tx.length ? tx.map(txRow).join('') : `<div class="empty"><b>Nada por aqui ainda</b>Faça um Pix ou resgate seu bônus diário.</div>`}</div>
-</div>`;
-}
-
-function pagePix() {
-  const keys = U().pixKeys;
-  const seen = new Set(); const recents = [];
-  for (const t of S.st.transactions) if (t.kind === 'pix_out' && t.toKey && !seen.has(t.toKey)) { seen.add(t.toKey); recents.push(t); if (recents.length >= 8) break; }
-  const hist = S.st.transactions.filter((t) => t.kind.startsWith('pix')).slice(0, 8);
-  return `${header({ title: 'Área Pix', sub: 'Envie e receba na hora, 24h por dia.' })}
-<div class="wrap" style="margin-top:-8px">
-  <div class="acts"><button class="act" data-act="pix"><i>${ico('send')}</i>Enviar</button><button class="act" data-act="pixPaste"><i>${ico('copy')}</i>Pagar com código</button><button class="act" data-act="charge"><i>${ico('down')}</i>Cobrar</button><button class="act" data-act="keys"><i>${ico('key')}</i>Minhas chaves</button></div>
-  ${recents.length ? `<div class="card"><div class="ttl"><h3>Enviar novamente</h3></div><div class="people">${recents.map((t) => `<button class="ppl" data-act="pix" data-key="${esc(t.toKey)}"><i>${esc(initials(t.counterparty))}</i><span>${esc((t.counterparty || '').split(' ')[0])}</span></button>`).join('')}</div></div>` : ''}
-  <div class="card"><div class="ttl"><h3>Minhas chaves</h3><button class="link" data-act="keys">Gerenciar</button></div>${keys.map((k) => `<div class="kv"><span style="text-transform:capitalize">${esc(k.type)}</span><span>${esc(k.value)}</span></div>`).join('')}</div>
-  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Movimentações Pix</h3></div>${hist.length ? hist.map(txRow).join('') : `<div class="empty"><b>Sem Pix ainda</b>Seus envios e recebimentos aparecem aqui.</div>`}</div>
-</div>`;
-}
-
-function pageCard() {
-  const u = U(), inv = S.st.invoice; const pct = inv.limit ? Math.min(100, (inv.used / inv.limit) * 100) : 0;
-  const c = S.card; const num = c ? c.cardNumber : `•••• •••• •••• ${u.cardNumber.slice(-4)}`;
-  const buys = S.st.transactions.filter((t) => t.method === 'credit' || t.kind === 'invoice_pay' || t.kind === 'credit_draw').slice(0, 10);
-  const due = new Date(inv.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
-  return `${header({ title: 'Cartão', sub: u.cardBlocked ? 'Bloqueado — compras suspensas' : 'Crédito Armin Black' })}
-<div class="wrap" style="margin-top:-6px">
-  <div class="plastic ${u.cardBlocked ? 'off' : ''}"><div class="nm"><span>ARMIN</span><span>${u.cardBlocked ? 'BLOQUEADO' : 'BLACK'}</span></div><div class="num">${esc(num)}</div><div class="meta"><span>${esc(u.fullName.toUpperCase())}</span><span>${c ? `${esc(c.exp)} · CVV ${esc(c.cvv)}` : 'VAL ••/•• · CVV •••'}</span></div></div>
-  <div class="acts"><button class="act" data-act="cardReveal"><i>${ico(c ? 'eyeoff' : 'eye')}</i>${c ? 'Ocultar dados' : 'Ver dados'}</button><button class="act" data-act="cardToggle"><i>${ico(u.cardBlocked ? 'unlock' : 'lock')}</i>${u.cardBlocked ? 'Desbloquear' : 'Bloquear'}</button><button class="act" data-act="purchase"><i>${ico('card')}</i>Simular compra</button><button class="act" data-act="draw"><i>${ico('bank')}</i>Sacar crédito</button></div>
-  <div class="card"><div class="ttl"><h3>Fatura atual</h3><span class="pill ${inv.used > 0 ? 'p' : 'g'}">${inv.used > 0 ? `vence ${esc(due)}` : 'zerada'}</span></div><div class="big">${mv(inv.used)}</div><div class="bar2"><span style="width:${pct}%"></span></div><div class="sm-t mu" style="display:flex;justify-content:space-between"><span>Disponível ${mv(inv.available)}</span><span>Limite ${mv(inv.limit)}</span></div><div class="btns two" style="margin-top:14px"><button class="btn" data-act="invoice" ${inv.used > 0 ? '' : 'disabled'}>Pagar fatura</button><button class="btn sec" data-act="creditReq">Mais limite</button></div></div>
-  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Movimentações do cartão</h3></div>${buys.length ? buys.map(txRow).join('') : `<div class="empty"><b>Nenhuma compra</b>Use "Simular compra" para testar seu cartão.</div>`}</div>
-</div>`;
-}
-
-function pageStatement() {
-  const f = S.filter; const all = S.st.transactions;
-  const list = all.filter((t) => f === 'all' || (f === 'in' && t.amount > 0) || (f === 'out' && t.amount < 0 && t.method !== 'credit') || (f === 'card' && (t.method === 'credit' || t.kind === 'invoice_pay')));
-  let last = '', html = '';
-  for (const t of list) { const l = dayLabel(t.createdAt); if (l !== last) { html += `<div class="day">${esc(l)}</div>`; last = l; } html += txRow(t); }
-  const chip = (k, l) => `<button class="chip ${f === k ? 'on' : ''}" data-act="filter" data-f="${k}">${l}</button>`;
-  return `${header({ title: 'Extrato', sub: `Saldo ${mv(U().balance)}` })}
-<div style="padding:14px 0 6px"><div class="chips">${chip('all', 'Tudo')}${chip('in', 'Entradas')}${chip('out', 'Saídas')}${chip('card', 'Cartão')}</div></div>
-${list.length ? `<div>${html}</div>` : `<div class="empty"><b>Nada encontrado</b>Nenhuma movimentação neste filtro.</div>`}`;
-}
-
-function pageProfile() {
-  const u = U(); const row = (i, t, s, a, extra = '', cl = '') => `<button class="row" data-act="${a}" ${extra}><span class="ic ${cl}">${ico(i)}</span><span class="mid"><b>${t}</b>${s ? `<span>${s}</span>` : ''}</span>${ico('chev', 'chev')}</button>`;
-  return `${header({ title: u.fullName, sub: `@${u.username}` })}
-<div class="wrap" style="margin-top:-6px">
-  <div class="card flush">${row('key', 'Minhas chaves Pix', `${u.pixKeys.length} cadastrada${u.pixKeys.length > 1 ? 's' : ''}`, 'keys')}${row('bell', 'Notificações', unread() ? `${unread()} nova${unread() > 1 ? 's' : ''}` : 'Tudo em dia', 'notifs')}${row('chat', 'Suporte', 'Fale com o Armin', 'nav', 'data-p="support"')}${row('lock', 'Alterar senha', '', 'password')}</div>
-  ${u.role === 'admin' ? `<div class="card flush">${row('users', 'Central Master', 'Crédito, jogadores e suporte', 'nav', 'data-p="master"', 'a')}</div>` : ''}
-  <div class="card"><div class="kv"><span>Cartão final</span><span>${esc(u.cardNumber.slice(-4))}</span></div><div class="kv"><span>Cliente desde</span><span>${esc(dLong(u.createdAt))}</span></div><div class="kv"><span>Score</span><span>${u.score}</span></div></div>
-  <button class="btn dng" data-act="logout">${ico('out')} Sair da conta</button>
-  <p class="empty" style="padding:6px 10px 0">Ambiente demonstrativo. Nenhum dinheiro real é movimentado.</p>
-</div>`;
-}
-
-function pageSupport() {
-  const msgs = S.st.supportMessages;
-  return `${header({ title: 'Suporte', sub: 'Converse com o Armin Master', back: true })}
-<div class="chat" id="chatList">${msgs.length ? msgs.map((m) => `<div class="msg ${m.role === 'support' ? '' : 'me'}">${esc(m.text)}<small>${dShort(m.createdAt)} · ${tShort(m.createdAt)}</small></div>`).join('') : `<div class="empty"><b>Como podemos ajudar?</b>Mande sua dúvida sobre Pix, cartão ou crédito.</div>`}</div>
-<form class="composer" data-form="support"><input id="chatIn" placeholder="Escreva sua mensagem" maxlength="500" autocomplete="off" aria-label="Mensagem" /><button type="submit" aria-label="Enviar">${ico('send')}</button></form>`;
-}
-
-function pageMaster() {
-  const m = S.master;
-  if (!m) return `${header({ title: 'Central Master', back: true })}<div class="empty">Carregando…</div>`;
-  const met = m.metrics;
-  return `${header({ title: 'Central Master', sub: 'Visão geral da guilda', back: true })}
-<div class="wrap" style="margin-top:-6px">
-  <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div><div class="sm-t mu">Jogadores</div><b style="font-size:22px">${met.players}</b></div><div><div class="sm-t mu">Análises abertas</div><b style="font-size:22px">${met.pendingCredits}</b></div><div><div class="sm-t mu">Saldo em jogo</div><b style="font-size:22px">${fmtBRL(met.moneyInPlay)}</b></div><div><div class="sm-t mu">Score médio</div><b style="font-size:22px">${met.avgScore}</b></div></div>
-  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Fila de crédito</h3></div>${m.pending.length ? m.pending.map((r) => `<div class="row" style="align-items:flex-start"><span class="mid" style="white-space:normal"><b style="white-space:normal">${esc(r.fullName)} · ${fmtBRL(r.amount)}</b><span style="white-space:normal">${esc(r.purpose)} · score ${r.score}</span><span class="btns two" style="margin-top:10px"><button class="btn sm" data-act="decide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="decide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></span></span></div>`).join('') : `<div class="empty"><b>Fila limpa</b>Nenhuma análise pendente.</div>`}</div>
-  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Jogadores</h3></div>${m.users.map((p) => `<button class="row" data-act="deposit" data-id="${esc(p.id)}"><span class="ic">${esc(initials(p.fullName))}</span><span class="mid"><b>${esc(p.fullName)}</b><span>@${esc(p.username)} · score ${p.score}</span></span><span class="end">${fmtBRL(p.balance)}<small>depositar</small></span></button>`).join('')}</div>
-  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Conversas de suporte</h3></div>${m.threads.length ? m.threads.map((t) => `<button class="row" data-act="thread" data-id="${esc(t.userId)}"><span class="ic ${t.awaiting ? 'a' : ''}">${ico('chat')}</span><span class="mid"><b>${esc(t.name)}</b><span>${esc(t.last)}</span></span>${t.awaiting ? '<span class="pill a">responder</span>' : ''}</button>`).join('') : `<div class="empty"><b>Sem conversas</b>Mensagens dos jogadores aparecem aqui.</div>`}</div>
-</div>`;
-}
-
-/* =================== render =================== */
-const MAIN = ['home', 'pix', 'card', 'statement', 'profile'];
-function authView() {
-  const reg = S.authTab === 'register';
-  return `<div class="auth"><div class="logo"><b>A</b>ARMIN BANK</div><h1>${reg ? 'Abra sua conta em segundos.' : 'Que bom ter você de volta.'}</h1><p>${reg ? 'Sem papelada e sem taxa de manutenção.' : 'Entre para ver seu saldo, fazer Pix e controlar seu cartão.'}</p>
-<div class="seg"><button data-act="authTab" data-t="login" class="${reg ? '' : 'on'}">Entrar</button><button data-act="authTab" data-t="register" class="${reg ? 'on' : ''}">Criar conta</button></div>
-<form data-form="${reg ? 'register' : 'login'}" autocomplete="on">
-${reg ? `<div class="fld"><label for="fName">Nome completo</label><input id="fName" name="fullName" autocomplete="name" required minlength="3" /></div>` : ''}
-<div class="fld"><label for="fUser">${reg ? 'Escolha um usuário' : 'Usuário ou e-mail'}</label><input id="fUser" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" required ${reg ? 'pattern="[a-zA-Z0-9_.]{3,20}" placeholder="ex.: lia.aventura"' : ''} /></div>
-<div class="fld"><label for="fPass">Senha</label><input id="fPass" name="password" type="password" autocomplete="${reg ? 'new-password' : 'current-password'}" required ${reg ? 'minlength="6" placeholder="mínimo 6 caracteres"' : ''} /></div>
-<button class="btn" type="submit">${reg ? 'Criar minha conta' : 'Entrar'}</button></form>
-<div class="demo">Ambiente demonstrativo — nenhum dinheiro real.<br />${reg ? '' : `<button data-act="demo" data-u="aventureiro" data-p="1234">Entrar como jogadora</button><button data-act="demo" data-u="master" data-p="master">Entrar como Master</button>`}</div></div>`;
-}
-function appView() {
-  const p = S.page; const main = MAIN.includes(p); const sub = !main;
-  const pages = { home: pageHome, pix: pagePix, card: pageCard, statement: pageStatement, profile: pageProfile, support: pageSupport, master: pageMaster };
-  const navItems = [['home', 'home', 'Início'], ['pix', 'pix', 'Pix'], ['card', 'card', 'Cartão'], ['statement', 'list', 'Extrato'], ['profile', 'user', 'Perfil']];
-  return `<div class="app"><div class="view ${sub ? 'sub' : ''}" id="view">${pages[p]()}</div>${main ? `<nav class="nav" aria-label="Principal">${navItems.map(([k, i, l]) => `<button class="${p === k ? 'on' : ''}" data-act="nav" data-p="${k}" ${p === k ? 'aria-current="page"' : ''}>${ico(i)}${l}</button>`).join('')}</nav>` : ''}</div>`;
-}
+/* ---------- renderização ---------- */
 function shell() {
-  return `<div id="screen"></div><div class="scrim" id="scrim" data-act="closeSheet"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="grab"></div><div class="sh"><h2 id="sheetTitle"></h2><button class="x" data-act="closeSheet" aria-label="Fechar">${ico('x')}</button></div><div class="sb" id="sheetBody"></div></div><div class="toast" id="toast" role="status" aria-live="polite"></div>`;
+  return `<div class="app"><div id="view" class="view"></div><nav class="tabs" id="tabs"></nav><div id="sheetHost"></div></div>`;
 }
 function render() {
-  const screen = $('#screen'); if (!screen) return;
-  const ae = document.activeElement; const keep = ae && ae.id && screen.contains(ae) ? { id: ae.id, v: ae.value, s: ae.selectionStart, e: ae.selectionEnd } : null;
-  const scroll = $('#view') ? $('#view').scrollTop : 0;
-  screen.style.height = '100%';
-  screen.innerHTML = S.st ? appView() : authView();
-  const v = $('#view'); if (v) v.scrollTop = scroll;
-  if (S.page === 'support' || S.page === 'master') { const c = $('#chatList'); if (c) c.parentElement.scrollTop = c.parentElement.scrollHeight; }
-  if (keep) { const el = document.getElementById(keep.id); if (el) { el.value = keep.v; el.focus({ preventScroll: true }); try { el.setSelectionRange(keep.s, keep.e); } catch {} } }
-  if (S.sheetKey === 'notifs') openNotifs(true);
-  if (S.sheetKey === 'keys') openKeys(true);
-  if (S.sheetKey === 'cofre') openSavings(true);
-  if (S.sheetKey === 'thread') openThread(S.threadId, true);
+  if (!S.token || !S.st) { renderAuth(); return; }
+  $('#root').innerHTML = shell();
+  $('#tabs').innerHTML = tabsHtml();
+  if (S.page === 'master' && U().role === 'admin') renderMaster();
+  else renderHome();
 }
 
-/* =================== sheet =================== */
-function sheet(title, html, key = '') {
-  $('#sheetTitle').textContent = title; $('#sheetBody').innerHTML = html; S.sheetKey = key;
-  $('#scrim').classList.add('show'); $('#sheet').classList.add('show');
-  const f = $('#sheetBody [autofocus], #sheetBody input:not([type=hidden])'); if (f && !('ontouchstart' in window)) setTimeout(() => f.focus(), 260);
-}
-function closeSheet() { S.sheetKey = ''; S.pix = null; $('#scrim').classList.remove('show'); $('#sheet').classList.remove('show'); }
-const sheetOpen = () => $('#sheet').classList.contains('show');
-const amountField = (id, value = '', label = '') => `<div class="fld" style="margin-bottom:6px">${label ? `<label for="${id}">${label}</label>` : ''}<div class="amt"><b>R$</b><input id="${id}" name="amount" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${esc(value)}" aria-label="Valor" /></div></div>`;
-
-/* ---- recibo ---- */
-function openReceipt(id) {
-  const t = S.st.transactions.find((x) => x.id === id); if (!t) return;
-  const rows = [['Tipo', t.title], t.counterparty ? [t.amount < 0 ? 'Para' : 'De', t.counterparty] : null, t.detail && !t.counterparty ? ['Detalhe', t.detail] : null, t.note ? ['Mensagem', t.note] : null, ['Data', `${dLong(t.createdAt)} às ${tShort(t.createdAt)}`], ['Forma', t.method === 'credit' ? 'Cartão de crédito' : t.method === 'savings' ? 'Cofrinho' : 'Saldo em conta'], ['Situação', 'Concluída'], ['Código', t.id]].filter(Boolean);
-  sheet('Comprovante', `<div style="text-align:center;margin-bottom:8px"><div class="sm-t mu">${esc(t.title)}</div><div class="big ${t.amount > 0 ? 'in' : ''}">${t.amount > 0 ? '+' : '−'} ${fmtBRL(Math.abs(t.amount))}</div></div>${rows.map(([k, v]) => `<div class="kv"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('')}<div class="btns" style="margin-top:14px"><button class="btn sec" data-act="shareReceipt" data-id="${esc(t.id)}">${ico('share')} Compartilhar comprovante</button></div>`);
-}
-/* ---- notificações ---- */
-function openNotifs(refresh = false) {
-  const list = S.st.notifications;
-  const html = list.length ? `<div class="card flush" style="box-shadow:none;border:1px solid var(--ln)">${list.map((n) => `<div class="row"><span class="ic ${n.type === 'success' ? 'g' : n.type === 'warning' ? 'a' : ''}">${ico(n.type === 'success' ? 'check' : 'bell')}</span><span class="mid"><b style="white-space:normal">${esc(n.title)}${n.read ? '' : ' <span class="pill p">nova</span>'}</b><span style="white-space:normal">${esc(n.text)}</span><span>${dShort(n.createdAt)} · ${tShort(n.createdAt)}</span></span></div>`).join('')}</div>` : `<div class="empty"><b>Sem notificações</b>Avisaremos aqui sobre Pix, crédito e fatura.</div>`;
-  sheet('Notificações', html, 'notifs');
-  if (!refresh && unread()) api('/api/notifications/read', { method: 'POST' }).then((r) => { S.st = r.state; render(); }).catch(() => {});
-}
-/* ---- Pix: enviar ---- */
-function pixStep1(msg = '') {
-  sheet('Enviar Pix', `<form data-form="pixLookup"><p class="mu" style="margin-top:0">Para quem você quer enviar?</p><div class="fld"><label for="pk">Chave Pix</label><input id="pk" name="key" placeholder="E-mail, telefone, CPF ou chave aleatória" value="${esc(S.pix?.key || '')}" autocomplete="off" autocapitalize="none" required /><small>Dica: cole um código "Pix copia e cola" aqui.</small></div><div class="btns"><button class="btn" type="submit">Continuar</button><button class="btn sec" type="button" data-act="pasteKey">${ico('copy')} Colar da área de transferência</button></div></form>`, 'pix');
-}
-function pixStep2() {
-  const r = S.pix.rec;
-  sheet('Quanto enviar?', `<form data-form="pixReview"><div class="row" style="padding:0 0 12px;border:0"><span class="ic">${esc(r.initials)}</span><span class="mid"><b>${esc(r.name)}</b><span>${esc(r.key)}</span></span></div>${amountField('pa', S.pix.amount || '')}<div class="sm-t mu" style="margin-bottom:14px">Saldo disponível: ${fmtBRL(U().balance)}</div><div class="fld"><label for="pn">Mensagem (opcional)</label><input id="pn" name="note" maxlength="80" value="${esc(S.pix.note || '')}" placeholder="Ex.: almoço" /></div><div class="btns"><button class="btn" type="submit">Revisar</button><button class="btn sec" type="button" data-act="pixBack1">Trocar destinatário</button></div></form>`, 'pix');
-}
-function pixStep3() {
-  const p = S.pix, r = p.rec;
-  sheet('Confirmar Pix', `<div style="text-align:center;margin-bottom:6px"><div class="sm-t mu">Você vai enviar</div><div class="big">${fmtBRL(p.value)}</div></div><div class="kv"><span>Para</span><span>${esc(r.name)}</span></div><div class="kv"><span>Chave</span><span>${esc(r.key)}</span></div>${p.note ? `<div class="kv"><span>Mensagem</span><span>${esc(p.note)}</span></div>` : ''}<div class="kv"><span>Quando</span><span>Agora</span></div><div class="kv"><span>Saldo após</span><span>${fmtBRL(U().balance - p.value)}</span></div><div class="btns" style="margin-top:14px"><button class="btn" data-act="pixConfirm">Confirmar e enviar</button><button class="btn sec" data-act="pixBack2">Voltar</button></div>`, 'pix');
-}
-function pixDone(tx) {
-  sheet('Pix enviado', `<div class="ok">${ico('check')}</div><div style="text-align:center"><div class="big">${fmtBRL(Math.abs(tx.amount))}</div><div class="mu">enviado para <b style="color:var(--tx)">${esc(tx.counterparty)}</b></div></div><div class="btns" style="margin-top:18px"><button class="btn sec" data-act="receipt" data-id="${esc(tx.id)}">Ver comprovante</button><button class="btn" data-act="closeSheet">Concluir</button></div>`);
-}
-/* ---- Pix: chaves ---- */
-function openKeys(refresh = false) {
-  const keys = U().pixKeys;
-  sheet('Minhas chaves Pix', `<div class="card flush" style="box-shadow:none;border:1px solid var(--ln);margin-bottom:14px">${keys.map((k) => `<div class="row"><span class="ic g">${ico('key')}</span><span class="mid"><b>${esc(k.value)}</b><span style="text-transform:capitalize">${esc(k.type)}</span></span><button class="ib" style="color:var(--p)" data-act="copyKey" data-v="${esc(k.value)}" aria-label="Copiar chave">${ico('copy')}</button>${keys.length > 1 ? `<button class="ib" style="color:var(--rd)" data-act="delKey" data-id="${esc(k.id)}" aria-label="Remover chave">${ico('trash')}</button>` : ''}</div>`).join('')}</div>${keys.length < 5 ? `<form data-form="addKey"><div class="fld"><label for="kt">Nova chave</label><select id="kt" name="type" data-change="keyType"><option value="aleatória">Chave aleatória</option><option value="email">E-mail</option><option value="telefone">Telefone</option><option value="cpf">CPF</option></select></div><div class="fld hidden" id="kvWrap"><label for="kv">Valor da chave</label><input id="kv" name="value" autocomplete="off" autocapitalize="none" /></div><button class="btn" type="submit">${ico('plus')} Cadastrar chave</button></form>` : '<p class="mu sm-t">Você atingiu o limite de 5 chaves.</p>'}`, 'keys');
-}
-/* ---- Pix: cobrar ---- */
-function openCharge() {
-  const keys = U().pixKeys;
-  sheet('Cobrar por Pix', `<form data-form="charge"><div class="fld"><label for="ck">Receber na chave</label><select id="ck" name="key">${keys.map((k) => `<option value="${esc(k.value)}">${esc(k.value)} (${esc(k.type)})</option>`).join('')}</select></div>${amountField('ca', '', 'Valor (opcional)')}<button class="btn" type="submit">Gerar código de cobrança</button></form><div id="chargeOut"></div>`);
-}
-/* ---- cofrinho ---- */
-function openSavings(refresh = false) {
-  const sv = S.st.savings; const m = Math.round(sv.balance * sv.monthlyRate * 100) / 100;
-  sheet('Cofrinho', `<div style="text-align:center;margin-bottom:12px"><div class="sm-t mu">Guardado</div><div class="big">${fmtBRL(sv.balance)}</div><div class="sm-t mu">Rendimento estimado: ${fmtBRL(m)} por mês (1% a.m.)</div></div><form data-form="savings">${amountField('sa', '', 'Quanto?')}<div class="sm-t mu" style="margin-bottom:14px">Conta: ${fmtBRL(U().balance)} · Cofrinho: ${fmtBRL(sv.balance)}</div><div class="btns two"><button class="btn" type="submit" data-dir="in">Guardar</button><button class="btn out" type="submit" data-dir="out">Resgatar</button></div></form>`, 'cofre');
-}
-/* ---- fatura / saque / compra / crédito ---- */
-function openInvoice() {
-  const inv = S.st.invoice; if (inv.used <= 0) return toast('Sua fatura está zerada.');
-  sheet('Pagar fatura', `<div style="text-align:center"><div class="sm-t mu">Fatura atual</div><div class="big">${fmtBRL(inv.used)}</div><div class="sm-t mu">Saldo em conta: ${fmtBRL(U().balance)}</div></div><form data-form="invoice">${amountField('ia', String(inv.used).replace('.', ','), 'Valor a pagar')}<div class="btns"><button class="btn" type="submit">Pagar fatura</button><button class="btn sec" type="button" data-act="fillAll" data-v="${inv.used}">Pagar valor total</button></div></form>`);
-}
-function openDraw() {
-  sheet('Sacar do crédito', `<p class="mu" style="margin-top:0">O dinheiro cai na sua conta na hora. Cobramos <b>3%</b> sobre o valor, somados à fatura.</p><div class="sm-t mu">Limite disponível: <b style="color:var(--tx)">${fmtBRL(S.st.invoice.available)}</b></div><form data-form="draw">${amountField('da', '', 'Quanto você precisa?')}<button class="btn" type="submit">Sacar</button></form>`);
-}
-function openPurchase() {
-  sheet('Simular compra', `<p class="mu" style="margin-top:0">Teste seu cartão: a compra entra na fatura. Disponível: <b style="color:var(--tx)">${fmtBRL(S.st.invoice.available)}</b></p><form data-form="purchase"><div class="fld"><label for="pm">Onde foi a compra?</label><input id="pm" name="merchant" maxlength="50" placeholder="Ex.: Taberna do Dragão" required /></div>${amountField('pv', '', 'Valor')}<button class="btn" type="submit">Comprar no crédito</button></form>`);
-}
-function openCreditReq() {
-  const u = U(), reqs = S.st.creditRequests; const pending = reqs.some((r) => r.status === 'pending');
-  const pill = (s) => s === 'pending' ? '<span class="pill a">em análise</span>' : s === 'approved' ? '<span class="pill g">aprovado</span>' : '<span class="pill r">reprovado</span>';
-  sheet('Limite de crédito', `<div class="card" style="background:var(--p3);box-shadow:none;margin-bottom:14px"><div class="sm-t mu">Limite atual</div><div class="big" style="color:var(--p2)">${fmtBRL(S.st.invoice.limit)}</div><div class="sm-t mu">Score ${u.score} · Usado ${fmtBRL(S.st.invoice.used)}</div></div>${pending ? '<div class="empty" style="padding:10px"><b>Análise em andamento</b>O Armin vai decidir em breve — você será avisado.</div>' : `<form data-form="creditReq">${amountField('cra', '', 'Qual limite você quer?')}<div class="fld"><label for="crp">Para quê?</label><textarea id="crp" name="purpose" maxlength="100" required placeholder="Conte como vai usar o crédito"></textarea></div><button class="btn" type="submit">Enviar para análise</button></form>`}${reqs.length ? `<h3 style="margin:18px 0 4px;font-size:15px">Meus pedidos</h3>${reqs.map((r) => `<div class="kv"><span>${fmtBRL(r.amount)} · ${dShort(r.createdAt)}${r.decisionNote ? `<br><small>${esc(r.decisionNote)}</small>` : ''}</span><span>${pill(r.status)}</span></div>`).join('')}` : ''}`);
-}
-function openPassword() {
-  sheet('Alterar senha', `<form data-form="password"><div class="fld"><label for="p0">Senha atual</label><input id="p0" name="current" type="password" autocomplete="current-password" required /></div><div class="fld"><label for="p1">Nova senha</label><input id="p1" name="next" type="password" autocomplete="new-password" minlength="6" required /><small>Mínimo de 6 caracteres.</small></div><button class="btn" type="submit">Salvar nova senha</button></form>`);
-}
-/* ---- master ---- */
-function openThread(userId, refresh = false) {
-  const t = S.master && S.master.threads.find((x) => x.userId === userId); if (!t) return;
-  S.threadId = userId;
-  sheet(t.name, `<div class="chat" style="padding:0 0 8px;min-height:0;max-height:46vh;overflow-y:auto">${t.messages.map((m) => `<div class="msg ${m.role === 'support' ? 'me' : ''}">${esc(m.text)}<small>${dShort(m.createdAt)} · ${tShort(m.createdAt)}</small></div>`).join('')}</div><form data-form="reply" class="composer" style="position:static;padding:8px 0 0;background:none;border:0"><input type="hidden" name="userId" value="${esc(userId)}" /><input id="ri" name="text" placeholder="Responder como Armin" maxlength="500" autocomplete="off" /><button type="submit" aria-label="Enviar">${ico('send')}</button></form>`, 'thread');
-}
-function openDeposit(id) {
-  const p = S.master.users.find((x) => x.id === id); if (!p) return;
-  sheet(`Depositar para ${p.fullName.split(' ')[0]}`, `<form data-form="deposit"><input type="hidden" name="userId" value="${esc(id)}" />${amountField('dv', '', 'Valor')}<div class="fld"><label for="dn">Motivo</label><input id="dn" name="note" maxlength="60" placeholder="Recompensa da guilda" /></div><button class="btn" type="submit">Depositar</button></form>`);
+function renderAuth() {
+  const tab = S.authTab;
+  $('#root').innerHTML = `
+    <div class="auth">
+      <div class="logo"><b>A</b> ARMIN BANK</div>
+      <h1>Seu banco digital<br>sem complicação</h1>
+      <p>Pix, cartão, cofrinho e crédito em um só lugar.</p>
+      <div class="seg">
+        <button class="${tab==='login'?'on':''}" data-act="switchAuth" data-tab="login">Entrar</button>
+        <button class="${tab==='register'?'on':''}" data-act="switchAuth" data-tab="register">Criar conta</button>
+      </div>
+      ${tab === 'login' ? `
+        <form data-form="login">
+          <div class="fld"><label>Usuário ou e-mail</label><input name="username" required autocomplete="username"></div>
+          <div class="fld"><label>Senha</label><input name="password" type="password" required autocomplete="current-password"></div>
+          <button class="btn" type="submit">${ico('arrow')} Entrar</button>
+        </form>
+      ` : `
+        <form data-form="register">
+          <div class="fld"><label>Nome completo</label><input name="fullName" required placeholder="Seu Nome Sobrenome" autocomplete="name"></div>
+          <div class="fld"><label>Usuário</label><input name="username" required pattern="[a-zA-Z0-9_]+" placeholder="seunome" autocomplete="username"><small>Apenas letras, números e underline</small></div>
+          <div class="fld"><label>Senha</label><input name="password" type="password" required minlength="4" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
+          <button class="btn" type="submit">${ico('check')} Criar minha conta</button>
+        </form>
+      `}
+      <div class="demo">
+        <p>Contas de demonstração:</p>
+        <button data-act="demoLogin" data-u="aventureiro" data-p="1234">👤 Lia (user)</button>
+        <button data-act="demoLogin" data-u="master" data-p="master">👑 Armin (admin)</button>
+      </div>
+    </div>
+  `;
 }
 
-/* =================== ações =================== */
-async function loadMaster() { if (!S.st || U().role !== 'admin') return; try { S.master = await api('/api/master/overview'); render(); } catch (e) { toast(e.message, 'err'); } }
-function go(p) {
-  if (!MAIN.includes(p)) S.back = MAIN.includes(S.page) ? S.page : S.back;
-  S.page = p; closeSheet(); render(); const v = $('#view'); if (v) v.scrollTop = 0;
-  if (p === 'master') loadMaster();
+function tabsHtml() {
+  const tabs = [
+    { id: 'home', label: 'Início', icon: 'home' },
+    { id: 'pix', label: 'Pix', icon: 'pix' },
+    { id: 'card', label: 'Cartão', icon: 'card' },
+    { id: 'more', label: 'Mais', icon: 'plus' },
+  ];
+  return tabs.map(t => `<button class="tab ${S.page===t.id?'on':''}" data-act="goPage" data-page="${t.id}">${ico(t.icon)}${t.label}</button>`).join('');
 }
-const setState = (r) => { if (r && r.state) { S.st = r.state; render(); } };
+
+function renderHome() {
+  const u = U();
+  const txs = (S.st.transactions || []).slice(0, 8);
+  const unread = (S.st.notifications || []).filter(n => !n.read).length;
+  $('#view').innerHTML = `
+    <div class="hdr tall">
+      <div class="bar">
+        <div class="av">${(u.fullName || u.username || '?')[0].toUpperCase()}</div>
+        <div class="tools">
+          <button class="ib" data-act="openNotifs">${ico('bell')}${unread ? `<span class="dot">${unread}</span>` : ''}</button>
+          <button class="ib" data-act="openSupport">${ico('help')}</button>
+          <button class="ib" data-act="logout">${ico('logout')}</button>
+        </div>
+      </div>
+      <h1>Olá, ${(u.fullName || u.username).split(' ')[0]}</h1>
+      <p>Saldo disponível</p>
+    </div>
+    <div class="wrap">
+      <div class="card">
+        <div class="big">${fmtBRL(u.balance)}</div>
+        <div class="acts">
+          <button class="act" data-act="openPix"><i>${ico('pix')}</i>Pix</button>
+          <button class="act" data-act="openSavings"><i>${ico('pig')}</i>Cofrinho</button>
+          <button class="act" data-act="openCard"><i>${ico('card')}</i>Cartão</button>
+          <button class="act" data-act="openCredit"><i>${ico('credit')}</i>Crédito</button>
+          <button class="act" data-act="bonus"><i>${ico('bonus')}</i>Bônus</button>
+        </div>
+      </div>
+      ${u.savings > 0 ? `
+        <div class="card">
+          <div class="ttl"><h3>🐷 Cofrinho</h3><span class="pill g">rendendo</span></div>
+          <div class="big">${fmtBRL(u.savings)}</div>
+          <p class="mu sm-t">Rende ~1% ao mês</p>
+        </div>
+      ` : ''}
+      <div class="card">
+        <div class="ttl"><h3>Últimas transações</h3><button class="lnk" data-act="goPage" data-page="pix">Ver todas</button></div>
+        ${txs.length ? txs.map(txRow).join('') : '<div class="empty"><b>Nenhuma transação</b>Suas movimentações aparecerão aqui.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderMaster() {
+  if (!S.master) { loadMaster(); return; }
+  const m = S.master;
+  $('#view').innerHTML = `
+    <div class="hdr">
+      <div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('arrow')}</button><div></div><button class="ib" data-act="refreshMaster">${ico('refresh')}</button></div>
+      <h1>Painel Master 👑</h1>
+      <p>Gerencie jogadores e crédito</p>
+    </div>
+    <div class="wrap">
+      <div class="stat">
+        <div class="b"><b>${m.metrics.players}</b><span>JOGADORES</span></div>
+        <div class="b"><b>${m.metrics.pendingCredits}</b><span>CRÉDITOS PENDENTES</span></div>
+        <div class="b"><b>${fmtBRL(m.metrics.moneyInPlay)}</b><span>EM JOGO</span></div>
+        <div class="b"><b>${m.metrics.avgScore}</b><span>SCORE MÉDIO</span></div>
+      </div>
+      ${m.pending.length ? `
+        <div class="card">
+          <div class="ttl"><h3>Pedidos de crédito pendentes</h3></div>
+          ${m.pending.map(r => `
+            <div class="row">
+              <div class="ic a">${ico('credit')}</div>
+              <div class="mid"><b>${esc(r.fullName || r.username)}</b><span>${esc(r.purpose)} • ${fmtBRL(r.amount)}</span></div>
+              <div class="end">
+                <button class="btn sm" style="background:var(--gr);color:#fff;margin-bottom:4px" data-act="decide" data-id="${r.id}" data-d="approve">Aprovar</button>
+                <button class="btn sm dng" data-act="decide" data-id="${r.id}" data-d="reject">Reprovar</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+      <div class="card">
+        <div class="ttl"><h3>Jogadores (${m.users.length})</h3></div>
+        ${m.users.map(u => `
+          <div class="row">
+            <div class="av">${(u.fullName || u.username)[0].toUpperCase()}</div>
+            <div class="mid"><b>${esc(u.fullName)}</b><span>@${esc(u.username)} • Score ${u.score}</span></div>
+            <div class="end">${fmtBRL(u.balance)}<small>${u.locked ? '🔒 bloqueado' : ''}</small></div>
+          </div>
+        `).join('')}
+      </div>
+      ${m.support && m.support.length ? `
+        <div class="card">
+          <div class="ttl"><h3>Suporte recente</h3></div>
+          ${m.support.slice(0,5).map(msg => `
+            <div class="row" data-act="thread" data-id="${msg.userId}">
+              <div class="ic">${ico('help')}</div>
+              <div class="mid"><b>${esc(msg.author || 'Jogador')}</b><span>${esc(msg.text.slice(0,50))}</span></div>
+              <div class="end">${fmtDate(msg.createdAt)}${ico('chevron')}</div>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+function txRow(tx) {
+  const isIn = tx.kind === 'pix_in' || tx.kind === 'savings_yield' || tx.kind === 'deposit' || tx.type === 'in';
+  const icon = tx.kind === 'pix_in' || tx.kind === 'pix_out' ? 'pix' : tx.kind === 'card' ? 'card' : tx.kind === 'savings' ? 'pig' : tx.kind === 'credit' ? 'credit' : 'arrow';
+  const title = tx.description || tx.title || (isIn ? 'Recebido' : 'Enviado');
+  const cls = isIn ? 'in' : 'out';
+  const val = isIn ? `+${fmtBRL(Math.abs(tx.amount))}` : `-${fmtBRL(Math.abs(tx.amount))}`;
+  return `<div class="row"><div class="ic ${isIn?'g':'r'}">${ico(icon)}</div><div class="mid"><b>${esc(title)}</b><span>${fmtDate(tx.createdAt)}</span></div><div class="end ${cls}">${val}</div></div>`;
+}
+
+/* ---------- ações ---------- */
 const A = {
-  nav: (el) => go(el.dataset.p),
-  back: () => go(S.back || 'home'),
-  closeSheet,
-  authTab: (el) => { S.authTab = el.dataset.t; render(); },
-  demo: async (el) => { await busy(el, () => doLogin(el.dataset.u, el.dataset.p)); },
-  toggleHide: () => { S.hidden = !S.hidden; localStorage.setItem('armin_hidden', S.hidden ? '1' : '0'); render(); },
-  filter: (el) => { S.filter = el.dataset.f; render(); },
-  receipt: (el) => openReceipt(el.dataset.id),
-  shareReceipt: async (el) => {
-    const t = S.st.transactions.find((x) => x.id === el.dataset.id); if (!t) return;
-    const text = `Comprovante Armin Bank\n${t.title}: ${fmtBRL(Math.abs(t.amount))}\n${t.counterparty ? `${t.amount < 0 ? 'Para' : 'De'}: ${t.counterparty}\n` : ''}${dLong(t.createdAt)} ${tShort(t.createdAt)}\nCódigo: ${t.id}`;
-    if (navigator.share) { try { await navigator.share({ title: 'Comprovante', text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
-    copyText(text, 'Comprovante copiado!');
-  },
-  notifs: () => openNotifs(),
-  logout: async () => { try { await api('/api/logout', { method: 'POST' }); } catch {} doLocalLogout(); },
-  password: openPassword,
-  /* pix */
-  pix: async (el) => { S.pix = { key: el.dataset.key || '' }; if (S.pix.key) { await lookupAndGo(S.pix.key); } else pixStep1(); },
-  pixPaste: () => { S.pix = {}; pixStep1(); pasteInto(); },
-  pasteKey: () => pasteInto(),
-  pixBack1: () => { S.pix = { key: '' }; pixStep1(); },
-  pixBack2: () => pixStep2(),
-  pixConfirm: async (el) => {
-    const p = S.pix; if (!p) return;
-    const r = await busy(el, () => api('/api/pix/send', { method: 'POST', body: { key: p.rec.key, amount: p.value, description: p.note } }));
-    if (r) { setState(r); pixDone(r.tx); }
-  },
-  keys: () => openKeys(),
-  copyKey: (el) => copyText(el.dataset.v, 'Chave copiada!'),
-  delKey: async (el) => { const r = await busy(el, () => api(`/api/pix/key/${encodeURIComponent(el.dataset.id)}`, { method: 'DELETE' })); if (r) { setState(r); toast('Chave removida.', 'ok'); } },
-  charge: openCharge,
-  copyCode: (el) => copyText(el.dataset.v, 'Código copiado!'),
-  /* dinheiro */
-  savings: () => openSavings(),
-  invoice: openInvoice, draw: openDraw, purchase: openPurchase, creditReq: openCreditReq,
-  fillAll: (el) => { const i = $('#ia'); if (i) i.value = String(el.dataset.v).replace('.', ','); },
+  switchAuth: (el) => { S.authTab = el.dataset.tab; render(); },
+  goPage: (el) => { S.page = el.dataset.page; render(); },
+  demoLogin: async (el) => { const r = await busy(el, () => api('/api/login', { method: 'POST', body: { username: el.dataset.u, password: el.dataset.p } })); if (r) { enter(r); } },
+  logout: () => doLocalLogout(),
+  openPix: () => { S.pix = { step: 1, key: '', rec: null, amount: '', value: 0, note: '' }; pixStep1(); },
+  openSavings: () => openSavings(),
+  openCard: () => openCard(),
+  openCredit: () => openCreditReq(),
   bonus: async (el) => { const r = await busy(el, () => api('/api/bonus', { method: 'POST' })); if (r) { setState(r); toast(`Você ganhou ${fmtBRL(r.reward)} de bônus!`, 'ok'); } },
-  /* cartão */
   cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method: 'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
   cardReveal: async (el) => {
     if (S.card) { S.card = null; clearTimeout(S.cardTimer); return render(); }
     const r = await busy(el, () => api('/api/card/secret')); if (!r) return;
     S.card = r.card; render(); clearTimeout(S.cardTimer); S.cardTimer = setTimeout(() => { S.card = null; render(); }, 20000);
   },
-  /* master */
   decide: async (el) => { const r = await busy(el, () => api(`/api/master/credit/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method: 'POST', body: {} })); if (r) { toast(el.dataset.d === 'approve' ? 'Crédito aprovado.' : 'Análise reprovada.', 'ok'); loadMaster(); } },
   thread: (el) => openThread(el.dataset.id),
   deposit: (el) => openDeposit(el.dataset.id),
+  refreshMaster: () => loadMaster(),
+  openNotifs: () => openNotifs(),
+  openSupport: () => openSupportChat(),
+  closeSheet: () => sheetClose(),
 };
 async function pasteInto() {
   try { const t = await navigator.clipboard.readText(); const i = $('#pk'); if (i && t) { i.value = t.trim(); toast('Colado!', 'ok'); } else toast('Nada para colar.'); }
@@ -563,7 +449,7 @@ async function lookupAndGo(raw) {
 }
 const CH = { keyType: (el) => { $('#kvWrap').classList.toggle('hidden', el.value === 'aleatória'); const k = $('#kv'); if (k) { k.required = el.value !== 'aleatória'; k.placeholder = { email: 'voce@email.com', telefone: '(11) 91234-5678', cpf: '000.000.000-00' }[el.value] || ''; } } };
 
-/* ---- formulários ---- */
+/* ---------- formulários ---------- */
 const F = {
   login: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); await busy(ev.submitter, () => doLogin(d.username, d.password)); },
   register: async (f, ev) => {
@@ -590,11 +476,11 @@ const F = {
     const r = await busy(ev.submitter, () => api(`/api/savings/${dir}`, { method: 'POST', body: { amount: v } }));
     if (r) { setState(r); openSavings(); toast(dir === 'in' ? 'Guardado com sucesso!' : 'Resgate feito — dinheiro na conta.', 'ok'); }
   },
-  invoice: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/pay', { method: 'POST', body: { amount: v } })); if (r) { setState(r); closeSheet(); toast('Fatura paga!', 'ok'); } },
-  draw: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v >= 10)) return toast('O valor mínimo é R$ 10,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/draw', { method: 'POST', body: { amount: v } })); if (r) { setState(r); closeSheet(); toast(`${fmtBRL(v)} na sua conta!`, 'ok'); } },
-  purchase: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/card/purchase', { method: 'POST', body: { merchant: d.merchant, amount: v } })); if (r) { setState(r); closeSheet(); toast('Compra aprovada!', 'ok'); } },
+  invoice: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/pay', { method: 'POST', body: { amount: v } })); if (r) { setState(r); sheetClose(); toast('Fatura paga!', 'ok'); } },
+  draw: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v >= 10)) return toast('O valor mínimo é R$ 10,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/draw', { method: 'POST', body: { amount: v } })); if (r) { setState(r); sheetClose(); toast(`${fmtBRL(v)} na sua conta!`, 'ok'); } },
+  purchase: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/card/purchase', { method: 'POST', body: { merchant: d.merchant, amount: v } })); if (r) { setState(r); sheetClose(); toast('Compra aprovada!', 'ok'); } },
   creditReq: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v >= 100)) return toast('Peça pelo menos R$ 100,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/request', { method: 'POST', body: { amount: v, purpose: d.purpose } })); if (r) { setState(r); openCreditReq(); toast(r.message, 'ok'); } },
-  password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method: 'POST', body: d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); closeSheet(); toast('Senha alterada!', 'ok'); } },
+  password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method: 'POST', body: d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); sheetClose(); toast('Senha alterada!', 'ok'); } },
   support: async (f, ev) => {
     const text = new FormData(f).get('text') ?? $('#chatIn').value; const t = String(text).trim(); if (!t) return;
     const r = await busy(ev.submitter, () => api('/api/support/messages', { method: 'POST', body: { text: t } })); if (r) { $('#chatIn').value = ''; setState(r); }
@@ -603,15 +489,15 @@ const F = {
     const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return;
     const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method: 'POST', body: d })); if (r) { await loadMaster(); openThread(d.userId, true); }
   },
-  deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method: 'POST', body: { userId: d.userId, amount: v, note: d.note } })); if (r) { closeSheet(); toast('Depósito feito.', 'ok'); loadMaster(); } },
+  deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method: 'POST', body: { userId: d.userId, amount: v, note: d.note } })); if (r) { sheetClose(); toast('Depósito feito.', 'ok'); loadMaster(); } },
 };
 
-/* =================== sessão e tempo real =================== */
+/* ====== sessão e tempo real ====== */
 async function doLogin(username, password) { const r = await api('/api/login', { method: 'POST', body: { username, password } }); enter(r); toast(`Olá, ${r.state.user.fullName.split(' ')[0]}!`, 'ok'); }
 function enter(r) { S.token = r.token; localStorage.setItem('armin_token', S.token); S.st = r.state; S.page = 'home'; S.master = null; render(); connectSocket(); }
 function doLocalLogout() {
   localStorage.removeItem('armin_token'); S.token = ''; S.st = null; S.master = null; S.card = null; S.page = 'home'; S.authTab = 'login';
-  if (S.socket) { S.socket.disconnect(); S.socket = null; } closeSheet(); render();
+  if (S.socket) { S.socket.disconnect(); S.socket = null; } sheetClose(); render();
 }
 function connectSocket() {
   if (S.socket) { S.socket.disconnect(); S.socket = null; }
@@ -622,7 +508,7 @@ function connectSocket() {
 }
 async function poll() { if (!S.token || !S.st || document.hidden) return; try { const r = await api('/api/me'); if (JSON.stringify(r.state) !== JSON.stringify(S.st)) { S.st = r.state; render(); } } catch {} }
 
-/* =================== eventos globais =================== */
+/* ========= eventos globais ========= */
 document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const fn = A[el.dataset.act]; if (!fn) { console.warn('Ação sem handler:', el.dataset.act); return; }
@@ -633,11 +519,11 @@ document.addEventListener('submit', (e) => {
   const fn = F[f.dataset.form]; if (fn) fn(f, e); else console.warn('Form sem handler:', f.dataset.form);
 });
 document.addEventListener('change', (e) => { const el = e.target.closest('[data-change]'); if (el && CH[el.dataset.change]) CH[el.dataset.change](el); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sheetOpen()) closeSheet(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sheetOpen()) sheetClose(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 setInterval(poll, 25000);
 
-/* =================== boot =================== */
+/* ========= boot ========= */
 $('#root').innerHTML = shell();
 (async function boot() {
   render();
