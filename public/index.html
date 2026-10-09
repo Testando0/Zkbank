@@ -50,11 +50,12 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .view{flex:1;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(92px + var(--bot))}
 .hdr{background:var(--bg);color:#fff;padding:calc(14px + var(--top)) 18px 22px}
 .hdr .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px}
-.hdr .tools{display:flex;gap:4px}
+.hdr .tools{display:flex;gap:4px;align-items:center}
 .ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:inherit;position:relative}
 .ib:active{background:var(--card2)}
 .hdr h1{margin:10px 0 0;font-size:26px;letter-spacing:-.03em;line-height:1.15;color:#fff}
 .hdr p{margin:4px 0 0;color:var(--mu);font-size:13.5px}
+.hdr .balance{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:10px 0 0;color:#fff}
 .av{width:42px;height:42px;border-radius:50%;background:var(--p);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px;flex:none}
 .dot{position:absolute;top:5px;right:5px;min-width:17px;height:17px;border-radius:9px;background:var(--rd);color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid var(--bg)}
 .wrap{padding:14px 14px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
@@ -99,7 +100,21 @@ button.row:active{background:var(--card2)}
 .plastic .num{position:absolute;left:20px;right:20px;bottom:44px;font-family:'Courier New',monospace;font-size:clamp(14px,4.6vw,19px);letter-spacing:.1em;font-weight:700;white-space:nowrap}
 .plastic .foot{position:absolute;left:20px;right:20px;bottom:18px;display:flex;justify-content:space-between;font-size:12px;gap:8px}
 .blocked{filter:grayscale(.85) brightness(.75)}
-/* menu inferior fixo */
+/* chat de suporte */
+.chatscroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
+.chatscroll::-webkit-scrollbar{display:none}
+.msgrow{display:flex;gap:8px;align-items:flex-end}
+.msgrow.me{justify-content:flex-end}
+.mavatar{width:28px;height:28px;border-radius:50%;background:var(--p3);color:#c77dff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.bubble{max-width:78%;padding:10px 14px;border-radius:18px;border-bottom-left-radius:6px;font-size:14px;line-height:1.45;background:var(--card2);color:#fff;word-wrap:break-word}
+.msgrow.me .bubble{background:var(--p);border-bottom-left-radius:18px;border-bottom-right-radius:6px}
+.mtime{font-size:10px;color:rgba(255,255,255,.55);margin-top:4px;text-align:right}
+.composer{flex:none;display:flex;gap:8px;align-items:center;padding:10px 12px calc(10px + var(--bot));border-top:1px solid var(--ln);background:var(--bg)}
+.composer input{flex:1;min-width:0;border:1.5px solid var(--ln);border-radius:999px;padding:12px 16px;background:var(--card2);color:#fff;outline:0;font-size:15px}
+.composer input:focus{border-color:var(--p)}
+.composer .send{width:46px;height:46px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;flex:none}
+.composer .send:active{filter:brightness(.9)}
+/* menu inferior */
 .tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg);border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot));z-index:20}
 .tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;font-size:10.5px;font-weight:700;color:var(--mu)}
 .tab.on{color:#c77dff}
@@ -112,11 +127,6 @@ button.row:active{background:var(--card2)}
 .sheet h3{color:#fff}
 .sheet .close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--card2);display:grid;place-items:center;color:var(--mu)}
 .code{background:#000;border:1.5px dashed var(--ln);border-radius:12px;padding:14px;font-family:'Courier New',monospace;font-size:12px;word-break:break-all;margin:14px 0;color:#fff}
-.chat{display:flex;flex-direction:column;gap:10px;padding:10px 0}
-.msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4}
-.msg.user{align-self:flex-end;background:var(--p);color:#fff;border-bottom-right-radius:4px}
-.msg.other{align-self:flex-start;background:var(--card2);color:#fff;border-bottom-left-radius:4px}
-.msg .who{display:block;font-size:11px;font-weight:700;opacity:.7;margin-bottom:3px}
 .stat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
 .stat .b{background:var(--card);border-radius:12px;padding:14px;text-align:center}
 .stat .b b{display:block;font-size:20px;font-weight:800;color:#c77dff;margin-bottom:4px}
@@ -143,7 +153,7 @@ const parseMoney = (s) => { const n = Number(String(s).replace(/\./g,'').replace
 const U = () => (S.st && S.st.user) || {};
 const ini = () => ((U().fullName || U().username || '?')[0] || '?').toUpperCase();
 
-const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', bonus:'<path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
+const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', back:'<path d="M19 12H5M12 19l-7-7 7-7"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', bonus:'<path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
 const ico = (k) => `<svg class="i" viewBox="0 0 24 24">${ICO[k] || ''}</svg>`;
 
 const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, page: 'home', authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'' }, toastTimer: null, sheetEl: null };
@@ -183,7 +193,10 @@ function render() {
   if (!S.token || !S.st) { renderAuth(); return; }
   $('#root').innerHTML = shell();
   $('#tabs').innerHTML = tabsHtml();
+  const v = $('#view');
+  v.style.cssText = (S.page === 'support') ? 'display:flex;flex-direction:column;overflow:hidden;padding-bottom:calc(66px + var(--bot))' : '';
   if (S.page === 'master' && U().role === 'admin') renderMaster();
+  else if (S.page === 'support') renderSupport();
   else if (S.page === 'pixhub') renderPixHub();
   else if (S.page === 'pix') renderExtract();
   else if (S.page === 'card') renderCardPage();
@@ -237,16 +250,18 @@ function renderHome() {
       <button class="ib" data-act="openSupport">${ico('help')}</button>
       <button class="ib" data-act="logout">${ico('logout')}</button>
     </div></div>
-    <h1>Olá, ${esc((u.fullName||u.username||'').split(' ')[0])}</h1><p>Saldo disponível</p></div>
+    <h1>Olá, ${esc((u.fullName||u.username||'').split(' ')[0])}</h1>
+    <p>Saldo disponível</p>
+    <div class="balance">${fmtBRL(u.balance)}</div>
+  </div>
   <div class="wrap">
-    <div class="card"><div class="big">${fmtBRL(u.balance)}</div>
-      <div class="acts">
-        <button class="act" data-act="openPixHub"><i>${ico('pix')}</i>Área Pix</button>
-        <button class="act" data-act="openPix"><i>${ico('arrow')}</i>Enviar</button>
-        <button class="act" data-act="openSavings"><i>${ico('pig')}</i>Cofrinho</button>
-        <button class="act" data-act="openCard"><i>${ico('card')}</i>Cartão</button>
-        <button class="act" data-act="bonus"><i>${ico('bonus')}</i>Bônus</button>
-      </div></div>
+    <div class="card"><div class="acts">
+      <button class="act" data-act="openPixHub"><i>${ico('pix')}</i>Área Pix</button>
+      <button class="act" data-act="openPix"><i>${ico('arrow')}</i>Enviar</button>
+      <button class="act" data-act="openSavings"><i>${ico('pig')}</i>Cofrinho</button>
+      <button class="act" data-act="openCard"><i>${ico('card')}</i>Cartão</button>
+      <button class="act" data-act="bonus"><i>${ico('bonus')}</i>Bônus</button>
+    </div></div>
     <button class="row" style="border-radius:var(--r);border-bottom:0" data-act="openPixHub">
       <div class="ic">${ico('pix')}</div>
       <div class="mid"><b>Área Pix</b><span>Enviar, cobrar e gerenciar chaves</span></div>${ico('chev')}
@@ -255,6 +270,32 @@ function renderHome() {
     <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Últimas movimentações</h3><button class="lnk" data-act="goPage" data-page="pix">Ver tudo</button></div>
       ${txs.length ? txs.map(txRow).join('') : '<div class="empty"><b>Nada por aqui ainda</b>Suas movimentações aparecem aqui.</div>'}</div>
   </div>`;
+}
+function msgRow(m) {
+  const me = m.role !== 'support';
+  return `<div class="msgrow ${me?'me':'them'}">
+    ${me ? '' : `<div class="mavatar">A</div>`}
+    <div class="bubble"><div class="mtext">${esc(m.text)}</div><div class="mtime">${fmtDate(m.createdAt)}</div></div>
+  </div>`;
+}
+function scrollChat(root) { const w = (root || document).querySelector('.chatscroll'); if (w) w.scrollTop = w.scrollHeight; }
+function renderSupport() {
+  const msgs = S.st.supportMessages || [];
+  $('#view').innerHTML = `
+  <div class="hdr" style="padding-bottom:14px">
+    <div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button>
+      <div class="tools"><span class="pill g">online</span></div></div>
+    <h1 style="font-size:22px;margin-top:6px">Suporte Armin</h1>
+    <p>A gente responde por aqui, em tempo real</p>
+  </div>
+  <div class="chatscroll">
+    ${msgs.length ? msgs.map(msgRow).join('') : '<div class="empty"><b>Nenhuma mensagem ainda</b>Mande um oi que a conversa começa.</div>'}
+  </div>
+  <form class="composer" data-form="support">
+    <input name="text" placeholder="Escreva sua mensagem" autocomplete="off">
+    <button class="send" type="submit" aria-label="Enviar">${ico('arrow')}</button>
+  </form>`;
+  scrollChat();
 }
 function renderPixHub() {
   const u = U(); const pixTx = (S.st.transactions || []).filter(t => (t.kind||'').includes('pix')).slice(0, 6);
@@ -311,7 +352,7 @@ function renderMaster() {
   if (!S.master) { $('#view').innerHTML = '<div class="empty">Carregando painel…</div>'; loadMaster(); return; }
   const m = S.master;
   $('#view').innerHTML = `
-  <div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('arrow')}</button><div class="tools"><button class="ib" data-act="refreshMaster">${ico('refresh')}</button></div></div><h1>Painel Master</h1><p>Gerencie jogadores e crédito</p></div>
+  <div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button><div class="tools"><button class="ib" data-act="refreshMaster">${ico('refresh')}</button></div></div><h1>Painel Master</h1><p>Gerencie jogadores e crédito</p></div>
   <div class="wrap">
     <div class="stat"><div class="b"><b>${m.metrics.players}</b><span>JOGADORES</span></div><div class="b"><b>${m.metrics.pendingCredits}</b><span>CRÉDITO PENDENTE</span></div><div class="b"><b>${fmtBRL(m.metrics.moneyInPlay)}</b><span>EM JOGO</span></div><div class="b"><b>${m.metrics.avgScore}</b><span>SCORE MÉDIO</span></div></div>
     ${m.pending.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Pedidos de crédito</h3></div>${m.pending.map(r => `
@@ -365,13 +406,19 @@ function openCharge() { const u = U(); sheetOpen(`<h2>Cobrar via Pix</h2><div id
 function openNotifs() { const ns = S.st.notifications || []; sheetOpen(`<h2>Notificações</h2><div id="sheetBody">
   ${ns.length ? ns.slice().reverse().map(n => `<div class="row" style="background:var(--card2);border-radius:12px;margin-bottom:8px;border-bottom:0"><div class="ic">${ico('bell')}</div><div class="mid"><b>${esc(n.title)}</b><span>${esc(n.text)}</span></div></div>`).join('') : '<div class="empty">Nenhuma notificação.</div>'}
   ${(S.st.unread||0) > 0 ? `<button class="btn sec" data-act="markRead">Marcar todas como lidas</button>` : ''}</div>`); }
-function openSupport() { const msgs = S.st.supportMessages || []; sheetOpen(`<h2>Suporte</h2><div id="sheetBody">
-  <div class="chat">${msgs.map(m => `<div class="msg ${m.role==='support'?'other':'user'}"><span class="who">${esc(m.author||'')}</span>${esc(m.text)}</div>`).join('') || '<div class="empty">Mande uma mensagem.</div>'}</div>
-  <form data-form="support"><div class="fld"><input id="chatIn" name="text" placeholder="Escreva sua mensagem"></div><button class="btn" type="submit">Enviar</button></form></div>`); }
-function openThread(userId) { const m = S.master || {}; const msgs = (m.support||[]).filter(x => x.userId === userId); const name = (m.users||[]).find(u => u.id === userId);
-  sheetOpen(`<h2>${esc(name ? name.fullName : 'Jogador')}</h2><div id="sheetBody">
-  <div class="chat">${msgs.map(x => `<div class="msg ${x.role==='support'?'other':'user'}"><span class="who">${esc(x.author||'')}</span>${esc(x.text)}</div>`).join('') || '<div class="empty">Sem mensagens.</div>'}</div>
-  <form data-form="reply"><input type="hidden" name="userId" value="${esc(userId)}"><div class="fld"><input name="text" placeholder="Responder como master"></div><button class="btn" type="submit">Responder</button></form></div>`); }
+function openThread(userId) {
+  const m = S.master || {}; const msgs = (m.support||[]).filter(x => x.userId === userId); const name = (m.users||[]).find(u => u.id === userId);
+  const s = sheetOpen(`<h2>${esc(name ? name.fullName : 'Jogador')}</h2><div id="sheetBody">
+  <div class="chatscroll" style="max-height:45vh;padding:4px 0 10px">
+    ${msgs.map(msgRow).join('') || '<div class="empty">Sem mensagens.</div>'}
+  </div>
+  <form class="composer" data-form="reply" style="border-top:0;padding:4px 0 0">
+    <input type="hidden" name="userId" value="${esc(userId)}">
+    <input name="text" placeholder="Responder como master" autocomplete="off">
+    <button class="send" type="submit" aria-label="Responder">${ico('arrow')}</button>
+  </form></div>`);
+  scrollChat(s);
+}
 function openDeposit(userId) { sheetOpen(`<h2>Depósito master</h2><div id="sheetBody">
   <form data-form="deposit"><input type="hidden" name="userId" value="${esc(userId)}"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Motivo</label><input name="note" maxlength="80" placeholder="Ex: prêmio do evento"></div><button class="btn" type="submit">Depositar</button></form></div>`); }
 function openPassword() { sheetOpen(`<h2>Alterar senha</h2><div id="sheetBody">
@@ -393,7 +440,7 @@ const A = {
   openKeys: () => openKeys(),
   openCharge: () => openCharge(),
   openNotifs: () => openNotifs(),
-  openSupport: () => openSupport(),
+  openSupport: () => { S.page = 'support'; render(); },
   openPassword: () => openPassword(),
   pasteCode: async () => { pixStep1(); setTimeout(() => A.pasteInto(), 150); },
   bonus: async (el) => { const r = await busy(el, () => api('/api/bonus', { method:'POST' })); if (r) { setState(r); toast(`Você ganhou ${fmtBRL(r.reward)} de bônus!`, 'ok'); } },
