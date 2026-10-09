@@ -3,17 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#1a1a1a" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#000000" />
 <meta name="description" content="Armin Bank — conta digital com Pix, cartão, cofrinho e crédito." />
 <link rel="manifest" href="/manifest.webmanifest" />
 <link rel="icon" href="/icon.svg" type="image/svg+xml" />
-<link rel="apple-touch-icon" href="/icon.svg" />
 <title>Armin Bank</title>
 <style>
-:root{--p:#820ad1;--p2:#6a07ae;--p3:#f3e8fb;--bg:#1a1a1a;--card:#2d2d2d;--tx:#ffffff;--mu:#a0a0a0;--ln:#404040;--gr:#0e9f6e;--gr2:#1a4d3a;--rd:#d6334f;--rd2:#4d1f2a;--am:#b7791f;--am2:#4d3d1f;--r:16px;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+:root{--bg:#000;--card:#141416;--card2:#1e1e22;--tx:#fff;--mu:#8e8e96;--ln:#26262b;--p:#820ad1;--p2:#9b1be8;--p3:#2a1240;--gr:#00c853;--gr2:#0e3b22;--rd:#ff5a76;--rd2:#3b1220;--am:#ffb020;--am2:#3b2a0e;--r:16px;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
 body{font-size:15px;line-height:1.4}
@@ -22,205 +18,140 @@ button{border:0;background:none;cursor:pointer;padding:0;touch-action:manipulati
 button:disabled{opacity:.55;cursor:default}
 svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .hidden{display:none!important}
-.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-#root{height:100%;max-width:480px;margin:0 auto;position:relative;background:var(--bg);box-shadow:0 0 0 1px rgba(255,255,255,.04)}
-@media(min-width:520px){body{background:#0d0d0d}#root{height:min(100%,900px);margin-top:max(0px,calc((100vh - 900px)/2));overflow:hidden;border-radius:20px}}
-
-/* ---------- login ---------- */
-.auth{height:100%;overflow-y:auto;background:linear-gradient(135deg,#820ad1 0%,#6a07ae 100%);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
+#root{height:100%;max-width:480px;margin:0 auto;position:relative;background:var(--bg)}
+@media(min-width:520px){body{background:#000}#root{height:min(100%,900px);margin-top:max(0px,calc((100vh - 900px)/2));overflow:hidden;border-radius:24px;box-shadow:0 0 0 1px #1e1e22}}
+/* login — fundo PRETO, detalhes roxos */
+.auth{height:100%;overflow-y:auto;background:var(--bg);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
-.logo b{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--p);display:grid;place-items:center;font-size:19px;letter-spacing:0}
-.auth h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;margin:44px 0 8px}
-.auth>p{margin:0 0 24px;opacity:.85}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.16);border-radius:12px;padding:4px;margin-bottom:18px}
-.seg button{padding:10px;border-radius:9px;font-weight:700;color:rgba(255,255,255,.85)}
-.seg button.on{background:#fff;color:var(--p)}
-.auth .fld label{color:rgba(255,255,255,.9)}
-.auth input{background:#fff;color:#1a1a1a}
-.auth .btn{background:#fff;color:var(--p);margin-top:8px}
-.demo{margin-top:auto;padding-top:26px;font-size:12px;opacity:.9;text-align:center}
-.demo button{display:inline-block;margin:6px 4px 0;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:12px}
-
-/* ---------- campos e botões ---------- */
+.logo b{width:38px;height:38px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;font-size:19px;letter-spacing:0}
+.auth h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;margin:44px 0 8px;color:#fff}
+.auth>p{margin:0 0 24px;color:var(--mu)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card2);border-radius:12px;padding:4px;margin-bottom:18px}
+.seg button{padding:10px;border-radius:9px;font-weight:700;color:var(--mu)}
+.seg button.on{background:var(--p);color:#fff}
+.auth .fld label{color:var(--mu)}
 .fld{margin:0 0 14px}
 .fld label{display:block;font-size:12.5px;font-weight:700;color:var(--mu);margin-bottom:6px}
-.fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:14px;background:#2d2d2d;color:var(--tx);outline:0;font-size:16px;transition:border-color .15s,box-shadow .15s}
-.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(130,10,209,.3)}
-.fld textarea{min-height:88px;resize:none}
+.fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:14px;background:var(--card2);color:#fff;outline:0;font-size:16px;transition:border-color .15s,box-shadow .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(130,10,209,.35)}
 .fld small{display:block;color:var(--mu);margin-top:5px;font-size:12px}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border-radius:999px;background:var(--p);color:#fff;font-weight:700;font-size:15.5px;padding:0 22px}
-.btn:active:not(:disabled){filter:brightness(.92)}
-.btn.sec{background:#3d3d3d;color:var(--p)}
-.btn.out{background:#2d2d2d;color:var(--p);border:1.5px solid var(--p)}
+.btn:active:not(:disabled){filter:brightness(.9)}
+.btn.sec{background:var(--card2);color:#c77dff}
+.btn.out{background:transparent;color:#c77dff;border:1.5px solid var(--p)}
 .btn.dng{background:var(--rd2);color:var(--rd)}
 .btn.sm{min-height:38px;font-size:13.5px;padding:0 16px;width:auto}
 .btns{display:grid;gap:10px;margin-top:6px}
 .btns.two{grid-template-columns:1fr 1fr}
-.lnk{color:var(--p);font-weight:700;font-size:13.5px}
-
-/* ---------- estrutura ---------- */
+.lnk{color:#c77dff;font-weight:700;font-size:13.5px}
+.demo{margin-top:auto;padding-top:26px;font-size:12px;color:var(--mu);text-align:center}
+.demo button{display:inline-block;margin:6px 4px 0;padding:8px 12px;border-radius:999px;background:var(--card2);color:#fff;font-weight:700;font-size:12px}
+/* app */
 .app{height:100%;display:flex;flex-direction:column}
 .view{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(84px + var(--bot))}
 .view.sub{padding-bottom:calc(24px + var(--bot))}
-.hdr{background:var(--p);color:#fff;padding:calc(14px + var(--top)) 18px 22px}
-.hdr.tall{padding-bottom:30px}
+.hdr{background:var(--bg);color:#fff;padding:calc(14px + var(--top)) 18px 22px}
 .hdr .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px}
 .hdr .tools{display:flex;gap:4px}
 .ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:inherit;position:relative}
-.ib:active{background:rgba(255,255,255,.15)}
-.hdr h1{margin:10px 0 0;font-size:26px;letter-spacing:-.03em;line-height:1.15}
-.hdr p{margin:4px 0 0;opacity:.85;font-size:13.5px}
-.av{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
-.dot{position:absolute;top:7px;right:7px;min-width:17px;height:17px;border-radius:9px;background:#ff4d6d;color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid var(--p)}
+.ib:active{background:var(--card2)}
+.hdr h1{margin:10px 0 0;font-size:26px;letter-spacing:-.03em;line-height:1.15;color:#fff}
+.hdr p{margin:4px 0 0;color:var(--mu);font-size:13.5px}
+.av{width:42px;height:42px;border-radius:50%;background:var(--p);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
+.dot{position:absolute;top:5px;right:5px;min-width:17px;height:17px;border-radius:9px;background:var(--rd);color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid var(--bg)}
 .wrap{padding:14px 14px 0;display:grid;gap:12px}
-.card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.card{background:var(--card);border-radius:var(--r);padding:16px}
 .card.flush{padding:0;overflow:hidden}
 .ttl{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
-.ttl h3{margin:0;font-size:15px}
+.ttl h3{margin:0;font-size:15px;color:#fff}
 .mu{color:var(--mu)}.sm-t{font-size:12.5px}
-.big{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:2px 0}
-.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--ln);background:#2d2d2d}
+.big{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:2px 0;color:#fff}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--ln);background:var(--card)}
 .row:last-child{border-bottom:0}
-button.row:active{background:#3a3a3a}
-.row .ic{width:40px;height:40px;border-radius:50%;background:var(--p3);color:var(--p);display:grid;place-items:center;flex:none}
-.row .ic.g{background:var(--gr2);color:var(--gr)}.row .ic.r{background:var(--rd2);color:var(--rd)}.row .ic.a{background:var(--am2);color:var(--am)}.row .ic.n{background:#4d4d4d;color:#a0a0a0}
+button.row:active{background:var(--card2)}
+.row .ic{width:40px;height:40px;border-radius:50%;background:var(--p3);color:#c77dff;display:grid;place-items:center;flex:none}
+.row .ic.g{background:var(--gr2);color:var(--gr)}.row .ic.r{background:var(--rd2);color:var(--rd)}.row .ic.a{background:var(--am2);color:var(--am)}
 .row .mid{flex:1;min-width:0}
-.row .mid b{display:block;font-size:14.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .mid b{display:block;font-size:14.5px;font-weight:650;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .mid span{display:block;font-size:12.5px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.row .end{text-align:right;font-weight:700;font-size:14.5px;flex:none;max-width:44%}
+.row .end{text-align:right;font-weight:700;font-size:14.5px;flex:none;max-width:44%;color:#fff}
 .row .end small{display:block;font-weight:500;font-size:11.5px;color:var(--mu)}
 .in{color:var(--gr)}.out{color:var(--tx)}
-.chev{color:#6b6b6b;width:20px;height:20px}
-.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#4d4d4d;color:#a0a0a0}
-.pill.g{background:var(--gr2);color:var(--gr)}.pill.a{background:var(--am2);color:var(--am)}.pill.r{background:var(--rd2);color:var(--rd)}.pill.p{background:var(--p3);color:var(--p)}
+.chev{color:#55555c;width:20px;height:20px}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:var(--card2);color:var(--mu)}
+.pill.g{background:var(--gr2);color:var(--gr)}.pill.r{background:var(--rd2);color:var(--rd)}.pill.p{background:var(--p3);color:#c77dff}
 .empty{text-align:center;color:var(--mu);padding:30px 18px;font-size:13.5px}
-.empty b{display:block;color:var(--tx);margin-bottom:4px;font-size:15px}
-.day{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 6px;background:var(--bg)}
-.acts{display:flex;gap:10px;overflow-x:auto;padding:2px 14px 4px;margin:0 -14px;scrollbar-width:none}
+.empty b{display:block;color:#fff;margin-bottom:4px;font-size:15px}
+.day{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 6px;background:var(--card)}
+.acts{display:flex;gap:10px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}
 .acts::-webkit-scrollbar{display:none}
-.act{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:650;text-align:center}
-.act i{width:58px;height:58px;border-radius:50%;background:#2d2d2d;color:var(--p);display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.act{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:650;text-align:center;color:var(--mu)}
+.act i{width:58px;height:58px;border-radius:50%;background:var(--card2);color:#c77dff;display:grid;place-items:center}
 .act:active i{background:var(--p3)}
-.chips{display:flex;gap:8px;overflow-x:auto;padding:0 14px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
-.chip{flex:none;padding:8px 14px;border-radius:999px;background:#2d2d2d;font-weight:700;font-size:13px;color:#a0a0a0;border:1.5px solid transparent}
-.chip.on{background:var(--p3);color:var(--p);border-color:var(--p)}
-.people{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none}.people::-webkit-scrollbar{display:none}
-.ppl{flex:0 0 64px;text-align:center;font-size:12px;font-weight:600}
-.ppl i{display:grid;place-items:center;width:52px;height:52px;margin:0 auto 5px;border-radius:50%;background:var(--p3);color:var(--p);font-style:normal;font-weight:800}
-.ppl span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar2{height:8px;border-radius:99px;background:#4d4d4d;overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
+.bar2{height:8px;border-radius:99px;background:var(--ln);overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:14px}
-.kv:last-child{border-bottom:0}.kv span:first-child{color:var(--mu)}.kv span:last-child{font-weight:650;text-align:right;overflow-wrap:anywhere}
-
-/* ---------- cartão ---------- */
-.plastic{border-radius:20px;padding:20px;color:#fff;position:relative;overflow:hidden;aspect-ratio:1.6/1;background:linear-gradient(135deg,#820ad1 0%,#6a07ae 100%)}
-.plastic::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.15) 0,transparent 40%);pointer-events:none}
-.plastic .tp{position:absolute;top:20px;right:20px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
-.plastic .chip{position:absolute;top:20px;left:20px;width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#d4af37 0%,#f4d03f 100%);box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.kv:last-child{border-bottom:0}.kv span:first-child{color:var(--mu)}.kv span:last-child{font-weight:650;text-align:right;color:#fff;overflow-wrap:anywhere}
+/* cartão roxo (o plástico pode ser roxo, como o cartão real da Nubank) */
+.plastic{border-radius:20px;padding:20px;color:#fff;position:relative;overflow:hidden;aspect-ratio:1.6/1;background:linear-gradient(135deg,#820ad1 0%,#4a0476 100%)}
+.plastic::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.16) 0,transparent 40%);pointer-events:none}
+.plastic .chipic{position:absolute;top:20px;left:20px;width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#d4af37,#f4d03f)}
+.plastic .tp{position:absolute;top:22px;right:20px}
 .plastic .num{position:absolute;left:20px;right:20px;bottom:44px;font-family:'Courier New',monospace;font-size:19px;letter-spacing:.12em;font-weight:700}
-.plastic .foot{position:absolute;left:20px;right:20px;bottom:20px;display:flex;justify-content:space-between;align-items:center;font-size:12px}
-.plastic .brand{font-weight:800;letter-spacing:.05em;font-size:14px}
-.blocked{filter:grayscale(.8) brightness(.8)}
-
-/* ---------- navegação inferior ---------- */
-.tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:#2d2d2d;border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot))}
+.plastic .foot{position:absolute;left:20px;right:20px;bottom:18px;display:flex;justify-content:space-between;font-size:12px}
+.blocked{filter:grayscale(.85) brightness(.75)}
+/* tabs pretas */
+.tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot))}
 .tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;font-size:11px;font-weight:700;color:var(--mu)}
-.tab.on{color:var(--p)}
+.tab.on{color:#c77dff}
 .tab i{width:26px;height:26px}
-
-/* ---------- sheets ---------- */
-.sheet{position:absolute;bottom:0;left:0;right:0;background:#2d2d2d;border-radius:20px 20px 0 0;padding:0 18px calc(18px + var(--bot));box-shadow:0 -8px 24px rgba(0,0,0,.4);transform:translateY(100%);transition:transform .25s ease-out;z-index:10;max-height:85%;overflow-y:auto}
+/* sheet preto */
+.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:0 18px calc(18px + var(--bot));box-shadow:0 -8px 24px rgba(0,0,0,.6);transform:translateY(100%);transition:transform .25s ease-out;z-index:10;max-height:85%;overflow-y:auto}
 .sheet.open{transform:translateY(0)}
-.sheet .grip{width:38px;height:4px;border-radius:2px;background:#4d4d4d;margin:10px auto 14px}
-.sheet h2{margin:0 0 14px;font-size:20px;letter-spacing:-.02em}
-.sheet .close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:#4d4d4d;display:grid;place-items:center;color:var(--mu)}
-
-/* ---------- código Pix ---------- */
-.code{background:#1a1a1a;border:1.5px dashed var(--ln);border-radius:12px;padding:14px;font-family:'Courier New',monospace;font-size:12px;word-break:break-all;margin:14px 0;color:var(--tx)}
-
-/* ---------- chat ---------- */
+.sheet .grip{width:38px;height:4px;border-radius:2px;background:var(--ln);margin:10px auto 14px}
+.sheet h2{margin:0 0 14px;font-size:20px;letter-spacing:-.02em;color:#fff}
+.sheet h3{color:#fff}
+.sheet .close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--card2);display:grid;place-items:center;color:var(--mu)}
+.code{background:#000;border:1.5px dashed var(--ln);border-radius:12px;padding:14px;font-family:'Courier New',monospace;font-size:12px;word-break:break-all;margin:14px 0;color:#fff}
 .chat{display:flex;flex-direction:column;gap:10px;padding:10px 0}
 .msg{max-width:85%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.4}
 .msg.user{align-self:flex-end;background:var(--p);color:#fff;border-bottom-right-radius:4px}
-.msg.other{align-self:flex-start;background:#4d4d4d;color:var(--tx);border-bottom-left-radius:4px}
+.msg.other{align-self:flex-start;background:var(--card2);color:#fff;border-bottom-left-radius:4px}
 .msg .who{display:block;font-size:11px;font-weight:700;opacity:.7;margin-bottom:3px}
-
-/* ---------- master ---------- */
 .stat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
-.stat .b{background:#2d2d2d;border-radius:12px;padding:14px;text-align:center}
-.stat .b b{display:block;font-size:22px;font-weight:800;color:var(--p);margin-bottom:4px}
+.stat .b{background:var(--card);border-radius:12px;padding:14px;text-align:center}
+.stat .b b{display:block;font-size:20px;font-weight:800;color:#c77dff;margin-bottom:4px}
 .stat .b span{font-size:11px;color:var(--mu);font-weight:700}
-
-/* ---------- toast ---------- */
-.toast{position:fixed;top:calc(20px + var(--top));left:50%;transform:translateX(-50%) translateY(-100px);background:#2d2d2d;color:var(--tx);padding:12px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.4);z-index:100;transition:transform .3s;max-width:calc(100% - 40px);border:1.5px solid var(--ln)}
+.toast{position:fixed;top:calc(20px + var(--top));left:50%;transform:translateX(-50%) translateY(-120px);background:var(--card2);color:#fff;padding:12px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.6);z-index:100;transition:transform .3s;max-width:calc(100% - 40px);border:1.5px solid var(--ln)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:var(--gr);color:var(--gr)}
 .toast.err{border-color:var(--rd);color:var(--rd)}
-
-/* ---------- spinner ---------- */
-.busy{position:fixed;inset:0;background:rgba(0,0,0,.7);display:grid;place-items:center;z-index:200}
+.busy{position:fixed;inset:0;background:rgba(0,0,0,.75);display:grid;place-items:center;z-index:200}
 .busy i{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 <div id="root"></div>
-
+<script src="/socket.io/socket.io.js"></script>
 <script>
 'use strict';
-
 const $ = (s) => document.querySelector(s);
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const fmtBRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-const fmtDate = (d) => new Date(d).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-const parseMoney = (s) => { const n = Number(String(s).replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
-
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const fmtBRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+const fmtDate = (d) => new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+const parseMoney = (s) => { const n = Number(String(s).replace(/\./g,'').replace(',','.')); return Number.isFinite(n) ? n : 0; };
 const U = () => (S.st && S.st.user) || {};
+const ini = () => ((U().fullName || U().username || '?')[0] || '?').toUpperCase();
 
-/* ---------- ícones SVG ---------- */
-const ICO = {
-  home: '<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>',
-  pix: '<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>',
-  card: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>',
-  pig: '<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>',
-  credit: '<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>',
-  bell: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>',
-  help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>',
-  chevron: '<path d="M9 6l6 6-6 6"/>',
-  arrow: '<path d="M5 12h14M12 5l7 7-7 7"/>',
-  plus: '<path d="M12 5v14M5 12h14"/>',
-  check: '<path d="M20 6L9 17l-5-5"/>',
-  close: '<path d="M18 6L6 18M6 6l12 12"/>',
-  copy: '<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>',
-  trash: '<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>',
-  lock: '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>',
-  eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
-  bonus: '<path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>',
-  logout: '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
-  refresh: '<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>',
-};
+const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', bonus:'<path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
 const ico = (k) => `<svg class="i" viewBox="0 0 24 24">${ICO[k] || ''}</svg>`;
 
-/* ---------- estado ---------- */
-const S = {
-  token: localStorage.getItem('armin_token') || '',
-  st: null,
-  master: null,
-  page: 'home',
-  authTab: 'login',
-  socket: null,
-  card: null,
-  cardTimer: null,
-  pix: { step: 1, key: '', rec: null, amount: '', value: 0, note: '' },
-  toastTimer: null,
-  sheetEl: null,
-};
+const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, page: 'home', authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'' }, toastTimer: null, sheetEl: null };
 
-/* ---------- API ---------- */
-async function api(path, opts = {}) {
+async function api(p, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (S.token) headers.authorization = `Bearer ${S.token}`;
-  const r = await fetch(path, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : null });
+  const r = await fetch(p, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : null });
   const j = await r.json().catch(() => null);
   if (!r.ok) throw new Error((j && j.message) || 'Erro na requisição');
   return j;
@@ -240,265 +171,246 @@ function sheetOpen(html) {
   sheetClose();
   const s = document.createElement('div'); s.className = 'sheet open';
   s.innerHTML = `<div class="grip"></div><button class="close" data-act="closeSheet">${ico('close')}</button>${html}`;
-  $('#root').appendChild(s); S.sheetEl = s;
-  s.addEventListener('click', (e) => { if (e.target === s) sheetClose(); });
-  return s;
+  $('#root').appendChild(s); S.sheetEl = s; return s;
 }
 function sheetClose() { if (S.sheetEl) { S.sheetEl.remove(); S.sheetEl = null; } }
+function setState(r) { if (r && r.state) S.st = r.state; render(); }
+async function loadMaster() { try { const m = await api('/api/master/overview'); S.master = m; render(); } catch (e) { toast(e.message, 'err'); } }
 
-/* ---------- renderização ---------- */
-function shell() {
-  return `<div class="app"><div id="view" class="view"></div><nav class="tabs" id="tabs"></nav><div id="sheetHost"></div></div>`;
-}
+function shell() { return `<div class="app"><div id="view" class="view"></div><nav class="tabs" id="tabs"></nav></div>`; }
 function render() {
+  sheetClose();
   if (!S.token || !S.st) { renderAuth(); return; }
   $('#root').innerHTML = shell();
   $('#tabs').innerHTML = tabsHtml();
   if (S.page === 'master' && U().role === 'admin') renderMaster();
+  else if (S.page === 'pix') renderExtract();
+  else if (S.page === 'card') renderCardPage();
+  else if (S.page === 'more') renderMore();
   else renderHome();
 }
-
+function tabsHtml() {
+  return [ {id:'home',l:'Início',i:'home'}, {id:'pix',l:'Extrato',i:'pix'}, {id:'card',l:'Cartão',i:'card'}, {id:'more',l:'Mais',i:'plus'} ]
+    .map(t => `<button class="tab ${S.page===t.id?'on':''}" data-act="goPage" data-page="${t.id}">${ico(t.i)}${t.l}</button>`).join('');
+}
 function renderAuth() {
   const tab = S.authTab;
   $('#root').innerHTML = `
-    <div class="auth">
-      <div class="logo"><b>A</b> ARMIN BANK</div>
-      <h1>Seu banco digital<br>sem complicação</h1>
-      <p>Pix, cartão, cofrinho e crédito em um só lugar.</p>
-      <div class="seg">
-        <button class="${tab==='login'?'on':''}" data-act="switchAuth" data-tab="login">Entrar</button>
-        <button class="${tab==='register'?'on':''}" data-act="switchAuth" data-tab="register">Criar conta</button>
-      </div>
-      ${tab === 'login' ? `
-        <form data-form="login">
-          <div class="fld"><label>Usuário ou e-mail</label><input name="username" required autocomplete="username"></div>
-          <div class="fld"><label>Senha</label><input name="password" type="password" required autocomplete="current-password"></div>
-          <button class="btn" type="submit">${ico('arrow')} Entrar</button>
-        </form>
-      ` : `
-        <form data-form="register">
-          <div class="fld"><label>Nome completo</label><input name="fullName" required placeholder="Seu Nome Sobrenome" autocomplete="name"></div>
-          <div class="fld"><label>Usuário</label><input name="username" required pattern="[a-zA-Z0-9_]+" placeholder="seunome" autocomplete="username"><small>Apenas letras, números e underline</small></div>
-          <div class="fld"><label>Senha</label><input name="password" type="password" required minlength="4" placeholder="Mínimo 4 caracteres" autocomplete="new-password"></div>
-          <button class="btn" type="submit">${ico('check')} Criar minha conta</button>
-        </form>
-      `}
-      <div class="demo">
-        <p>Contas de demonstração:</p>
-        <button data-act="demoLogin" data-u="aventureiro" data-p="1234">👤 Lia (user)</button>
-        <button data-act="demoLogin" data-u="master" data-p="master">👑 Armin (admin)</button>
-      </div>
+  <div class="auth">
+    <div class="logo"><b>A</b> ARMIN BANK</div>
+    <h1>Seu banco digital<br>sem complicação</h1>
+    <p>Pix, cartão, cofrinho e crédito em um só lugar.</p>
+    <div class="seg">
+      <button class="${tab==='login'?'on':''}" data-act="switchAuth" data-tab="login">Entrar</button>
+      <button class="${tab==='register'?'on':''}" data-act="switchAuth" data-tab="register">Criar conta</button>
     </div>
-  `;
+    ${tab === 'login' ? `
+      <form data-form="login">
+        <div class="fld"><label>Usuário ou e-mail</label><input name="username" required autocomplete="username"></div>
+        <div class="fld"><label>Senha</label><input name="password" type="password" required autocomplete="current-password"></div>
+        <button class="btn" type="submit">${ico('arrow')} Entrar</button>
+      </form>` : `
+      <form data-form="register">
+        <div class="fld"><label>Nome completo</label><input name="fullName" required placeholder="Nome e sobrenome"></div>
+        <div class="fld"><label>Usuário</label><input name="username" required pattern="[a-zA-Z0-9_]+" placeholder="só letras, números e _"><small>Sem espaços nem acentos</small></div>
+        <div class="fld"><label>Senha</label><input name="password" type="password" required minlength="4" placeholder="mínimo 4 caracteres"></div>
+        <button class="btn" type="submit">${ico('check')} Criar conta grátis</button>
+      </form>`}
+    <div class="demo"><p>Contas de demonstração:</p>
+      <button data-act="demoLogin" data-u="aventureiro" data-p="1234">Lia (user)</button>
+      <button data-act="demoLogin" data-u="master" data-p="master">Armin (admin)</button>
+    </div>
+  </div>`;
 }
-
-function tabsHtml() {
-  const tabs = [
-    { id: 'home', label: 'Início', icon: 'home' },
-    { id: 'pix', label: 'Pix', icon: 'pix' },
-    { id: 'card', label: 'Cartão', icon: 'card' },
-    { id: 'more', label: 'Mais', icon: 'plus' },
-  ];
-  return tabs.map(t => `<button class="tab ${S.page===t.id?'on':''}" data-act="goPage" data-page="${t.id}">${ico(t.icon)}${t.label}</button>`).join('');
+function txRow(tx) {
+  const isIn = (tx.amount || 0) >= 0;
+  const icon = (tx.kind||'').includes('pix') ? 'pix' : tx.kind === 'card' ? 'card' : tx.kind === 'savings_yield' ? 'pig' : tx.kind === 'deposit' ? 'bonus' : 'arrow';
+  return `<div class="row"><div class="ic ${isIn?'g':'r'}">${ico(icon)}</div><div class="mid"><b>${esc(tx.description || tx.title || 'Movimentação')}</b><span>${fmtDate(tx.createdAt)}</span></div><div class="end ${isIn?'in':'out'}">${isIn?'+':'-'}${fmtBRL(Math.abs(tx.amount))}</div></div>`;
 }
-
 function renderHome() {
-  const u = U();
-  const txs = (S.st.transactions || []).slice(0, 8);
-  const unread = (S.st.notifications || []).filter(n => !n.read).length;
+  const u = U(); const txs = (S.st.transactions || []).slice(0, 5); const unread = S.st.unread || 0;
   $('#view').innerHTML = `
-    <div class="hdr tall">
-      <div class="bar">
-        <div class="av">${(u.fullName || u.username || '?')[0].toUpperCase()}</div>
-        <div class="tools">
-          <button class="ib" data-act="openNotifs">${ico('bell')}${unread ? `<span class="dot">${unread}</span>` : ''}</button>
-          <button class="ib" data-act="openSupport">${ico('help')}</button>
-          <button class="ib" data-act="logout">${ico('logout')}</button>
-        </div>
-      </div>
-      <h1>Olá, ${(u.fullName || u.username).split(' ')[0]}</h1>
-      <p>Saldo disponível</p>
-    </div>
-    <div class="wrap">
-      <div class="card">
-        <div class="big">${fmtBRL(u.balance)}</div>
-        <div class="acts">
-          <button class="act" data-act="openPix"><i>${ico('pix')}</i>Pix</button>
-          <button class="act" data-act="openSavings"><i>${ico('pig')}</i>Cofrinho</button>
-          <button class="act" data-act="openCard"><i>${ico('card')}</i>Cartão</button>
-          <button class="act" data-act="openCredit"><i>${ico('credit')}</i>Crédito</button>
-          <button class="act" data-act="bonus"><i>${ico('bonus')}</i>Bônus</button>
-        </div>
-      </div>
-      ${u.savings > 0 ? `
-        <div class="card">
-          <div class="ttl"><h3>🐷 Cofrinho</h3><span class="pill g">rendendo</span></div>
-          <div class="big">${fmtBRL(u.savings)}</div>
-          <p class="mu sm-t">Rende ~1% ao mês</p>
-        </div>
-      ` : ''}
-      <div class="card">
-        <div class="ttl"><h3>Últimas transações</h3><button class="lnk" data-act="goPage" data-page="pix">Ver todas</button></div>
-        ${txs.length ? txs.map(txRow).join('') : '<div class="empty"><b>Nenhuma transação</b>Suas movimentações aparecerão aqui.</div>'}
-      </div>
-    </div>
-  `;
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div>
+    <div class="tools">
+      <button class="ib" data-act="openNotifs">${ico('bell')}${unread ? `<span class="dot">${unread}</span>` : ''}</button>
+      <button class="ib" data-act="openSupport">${ico('help')}</button>
+      <button class="ib" data-act="logout">${ico('logout')}</button>
+    </div></div>
+    <h1>Olá, ${esc((u.fullName||u.username||'').split(' ')[0])}</h1><p>Saldo disponível</p></div>
+  <div class="wrap">
+    <div class="card"><div class="big">${fmtBRL(u.balance)}</div>
+      <div class="acts">
+        <button class="act" data-act="openPix"><i>${ico('pix')}</i>Pix</button>
+        <button class="act" data-act="openSavings"><i>${ico('pig')}</i>Cofrinho</button>
+        <button class="act" data-act="openCard"><i>${ico('card')}</i>Cartão</button>
+        <button class="act" data-act="openCredit"><i>${ico('credit')}</i>Crédito</button>
+        <button class="act" data-act="bonus"><i>${ico('bonus')}</i>Bônus</button>
+      </div></div>
+    ${(u.savings||0) > 0 ? `<div class="card"><div class="ttl"><h3>Cofrinho</h3><span class="pill g">rendendo</span></div><div class="big">${fmtBRL(u.savings)}</div><p class="mu sm-t">Rende ~1% ao mês</p></div>` : ''}
+    <div class="card"><div class="ttl"><h3>Últimas movimentações</h3><button class="lnk" data-act="goPage" data-page="pix">Ver tudo</button></div>
+      ${txs.length ? txs.map(txRow).join('') : '<div class="empty"><b>Nada por aqui ainda</b>Suas movimentações aparecem aqui.</div>'}</div>
+  </div>`;
 }
-
+function renderExtract() {
+  const txs = S.st.transactions || []; let last = '';
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="goPage" data-page="home">${ico('close')}</button></div></div><h1>Extrato</h1><p>${txs.length} movimentações</p></div>
+  <div class="wrap"><div class="card flush">${txs.length ? txs.map(t => { const d = new Date(t.createdAt).toLocaleDateString('pt-BR'); const h = d !== last ? `<div class="day">${d}</div>` : ''; last = d; return h + txRow(t); }).join('') : '<div class="empty"><b>Nada por aqui ainda</b></div>'}</div></div>`;
+}
+function renderCardPage() {
+  const u = U(); const c = S.card;
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="cardReveal">${ico('eye')}</button></div></div><h1>Cartão</h1><p>${u.cardBlocked ? 'Bloqueado' : 'Ativo'}</p></div>
+  <div class="wrap">
+    <div class="plastic ${u.cardBlocked?'blocked':''}"><div class="chipic"></div><div class="tp">${ico('card')}</div>
+      <div class="num">${c ? esc(c.number) : '•••• •••• •••• ••••'}</div>
+      <div class="foot"><span>${esc(u.fullName||'')}</span><span>${c ? esc(c.expiry) : '••/••'}</span></div></div>
+    ${c ? `<div class="card"><div class="kv"><span>CVV</span><span>${esc(c.cvv)}</span></div><div class="kv"><span>Validade</span><span>${esc(c.expiry)}</span></div></div>` : '<p class="mu sm-t">Toque no olho para revelar número e CVV por 20s.</p>'}
+    <div class="card"><div class="kv"><span>Limite</span><span>${fmtBRL(u.creditLimit)}</span></div><div class="kv"><span>Usado</span><span>${fmtBRL(u.creditUsed)}</span></div><div class="kv"><span>Disponível</span><span>${fmtBRL((u.creditLimit||0)-(u.creditUsed||0))}</span></div>
+      <div class="bar2"><span style="width:${Math.min(100, u.creditLimit ? (u.creditUsed/u.creditLimit*100) : 0)}%"></span></div></div>
+    <div class="btns">
+      <button class="btn" data-act="openPurchase">${ico('card')} Simular compra</button>
+      <button class="btn ${u.cardBlocked?'':'dng'}" data-act="cardToggle">${ico('lock')} ${u.cardBlocked ? 'Desbloquear' : 'Bloquear'} cartão</button>
+      <button class="btn sec" data-act="openCredit">${ico('credit')} Crédito e fatura</button>
+    </div></div>`;
+}
+function renderMore() {
+  const u = U();
+  const item = (act, ic, label, extra='') => `<button class="row" data-act="${act}" ${extra}><div class="ic">${ico(ic)}</div><div class="mid"><b>${label}</b></div>${ico('chev')}</button>`;
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="logout">${ico('logout')}</button></div></div><h1>Mais</h1><p>@${esc(u.username)}</p></div>
+  <div class="wrap"><div class="card flush">
+    ${item('openSavings','pig','Cofrinho')}${item('openCredit','credit','Crédito e fatura')}${item('openKeys','pix','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
+  </div><div class="btns"><button class="btn dng" data-act="logout">${ico('logout')} Sair da conta</button></div></div>`;
+}
 function renderMaster() {
-  if (!S.master) { loadMaster(); return; }
+  if (!S.master) { $('#view').innerHTML = '<div class="empty">Carregando painel…</div>'; loadMaster(); return; }
   const m = S.master;
   $('#view').innerHTML = `
-    <div class="hdr">
-      <div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('arrow')}</button><div></div><button class="ib" data-act="refreshMaster">${ico('refresh')}</button></div>
-      <h1>Painel Master 👑</h1>
-      <p>Gerencie jogadores e crédito</p>
-    </div>
-    <div class="wrap">
-      <div class="stat">
-        <div class="b"><b>${m.metrics.players}</b><span>JOGADORES</span></div>
-        <div class="b"><b>${m.metrics.pendingCredits}</b><span>CRÉDITOS PENDENTES</span></div>
-        <div class="b"><b>${fmtBRL(m.metrics.moneyInPlay)}</b><span>EM JOGO</span></div>
-        <div class="b"><b>${m.metrics.avgScore}</b><span>SCORE MÉDIO</span></div>
-      </div>
-      ${m.pending.length ? `
-        <div class="card">
-          <div class="ttl"><h3>Pedidos de crédito pendentes</h3></div>
-          ${m.pending.map(r => `
-            <div class="row">
-              <div class="ic a">${ico('credit')}</div>
-              <div class="mid"><b>${esc(r.fullName || r.username)}</b><span>${esc(r.purpose)} • ${fmtBRL(r.amount)}</span></div>
-              <div class="end">
-                <button class="btn sm" style="background:var(--gr);color:#fff;margin-bottom:4px" data-act="decide" data-id="${r.id}" data-d="approve">Aprovar</button>
-                <button class="btn sm dng" data-act="decide" data-id="${r.id}" data-d="reject">Reprovar</button>
-              </div>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-      <div class="card">
-        <div class="ttl"><h3>Jogadores (${m.users.length})</h3></div>
-        ${m.users.map(u => `
-          <div class="row">
-            <div class="av">${(u.fullName || u.username)[0].toUpperCase()}</div>
-            <div class="mid"><b>${esc(u.fullName)}</b><span>@${esc(u.username)} • Score ${u.score}</span></div>
-            <div class="end">${fmtBRL(u.balance)}<small>${u.locked ? '🔒 bloqueado' : ''}</small></div>
-          </div>
-        `).join('')}
-      </div>
-      ${m.support && m.support.length ? `
-        <div class="card">
-          <div class="ttl"><h3>Suporte recente</h3></div>
-          ${m.support.slice(0,5).map(msg => `
-            <div class="row" data-act="thread" data-id="${msg.userId}">
-              <div class="ic">${ico('help')}</div>
-              <div class="mid"><b>${esc(msg.author || 'Jogador')}</b><span>${esc(msg.text.slice(0,50))}</span></div>
-              <div class="end">${fmtDate(msg.createdAt)}${ico('chevron')}</div>
-            </div>
-          `).join('')}
-        </div>
-      ` : ''}
-    </div>
-  `;
+  <div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('arrow')}</button><div class="tools"><button class="ib" data-act="refreshMaster">${ico('refresh')}</button></div></div><h1>Painel Master</h1><p>Gerencie jogadores e crédito</p></div>
+  <div class="wrap">
+    <div class="stat"><div class="b"><b>${m.metrics.players}</b><span>JOGADORES</span></div><div class="b"><b>${m.metrics.pendingCredits}</b><span>CRÉDITO PENDENTE</span></div><div class="b"><b>${fmtBRL(m.metrics.moneyInPlay)}</b><span>EM JOGO</span></div><div class="b"><b>${m.metrics.avgScore}</b><span>SCORE MÉDIO</span></div></div>
+    ${m.pending.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Pedidos de crédito</h3></div>${m.pending.map(r => `
+      <div class="row"><div class="ic a">${ico('credit')}</div><div class="mid"><b>${esc(r.fullName||r.username)}</b><span>${esc(r.purpose||'')} • ${fmtBRL(r.amount)}</span></div>
+      <div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="decide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="decide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Jogadores</h3></div>${m.users.map(u => `
+      <div class="row"><div class="av">${(u.fullName||'?')[0].toUpperCase()}</div><div class="mid"><b>${esc(u.fullName)}</b><span>@${esc(u.username)} • score ${u.score}</span></div>
+      <div class="end">${fmtBRL(u.balance)}<small><button class="lnk" data-act="deposit" data-id="${esc(u.id)}">depósito</button></small></div></div>`).join('')}</div>
+    ${m.support.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Suporte recente</h3></div>${m.support.slice(-6).reverse().map(msg => `
+      <button class="row" data-act="thread" data-id="${esc(msg.userId)}"><div class="ic">${ico('help')}</div><div class="mid"><b>${esc(msg.author||'Jogador')}</b><span>${esc(String(msg.text).slice(0,60))}</span></div><div class="end">${fmtDate(msg.createdAt)}</div></button>`).join('')}</div>` : ''}
+  </div>`;
 }
 
-function txRow(tx) {
-  const isIn = tx.kind === 'pix_in' || tx.kind === 'savings_yield' || tx.kind === 'deposit' || tx.type === 'in';
-  const icon = tx.kind === 'pix_in' || tx.kind === 'pix_out' ? 'pix' : tx.kind === 'card' ? 'card' : tx.kind === 'savings' ? 'pig' : tx.kind === 'credit' ? 'credit' : 'arrow';
-  const title = tx.description || tx.title || (isIn ? 'Recebido' : 'Enviado');
-  const cls = isIn ? 'in' : 'out';
-  const val = isIn ? `+${fmtBRL(Math.abs(tx.amount))}` : `-${fmtBRL(Math.abs(tx.amount))}`;
-  return `<div class="row"><div class="ic ${isIn?'g':'r'}">${ico(icon)}</div><div class="mid"><b>${esc(title)}</b><span>${fmtDate(tx.createdAt)}</span></div><div class="end ${cls}">${val}</div></div>`;
-}
+/* ---------- sheets ---------- */
+function pixStep1() { sheetOpen(`<h2>Enviar Pix</h2><div id="sheetBody">
+  <form data-form="pixLookup"><div class="fld"><label>Chave de quem vai receber</label><input id="pk" name="key" required placeholder="e-mail, telefone ou aleatória"></div>
+  <div class="btns"><button class="btn" type="submit">${ico('arrow')} Continuar</button><button class="btn sec" type="button" data-act="pasteInto">${ico('copy')} Colar código</button></div></form>
+  <div class="btns two" style="margin-top:10px"><button class="btn out sm" data-act="openCharge">Cobrar</button><button class="btn out sm" data-act="openKeys">Minhas chaves</button></div></div>`); }
+function pixStep2() { const p = S.pix; sheetOpen(`<h2>Enviar Pix</h2><div id="sheetBody">
+  <div class="card" style="background:var(--card2)"><div class="row" style="background:none;border:0;padding:6px 0"><div class="ic g">${ico('check')}</div><div class="mid"><b>${esc(p.rec.fullName)}</b><span>@${esc(p.rec.username)}</span></div></div></div>
+  <form data-form="pixReview"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00" value="${esc(p.amount)}"></div>
+  <div class="fld"><label>Descrição (opcional)</label><input name="note" maxlength="80" placeholder="Ex: aluguel"></div>
+  <button class="btn" type="submit">${ico('arrow')} Revisar</button></form></div>`); }
+function pixStep3() { const p = S.pix; sheetOpen(`<h2>Confirmar Pix</h2><div id="sheetBody">
+  <div class="kv"><span>Para</span><span>${esc(p.rec.fullName)}</span></div>
+  <div class="kv"><span>Chave</span><span>${esc(p.key)}</span></div>
+  <div class="kv"><span>Valor</span><span>${fmtBRL(p.value)}</span></div>
+  ${p.note ? `<div class="kv"><span>Descrição</span><span>${esc(p.note)}</span></div>` : ''}
+  <div class="btns"><button class="btn" data-act="pixConfirm">${ico('check')} Confirmar e enviar</button><button class="btn sec" data-act="closeSheet">Cancelar</button></div></div>`); }
+function openSavings() { const u = U(); sheetOpen(`<h2>Cofrinho</h2><div id="sheetBody">
+  <div class="big">${fmtBRL(u.savings||0)}</div><p class="mu sm-t">Rende ~1% ao mês, creditado por hora.</p>
+  <form data-form="savings"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div>
+  <div class="btns two"><button class="btn" type="submit" data-dir="in">${ico('pig')} Guardar</button><button class="btn sec" type="submit" data-dir="out">Resgatar</button></div></form></div>`); }
+function openCreditReq() { const u = U(); sheetOpen(`<h2>Crédito</h2><div id="sheetBody">
+  <div class="kv"><span>Limite</span><span>${fmtBRL(u.creditLimit)}</span></div><div class="kv"><span>Usado</span><span>${fmtBRL(u.creditUsed)}</span></div><div class="kv"><span>Disponível</span><span>${fmtBRL((u.creditLimit||0)-(u.creditUsed||0))}</span></div><div class="kv"><span>Score</span><span>${u.score}</span></div>
+  <h3 style="margin:14px 0 8px;font-size:14px">Pedir aumento de limite</h3>
+  <form data-form="creditReq"><div class="fld"><label>Valor (mín. R$ 50)</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Para quê</label><input name="purpose" maxlength="100" placeholder="Ex: equipamento novo"></div><button class="btn" type="submit">Enviar pedido</button></form>
+  <h3 style="margin:14px 0 8px;font-size:14px">Saque do crédito (taxa 3%)</h3>
+  <form data-form="draw"><div class="fld"><label>Valor (mín. R$ 10)</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><button class="btn sec" type="submit">Sacar para a conta</button></form>
+  <h3 style="margin:14px 0 8px;font-size:14px">Pagar fatura</h3>
+  <form data-form="invoice"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><button class="btn sec" type="submit">Pagar fatura</button></form></div>`); }
+function openPurchase() { sheetOpen(`<h2>Simular compra</h2><div id="sheetBody">
+  <form data-form="purchase"><div class="fld"><label>Loja</label><input name="merchant" required placeholder="Ex: Loja do Reino"></div><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><button class="btn" type="submit">Comprar no crédito</button></form></div>`); }
+function openKeys() { const u = U(); sheetOpen(`<h2>Minhas chaves Pix</h2><div id="sheetBody">
+  ${(u.pixKeys||[]).map(k => `<div class="row" style="background:var(--card2);border-radius:12px;margin-bottom:8px"><div class="ic">${ico('pix')}</div><div class="mid"><b>${esc(k.value)}</b><span>${esc(k.type)}</span></div><button class="btn sm dng" data-act="removeKey" data-id="${esc(k.id)}">${ico('trash')}</button></div>`).join('')}
+  <form data-form="addKey" style="margin-top:12px"><div class="fld"><label>Tipo</label><select name="type" data-change="keyType"><option value="aleatória">Aleatória</option><option value="email">E-mail</option><option value="telefone">Telefone</option></select></div>
+  <div class="fld hidden" id="kvWrap"><label>Valor</label><input id="kv" name="value"></div><button class="btn" type="submit">Adicionar chave</button></form></div>`); }
+function openCharge() { const u = U(); sheetOpen(`<h2>Cobrar via Pix</h2><div id="sheetBody">
+  <form data-form="charge"><div class="fld"><label>Receber na chave</label><select name="key">${(u.pixKeys||[]).map(k => `<option value="${esc(k.value)}">${esc(k.value)}</option>`).join('')}</select></div>
+  <div class="fld"><label>Valor (opcional)</label><input name="amount" inputmode="decimal" placeholder="0,00"></div><button class="btn" type="submit">Gerar código</button></form><div id="chargeOut"></div></div>`); }
+function openNotifs() { const ns = S.st.notifications || []; sheetOpen(`<h2>Notificações</h2><div id="sheetBody">
+  ${ns.length ? ns.slice().reverse().map(n => `<div class="row" style="background:var(--card2);border-radius:12px;margin-bottom:8px"><div class="ic">${ico('bell')}</div><div class="mid"><b>${esc(n.title)}</b><span>${esc(n.text)}</span></div></div>`).join('') : '<div class="empty">Nenhuma notificação.</div>'}
+  ${(S.st.unread||0) > 0 ? `<button class="btn sec" data-act="markRead">Marcar todas como lidas</button>` : ''}</div>`); }
+function openSupport() { const msgs = S.st.supportMessages || []; sheetOpen(`<h2>Suporte</h2><div id="sheetBody">
+  <div class="chat">${msgs.map(m => `<div class="msg ${m.role==='support'?'other':'user'}"><span class="who">${esc(m.author||'')}</span>${esc(m.text)}</div>`).join('') || '<div class="empty">Mande uma mensagem.</div>'}</div>
+  <form data-form="support"><div class="fld"><input id="chatIn" name="text" placeholder="Escreva sua mensagem"></div><button class="btn" type="submit">Enviar</button></form></div>`); }
+function openThread(userId) { const m = S.master || {}; const msgs = (m.support||[]).filter(x => x.userId === userId); const name = (m.users||[]).find(u => u.id === userId);
+  sheetOpen(`<h2>${esc(name ? name.fullName : 'Jogador')}</h2><div id="sheetBody">
+  <div class="chat">${msgs.map(x => `<div class="msg ${x.role==='support'?'other':'user'}"><span class="who">${esc(x.author||'')}</span>${esc(x.text)}</div>`).join('') || '<div class="empty">Sem mensagens.</div>'}</div>
+  <form data-form="reply"><input type="hidden" name="userId" value="${esc(userId)}"><div class="fld"><input name="text" placeholder="Responder como master"></div><button class="btn" type="submit">Responder</button></form></div>`); }
+function openDeposit(userId) { sheetOpen(`<h2>Depósito master</h2><div id="sheetBody">
+  <form data-form="deposit"><input type="hidden" name="userId" value="${esc(userId)}"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Motivo</label><input name="note" maxlength="80" placeholder="Ex: prêmio do evento"></div><button class="btn" type="submit">Depositar</button></form></div>`); }
+function openPassword() { sheetOpen(`<h2>Alterar senha</h2><div id="sheetBody">
+  <form data-form="password"><div class="fld"><label>Senha atual</label><input name="current" type="password" required></div><div class="fld"><label>Nova senha</label><input name="next" type="password" required minlength="4"></div><button class="btn" type="submit">Salvar nova senha</button></form></div>`); }
 
 /* ---------- ações ---------- */
 const A = {
   switchAuth: (el) => { S.authTab = el.dataset.tab; render(); },
   goPage: (el) => { S.page = el.dataset.page; render(); },
-  demoLogin: async (el) => { const r = await busy(el, () => api('/api/login', { method: 'POST', body: { username: el.dataset.u, password: el.dataset.p } })); if (r) { enter(r); } },
+  demoLogin: async (el) => { const r = await busy(el, () => api('/api/login', { method:'POST', body:{ username: el.dataset.u, password: el.dataset.p } })); if (r) enter(r); },
   logout: () => doLocalLogout(),
-  openPix: () => { S.pix = { step: 1, key: '', rec: null, amount: '', value: 0, note: '' }; pixStep1(); },
+  closeSheet: () => sheetClose(),
+  openPix: () => pixStep1(),
   openSavings: () => openSavings(),
-  openCard: () => openCard(),
+  openCard: () => { S.page = 'card'; render(); },
   openCredit: () => openCreditReq(),
-  bonus: async (el) => { const r = await busy(el, () => api('/api/bonus', { method: 'POST' })); if (r) { setState(r); toast(`Você ganhou ${fmtBRL(r.reward)} de bônus!`, 'ok'); } },
-  cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method: 'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
+  openPurchase: () => openPurchase(),
+  openKeys: () => openKeys(),
+  openCharge: () => openCharge(),
+  openNotifs: () => openNotifs(),
+  openSupport: () => openSupport(),
+  openPassword: () => openPassword(),
+  bonus: async (el) => { const r = await busy(el, () => api('/api/bonus', { method:'POST' })); if (r) { setState(r); toast(`Você ganhou ${fmtBRL(r.reward)} de bônus!`, 'ok'); } },
+  cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method:'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
   cardReveal: async (el) => {
-    if (S.card) { S.card = null; clearTimeout(S.cardTimer); return render(); }
+    if (S.card) { S.card = null; clearTimeout(S.cardTimer); render(); return; }
     const r = await busy(el, () => api('/api/card/secret')); if (!r) return;
     S.card = r.card; render(); clearTimeout(S.cardTimer); S.cardTimer = setTimeout(() => { S.card = null; render(); }, 20000);
   },
-  decide: async (el) => { const r = await busy(el, () => api(`/api/master/credit/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method: 'POST', body: {} })); if (r) { toast(el.dataset.d === 'approve' ? 'Crédito aprovado.' : 'Análise reprovada.', 'ok'); loadMaster(); } },
+  pixConfirm: async (el) => { const p = S.pix; const r = await busy(el, () => api('/api/pix/send', { method:'POST', body:{ key:p.key, amount:p.value, description:p.note } })); if (r) { setState(r); sheetClose(); toast('Pix enviado!', 'ok'); } },
+  pasteInto: async () => { try { const t = await navigator.clipboard.readText(); const i = $('#pk'); if (i && t) { i.value = t.trim(); toast('Colado!', 'ok'); } else toast('Nada para colar.'); } catch { toast('Cole manualmente no campo.'); const i = $('#pk'); if (i) i.focus(); } },
+  copyCode: (el) => { if (navigator.clipboard) navigator.clipboard.writeText(el.dataset.v).then(() => toast('Código copiado!', 'ok'), () => toast('Copie manualmente.')); else toast('Copie manualmente.'); },
+  removeKey: async (el) => { const r = await busy(el, () => api('/api/pix/key/' + encodeURIComponent(el.dataset.id), { method:'DELETE' })); if (r) { setState(r); openKeys(); toast('Chave removida.', 'ok'); } },
+  markRead: async (el) => { const r = await busy(el, () => api('/api/notifications/read', { method:'POST' })); if (r) setState(r); },
+  decide: async (el) => { const r = await busy(el, () => api(`/api/master/credit/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Crédito aprovado.' : 'Análise reprovada.', 'ok'); loadMaster(); } },
   thread: (el) => openThread(el.dataset.id),
   deposit: (el) => openDeposit(el.dataset.id),
   refreshMaster: () => loadMaster(),
-  openNotifs: () => openNotifs(),
-  openSupport: () => openSupportChat(),
-  closeSheet: () => sheetClose(),
 };
-async function pasteInto() {
-  try { const t = await navigator.clipboard.readText(); const i = $('#pk'); if (i && t) { i.value = t.trim(); toast('Colado!', 'ok'); } else toast('Nada para colar.'); }
-  catch { toast('Seu navegador bloqueou a área de transferência. Cole manualmente no campo.'); $('#pk') && $('#pk').focus(); }
-}
-async function lookupAndGo(raw) {
-  let key = String(raw || '').trim(), amount = '';
-  if (key.startsWith('ZKPIX|')) { const [, k, a] = key.split('|'); key = k; if (a && Number(a) > 0) amount = String(a).replace('.', ','); }
-  const r = await busy($('#sheetBody button[type=submit]'), () => api('/api/pix/lookup', { method: 'POST', body: { key } }));
-  if (!r) { if (!sheetOpen()) pixStep1(); return; }
-  S.pix = { ...S.pix, key, rec: r.recipient, amount }; pixStep2();
-}
-const CH = { keyType: (el) => { $('#kvWrap').classList.toggle('hidden', el.value === 'aleatória'); const k = $('#kv'); if (k) { k.required = el.value !== 'aleatória'; k.placeholder = { email: 'voce@email.com', telefone: '(11) 91234-5678', cpf: '000.000.000-00' }[el.value] || ''; } } };
 
 /* ---------- formulários ---------- */
 const F = {
-  login: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); await busy(ev.submitter, () => doLogin(d.username, d.password)); },
-  register: async (f, ev) => {
-    const d = Object.fromEntries(new FormData(f));
-    const r = await busy(ev.submitter, () => api('/api/register', { method: 'POST', body: d })); if (r) { enter(r); toast('Conta criada! Bem-vindo(a).', 'ok'); }
-  },
-  pixLookup: (f) => lookupAndGo(new FormData(f).get('key')),
-  pixReview: (f) => {
-    const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount);
-    if (!(v > 0)) return toast('Digite um valor válido.', 'err');
-    if (v > U().balance) return toast('Saldo insuficiente para este Pix.', 'err');
-    S.pix.value = v; S.pix.amount = d.amount; S.pix.note = (d.note || '').trim(); pixStep3();
-  },
-  addKey: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/pix/key', { method: 'POST', body: d })); if (r) { setState(r); toast('Chave cadastrada!', 'ok'); } },
-  charge: (f) => {
-    const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const hasV = d.amount.trim() !== '';
-    if (hasV && !(v > 0)) return toast('Valor inválido.', 'err');
-    const code = `ZKPIX|${d.key}|${hasV ? v.toFixed(2) : '0'}`;
-    $('#chargeOut').innerHTML = `<div class="code">${esc(code)}</div><div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(code)}">${ico('copy')} Copiar código</button></div><p class="mu sm-t">Envie este código. Quem for pagar cola em <b>Pix → Pagar com código</b>.</p>`;
-  },
-  savings: async (f, ev) => {
-    const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err');
-    const dir = (ev.submitter && ev.submitter.dataset.dir) || 'in';
-    const r = await busy(ev.submitter, () => api(`/api/savings/${dir}`, { method: 'POST', body: { amount: v } }));
-    if (r) { setState(r); openSavings(); toast(dir === 'in' ? 'Guardado com sucesso!' : 'Resgate feito — dinheiro na conta.', 'ok'); }
-  },
-  invoice: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/pay', { method: 'POST', body: { amount: v } })); if (r) { setState(r); sheetClose(); toast('Fatura paga!', 'ok'); } },
-  draw: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v >= 10)) return toast('O valor mínimo é R$ 10,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/draw', { method: 'POST', body: { amount: v } })); if (r) { setState(r); sheetClose(); toast(`${fmtBRL(v)} na sua conta!`, 'ok'); } },
-  purchase: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/card/purchase', { method: 'POST', body: { merchant: d.merchant, amount: v } })); if (r) { setState(r); sheetClose(); toast('Compra aprovada!', 'ok'); } },
-  creditReq: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v >= 100)) return toast('Peça pelo menos R$ 100,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/request', { method: 'POST', body: { amount: v, purpose: d.purpose } })); if (r) { setState(r); openCreditReq(); toast(r.message, 'ok'); } },
-  password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method: 'POST', body: d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); sheetClose(); toast('Senha alterada!', 'ok'); } },
-  support: async (f, ev) => {
-    const text = new FormData(f).get('text') ?? $('#chatIn').value; const t = String(text).trim(); if (!t) return;
-    const r = await busy(ev.submitter, () => api('/api/support/messages', { method: 'POST', body: { text: t } })); if (r) { $('#chatIn').value = ''; setState(r); }
-  },
-  reply: async (f, ev) => {
-    const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return;
-    const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method: 'POST', body: d })); if (r) { await loadMaster(); openThread(d.userId, true); }
-  },
-  deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method: 'POST', body: { userId: d.userId, amount: v, note: d.note } })); if (r) { sheetClose(); toast('Depósito feito.', 'ok'); loadMaster(); } },
+  login: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/login', { method:'POST', body:{ username:d.username, password:d.password } })); if (r) { enter(r); toast(`Olá, ${((r.state&&r.state.user&&r.state.user.fullName)||'').split(' ')[0] || 'bem-vindo'}!`, 'ok'); } },
+  register: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/register', { method:'POST', body:d })); if (r) { enter(r); toast('Conta criada! Bem-vindo(a).', 'ok'); } },
+  pixLookup: async (f, ev) => { const key = new FormData(f).get('key'); const r = await busy(ev.submitter, () => api('/api/pix/lookup', { method:'POST', body:{ key } })); if (r) { S.pix = { ...S.pix, key, rec:r.recipient, amount:'' }; pixStep2(); } },
+  pixReview: (f) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); if (v > U().balance) return toast('Saldo insuficiente para este Pix.', 'err'); S.pix.value = v; S.pix.amount = d.amount; S.pix.note = (d.note||'').trim(); pixStep3(); },
+  addKey: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/pix/key', { method:'POST', body:d })); if (r) { setState(r); openKeys(); toast('Chave cadastrada!', 'ok'); } },
+  charge: (f) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const hasV = String(d.amount||'').trim() !== ''; if (hasV && !(v > 0)) return toast('Valor inválido.', 'err'); const code = `ZKPIX|${d.key}|${hasV ? v.toFixed(2) : '0'}`; $('#chargeOut').innerHTML = `<div class="code">${esc(code)}</div><div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(code)}">${ico('copy')} Copiar código</button></div><p class="mu sm-t">Quem paga cola em Pix → Colar código.</p>`; },
+  savings: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const dir = (ev.submitter && ev.submitter.dataset.dir) || 'in'; const r = await busy(ev.submitter, () => api(`/api/savings/${dir}`, { method:'POST', body:{ amount:v } })); if (r) { setState(r); openSavings(); toast(dir === 'in' ? 'Guardado com sucesso!' : 'Resgate feito — dinheiro na conta.', 'ok'); } },
+  invoice: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/pay', { method:'POST', body:{ amount:v } })); if (r) { setState(r); sheetClose(); toast('Fatura paga!', 'ok'); } },
+  draw: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v >= 10)) return toast('O valor mínimo é R$ 10,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/draw', { method:'POST', body:{ amount:v } })); if (r) { setState(r); sheetClose(); toast(`${fmtBRL(v)} na sua conta!`, 'ok'); } },
+  purchase: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/card/purchase', { method:'POST', body:{ merchant:d.merchant, amount:v } })); if (r) { setState(r); sheetClose(); toast('Compra aprovada!', 'ok'); } },
+  creditReq: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v >= 50)) return toast('Peça pelo menos R$ 50,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/request', { method:'POST', body:{ amount:v, purpose:d.purpose } })); if (r) { setState(r); openCreditReq(); toast(r.message, 'ok'); } },
+  password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method:'POST', body:d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); sheetClose(); toast('Senha alterada!', 'ok'); } },
+  support: async (f, ev) => { const t = String(new FormData(f).get('text') || '').trim(); if (!t) return; const r = await busy(ev.submitter, () => api('/api/support/messages', { method:'POST', body:{ text:t } })); if (r) setState(r); },
+  reply: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return; const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method:'POST', body:d })); if (r) { await loadMaster(); openThread(d.userId); } },
+  deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method:'POST', body:{ userId:d.userId, amount:v, note:d.note } })); if (r) { sheetClose(); toast('Depósito feito.', 'ok'); loadMaster(); } },
 };
+const CH = { keyType: (el) => { const w = $('#kvWrap'); if (w) w.classList.toggle('hidden', el.value === 'aleatória'); const k = $('#kv'); if (k) { k.required = el.value !== 'aleatória'; k.placeholder = { email:'voce@email.com', telefone:'(11) 91234-5678' }[el.value] || ''; } } };
 
-/* ====== sessão e tempo real ====== */
-async function doLogin(username, password) { const r = await api('/api/login', { method: 'POST', body: { username, password } }); enter(r); toast(`Olá, ${r.state.user.fullName.split(' ')[0]}!`, 'ok'); }
+/* ---------- sessão / tempo real ---------- */
 function enter(r) { S.token = r.token; localStorage.setItem('armin_token', S.token); S.st = r.state; S.page = 'home'; S.master = null; render(); connectSocket(); }
-function doLocalLogout() {
-  localStorage.removeItem('armin_token'); S.token = ''; S.st = null; S.master = null; S.card = null; S.page = 'home'; S.authTab = 'login';
-  if (S.socket) { S.socket.disconnect(); S.socket = null; } sheetClose(); render();
-}
+function doLocalLogout() { localStorage.removeItem('armin_token'); S.token = ''; S.st = null; S.master = null; S.card = null; S.page = 'home'; S.authTab = 'login'; if (S.socket) { S.socket.disconnect(); S.socket = null; } render(); }
 function connectSocket() {
   if (S.socket) { S.socket.disconnect(); S.socket = null; }
   if (typeof io === 'undefined' || !S.token) return;
@@ -506,30 +418,21 @@ function connectSocket() {
   S.socket.on('account:updated', (p) => { if (p.state) { S.st = p.state; render(); } });
   S.socket.on('master:refresh', () => { if (S.page === 'master') loadMaster(); });
 }
-async function poll() { if (!S.token || !S.st || document.hidden) return; try { const r = await api('/api/me'); if (JSON.stringify(r.state) !== JSON.stringify(S.st)) { S.st = r.state; render(); } } catch {} }
+async function poll() { if (!S.token || !S.st || document.hidden) return; try { const r = await api('/api/me'); if (JSON.stringify(r.state) !== JSON.stringify(S.st)) { S.st = r.state; render(); } } catch (e) {} }
 
-/* ========= eventos globais ========= */
-document.addEventListener('click', (e) => {
-  const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
-  const fn = A[el.dataset.act]; if (!fn) { console.warn('Ação sem handler:', el.dataset.act); return; }
-  e.preventDefault(); fn(el, e);
-});
-document.addEventListener('submit', (e) => {
-  const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault();
-  const fn = F[f.dataset.form]; if (fn) fn(f, e); else console.warn('Form sem handler:', f.dataset.form);
-});
+document.addEventListener('click', (e) => { const el = e.target.closest('[data-act]'); if (!el || el.disabled) return; const fn = A[el.dataset.act]; if (!fn) return; e.preventDefault(); fn(el, e); });
+document.addEventListener('submit', (e) => { const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const fn = F[f.dataset.form]; if (fn) fn(f, e); });
 document.addEventListener('change', (e) => { const el = e.target.closest('[data-change]'); if (el && CH[el.dataset.change]) CH[el.dataset.change](el); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sheetOpen()) sheetClose(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') sheetClose(); });
 document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
 setInterval(poll, 25000);
 
-/* ========= boot ========= */
 $('#root').innerHTML = shell();
 (async function boot() {
   render();
   if (!S.token) return;
   try { const r = await api('/api/me'); S.st = r.state; render(); connectSocket(); }
-  catch (e) { if (S.token) { /* erro de rede: mantém token, mostra login */ } render(); }
+  catch (e) { localStorage.removeItem('armin_token'); S.token = ''; S.st = null; render(); }
 })();
 </script>
 </body>
