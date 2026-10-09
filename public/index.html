@@ -1,253 +1,650 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#820ad1" />
-  <meta name="description" content="Armin Bank — conta digital com Pix, crédito e suporte em tempo real." />
-  <title>Armin Bank | Conta digital premium</title>
-  <script src="/socket.io/socket.io.js"></script>
-  <style>
-    :root{--bg:#f6f6f8;--surface:#fff;--surface-2:#fafafd;--line:#e8e6ee;--text:#17131f;--muted:#777180;--muted-2:#a19ca8;--purple:#820ad1;--purple-dark:#5c1696;--mint:#158f62;--amber:#b7791f;--danger:#c53b55;--shadow:0 14px 40px rgba(28,15,43,.08);--radius:18px;--safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px)}
-    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text)}body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}button,input,select,textarea{font:inherit}button{border:0;cursor:pointer}button:active{transform:scale(.99)}a{color:inherit}.hidden{display:none!important}
-    .app-shell{min-height:100dvh;background:var(--bg)}
-    .login-screen{min-height:100dvh;display:grid;place-items:center;padding:28px;background:#fff}.login-wrap{width:min(100%,420px)}
-    .brand-lockup{display:flex;align-items:center;gap:12px;margin-bottom:34px}.brand-mark{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--purple);color:#fff;font-size:18px;font-weight:800}.brand-name{font-size:16px;letter-spacing:.12em;font-weight:800}.brand-caption{color:var(--muted);font-size:11px;margin-top:3px}
-    .login-card{padding:0;border:0;background:transparent;box-shadow:none}.eyebrow{color:var(--muted);text-transform:uppercase;font-size:10px;letter-spacing:.14em;font-weight:800}.login-card h1{font-size:34px;line-height:1.08;letter-spacing:-.045em;margin:11px 0 10px}.login-card>p{color:var(--muted);line-height:1.55;margin:0 0 28px;font-size:15px}.field{margin:16px 0}.field label{display:block;color:#5e5865;font-size:12px;font-weight:700;margin-bottom:8px}.field input,.field select,.field textarea{width:100%;border:1px solid #d8d4df;border-radius:10px;outline:0;background:#fff;color:var(--text);padding:15px;transition:border-color .2s,box-shadow .2s}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(130,10,209,.12)}.field textarea{resize:vertical;min-height:90px}.btn{min-height:45px;border-radius:10px;padding:0 18px;color:var(--text);background:#f1eff4;border:1px solid var(--line);font-weight:750;transition:.2s}.btn:hover{filter:brightness(.98)}.btn-primary{background:var(--purple);color:#fff;box-shadow:0 7px 18px rgba(130,10,209,.2)}.btn-mint{background:#e2f5ec;color:#136e4e;border-color:#c7ead8}.btn-ghost{background:transparent;color:var(--muted)}.btn-danger{background:#fff0f2;color:var(--danger);border-color:#f2cbd2}.btn-small{min-height:34px;padding:0 11px;border-radius:8px;font-size:12px}.login-actions{margin-top:24px;display:grid}.login-actions .btn{width:100%;height:50px}.disclaimer{color:var(--muted-2);font-size:11px;text-align:center;margin:25px 0 0;line-height:1.5}
-    .app{min-height:100dvh;display:flex;flex-direction:column}.topbar{height:72px;padding:14px max(20px,calc((100vw - 1120px)/2));display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);position:sticky;top:0;z-index:10}.topbar .brand-lockup{margin:0;gap:9px}.topbar .brand-mark{width:32px;height:32px;font-size:14px}.topbar .brand-name{font-size:13px}.topbar .brand-caption{font-size:10px}.topbar-right{display:flex;align-items:center;gap:10px}.live-pill{display:flex;align-items:center;gap:6px;border:1px solid #dcefe5;color:var(--mint);background:#f3fbf7;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:800;text-transform:uppercase}.live-dot{width:6px;height:6px;border-radius:50%;background:#36b77b;box-shadow:0 0 0 3px rgba(54,183,123,.12)}.avatar{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#f0e8f7;color:var(--purple);font-weight:800}
-    .main{width:min(100%,1120px);margin:0 auto;padding:34px 20px calc(100px + var(--safe-bottom));flex:1}.section{display:none;animation:rise .22s ease-out}.section.active{display:block}@keyframes rise{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:none}}.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:5px 0 24px}.section-head h2{font-size:32px;margin:0;letter-spacing:-.05em}.section-head p{margin:7px 0 0;color:var(--muted);font-size:14px;line-height:1.5}.grid{display:grid;gap:16px}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}.card{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}.card-pad{padding:21px}.hero-grid{display:grid;gap:20px}.balance-card{min-height:255px;padding:25px;border-radius:22px;position:relative;overflow:hidden;background:linear-gradient(135deg,#820ad1,#5f1594);color:#fff;box-shadow:0 18px 38px rgba(130,10,209,.22)}.balance-card:before{content:"";position:absolute;width:330px;height:330px;right:-145px;top:-160px;border-radius:50%;background:rgba(255,255,255,.09)}.balance-top,.balance-bottom{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}.card-kicker{font-size:11px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.12em;font-weight:800}.card-emblem{width:34px;height:24px;border-radius:6px;border:1px solid rgba(255,255,255,.4);background:linear-gradient(135deg,#f3d48e,#ba8220)}.balance-label{color:rgba(255,255,255,.72);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin:43px 0 5px;position:relative;z-index:1}.balance-value{font-size:45px;letter-spacing:-.07em;line-height:1;font-weight:850;position:relative;z-index:1}.balance-bottom{margin-top:42px;color:rgba(255,255,255,.7);font-size:12px}.balance-bottom strong{color:#fff}.hide-balance{cursor:pointer;color:rgba(255,255,255,.8);background:transparent;font-size:17px}.welcome h1{font-size:36px;letter-spacing:-.055em;line-height:1.02;margin:0}.welcome h1 span{color:var(--purple)}.welcome p{color:var(--muted);line-height:1.6;max-width:540px;margin:11px 0 0}.status-card{display:flex;align-items:center;gap:13px;padding:14px;margin-top:20px;background:#f7fbf9;border:1px solid #dceddf;border-radius:14px}.status-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;background:#e0f5e9;color:var(--mint);font-weight:900}.status-card strong{display:block;font-size:13px}.status-card span{display:block;color:var(--muted);font-size:12px;margin-top:3px}.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:17px 0}.quick-action{min-height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:13px;color:var(--text);border:1px solid var(--line);background:#fff;font-size:11px;font-weight:800}.quick-action b{width:29px;height:29px;display:grid;place-items:center;border-radius:50%;color:var(--purple);background:#f3eafa;font-size:15px}.quick-action:nth-child(2) b{color:var(--mint);background:#e8f7ef}.quick-action:nth-child(3) b{color:var(--amber);background:#fff4e3}.quick-action:nth-child(4) b{color:#527bd1;background:#edf2ff}.metric-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.metric{padding:16px;background:#fff;border:1px solid var(--line);border-radius:14px}.metric-label{color:var(--muted);font-size:11px}.metric-value{font-size:19px;font-weight:850;margin-top:7px;letter-spacing:-.03em}.metric-value.mint{color:var(--mint)}.metric-value.violet{color:var(--purple)}.metric-value.amber{color:var(--amber)}.card-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.card-title h3{margin:0;font-size:15px}.card-title a,.text-btn{color:var(--purple);font-size:12px;font-weight:800;background:none;padding:0}.score-card{display:flex;align-items:center;gap:17px}.score-ring{width:86px;height:86px;flex:0 0 auto;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--purple) calc(var(--score-pct)*1%),#eeeaf1 0);position:relative}.score-ring:before{content:"";position:absolute;inset:7px;background:#fff;border-radius:50%}.score-ring strong{position:relative;font-size:21px}.score-copy strong{display:block;font-size:15px}.score-copy p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.45}.pill{display:inline-flex;align-items:center;gap:5px;padding:6px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:#faf9fb;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}.pill.mint{color:var(--mint);border-color:#cbeada;background:#f1fbf5}.pill.violet{color:var(--purple);border-color:#e1cbed;background:#faf3fe}.pill.amber{color:var(--amber);border-color:#f2dfbe;background:#fffaf1}.pill.red{color:var(--danger);border-color:#f1ced4;background:#fff4f5}.activity-list,.request-list,.user-list{display:grid;gap:11px}.activity,.request,.user-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}.activity:last-child,.request:last-child,.user-row:last-child{border-bottom:0;padding-bottom:0}.activity:first-child,.request:first-child,.user-row:first-child{padding-top:0}.activity-icon{width:37px;height:37px;flex:0 0 auto;display:grid;place-items:center;border-radius:50%;background:#f3eafa;color:var(--purple);font-weight:900}.activity-icon.in{color:var(--mint);background:#e8f7ef}.activity-main{flex:1;min-width:0}.activity-main strong,.user-main strong{display:block;font-size:13px}.activity-main span,.user-main span{display:block;color:var(--muted);font-size:11px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-amount{font-size:13px;font-weight:850}.amount-in{color:var(--mint)}.amount-out{color:#c6566d}.empty{padding:22px 10px;text-align:center;color:var(--muted);font-size:13px;border:1px dashed #ddd8e2;border-radius:13px;line-height:1.55}.empty strong{display:block;color:var(--text);margin-bottom:4px}.tabbar{display:inline-flex;gap:3px;padding:4px;border-radius:11px;border:1px solid var(--line);background:#fff;margin-bottom:16px}.tab{border:0;background:transparent;color:var(--muted);padding:9px 12px;border-radius:8px;font-size:12px;font-weight:800}.tab.active{color:var(--purple);background:#f5eafa}.pix-key{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}.pix-key:last-child{border-bottom:0}.key-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:50%;color:var(--mint);background:#e8f7ef;font-weight:900}.key-copy{flex:1;min-width:0}.key-copy strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.key-copy span{color:var(--muted);font-size:11px;text-transform:capitalize}.form-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:18px}.form-grid{display:grid;gap:4px 12px}.credit-hero{padding:23px;border-radius:22px;background:linear-gradient(135deg,#f0e8f7,#fff);border:1px solid #e4d9eb}.credit-hero-top{display:flex;align-items:start;justify-content:space-between;gap:15px}.credit-hero h3{margin:7px 0 0;font-size:24px;letter-spacing:-.045em}.limit-number{font-size:43px;margin-top:29px;font-weight:900;letter-spacing:-.06em}.progress{height:7px;border-radius:999px;overflow:hidden;background:#e9e5eb;margin-top:11px}.progress span{display:block;height:100%;border-radius:inherit;background:var(--purple)}.credit-foot{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:8px}.request{align-items:start}.request-main{flex:1}.request-main strong{display:block;font-size:14px}.request-main span{display:block;color:var(--muted);font-size:11px;margin-top:4px;line-height:1.4}.request-right{text-align:right}.request-right strong{display:block;font-size:14px}.request-right span{display:block;margin-top:6px}.chat{min-height:410px;display:flex;flex-direction:column}.chat-messages{flex:1;min-height:290px;max-height:480px;overflow:auto;padding-right:4px;display:flex;flex-direction:column;gap:10px}.bubble{max-width:86%;align-self:flex-start;padding:11px 13px;border-radius:14px 14px 14px 4px;background:#f1eff4;color:var(--text);font-size:13px;line-height:1.45}.bubble.mine{align-self:flex-end;border-radius:14px 14px 4px 14px;background:var(--purple);color:#fff}.bubble small{display:block;color:var(--muted);font-size:10px;margin-top:5px}.bubble.mine small{color:rgba(255,255,255,.68)}.chat-form{display:flex;gap:8px;border-top:1px solid var(--line);padding-top:14px;margin-top:15px}.chat-form input,.chat-form select{flex:1;min-width:0;border:1px solid #d8d4df;border-radius:10px;background:#fff;color:var(--text);padding:12px 13px;outline:none}.chat-form input:focus,.chat-form select:focus{border-color:var(--purple)}.chat-send{width:45px;padding:0}.master-banner{display:flex;align-items:center;gap:14px;padding:17px;margin-bottom:17px;border-radius:17px;background:#f6effa;border:1px solid #e4d3ed}.master-banner .brand-mark{width:40px;height:40px;flex:0 0 auto}.master-banner strong{display:block;font-size:14px}.master-banner span{display:block;color:var(--muted);margin-top:3px;font-size:12px}.master-metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:17px}.master-metric{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fff}.master-metric span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em}.master-metric strong{display:block;margin-top:8px;font-size:20px}.master-metric strong.mint{color:var(--mint)}.admin-request-actions{display:flex;gap:7px;margin-top:12px}.support-preview{display:grid;gap:10px;max-height:300px;overflow:auto}.support-line{padding:12px;border-radius:11px;background:#faf9fb;border:1px solid var(--line)}.support-line strong{font-size:12px}.support-line span{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}.bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:20;display:flex;justify-content:center;padding:8px 10px calc(8px + var(--safe-bottom));background:rgba(255,255,255,.94);border-top:1px solid var(--line);backdrop-filter:blur(20px)}.nav-inner{width:min(100%,640px);display:grid;grid-template-columns:repeat(5,1fr);gap:4px}.nav-item{position:relative;min-height:52px;padding:6px 3px;border-radius:11px;background:transparent;color:var(--muted-2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:10px;font-weight:800}.nav-item b{font-size:18px;line-height:1;font-weight:500}.nav-item.active{color:var(--purple);background:#f7effb}.nav-item.master-nav{display:none}.nav-item.master-nav.visible{display:flex}.notification-dot{position:absolute;top:5px;right:22%;width:6px;height:6px;border-radius:50%;background:var(--danger)}.toast{position:fixed;left:50%;bottom:calc(86px + var(--safe-bottom));z-index:60;max-width:calc(100% - 32px);transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:12px 16px;border-radius:10px;background:#2d2433;color:#fff;box-shadow:var(--shadow);font-size:13px;font-weight:750;transition:.22s}.toast.show{opacity:1;transform:translate(-50%,0)}.toast.success{color:#135d43;background:#dff5e9}.toast.error{color:#8e2138;background:#ffe8ec}.toast.warning{color:#7d5012;background:#fff0d6}.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:rgba(16,11,22,.4);backdrop-filter:blur(10px)}.modal-card{width:min(100%,430px);padding:23px;border:1px solid var(--line);border-radius:18px;background:#fff;box-shadow:var(--shadow)}.modal-head{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:18px}.modal-head h3{margin:0;font-size:20px}.close{width:32px;height:32px;border-radius:50%;background:#f3f1f5;color:var(--muted)}.copy-btn{flex:0 0 auto;width:32px;height:32px;border-radius:50%;background:#e8f7ef;color:var(--mint)}.footer-note{color:var(--muted-2);font-size:11px;line-height:1.5;margin-top:18px}
-    @media (min-width:700px){.main{padding-top:42px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-grid{grid-template-columns:1.05fr .95fr;align-items:stretch}.bottom-nav{position:sticky;bottom:0}.welcome h1{font-size:42px}}
-    @media (min-width:1020px){.main{padding-left:0;padding-right:0}.topbar{padding-left:max(30px,calc((100vw - 1120px)/2));padding-right:max(30px,calc((100vw - 1120px)/2))}}
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#820ad1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="description" content="Armin Bank — conta digital com Pix, cartão, cofrinho e crédito." />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/icon.svg" />
+<title>Armin Bank</title>
+<style>
+:root{--p:#820ad1;--p2:#6a07ae;--p3:#f3e8fb;--bg:#f2f1f5;--card:#fff;--tx:#1d1a22;--mu:#76707f;--ln:#e9e6ee;--gr:#0e9f6e;--gr2:#e3f6ee;--rd:#d6334f;--rd2:#fdebee;--am:#b7791f;--am2:#fff4de;--r:16px;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;overscroll-behavior-y:none}
+body{font-size:15px;line-height:1.4}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;padding:0;touch-action:manipulation}
+button:disabled{opacity:.55;cursor:default}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#root{height:100%;max-width:480px;margin:0 auto;position:relative;background:var(--bg);box-shadow:0 0 0 1px rgba(0,0,0,.04)}
+@media(min-width:520px){body{background:#e4e1ea}#root{height:min(100%,900px);margin-top:max(0px,calc((100dvh - 900px)/2));overflow:hidden;border-radius:0}}
 
-    /* Dark premium mobile banking layer */
-    :root{--bg:#100d13;--surface:#18151c;--surface-2:#211c25;--line:#302936;--text:#f8f5fa;--muted:#a7a0ad;--muted-2:#77717d;--purple:#820ad1;--purple-dark:#5e0a97;--mint:#61d69f;--amber:#e7ae58;--danger:#ee7087;--shadow:0 18px 50px rgba(0,0,0,.28)}
-    html,body{background:var(--bg);color:var(--text)}
-    .app-shell{background:radial-gradient(circle at 55% -12%,rgba(130,10,209,.18),transparent 34%),var(--bg)}
-    .login-screen{background:radial-gradient(circle at 50% 0%,rgba(130,10,209,.2),transparent 36%),#100d13}.login-card{color:var(--text)}.login-card>p{color:var(--muted)}.field label{color:#bdb6c3}.field input,.field select,.field textarea{border-color:#3a3340;background:#18151c;color:var(--text)}.field input:focus,.field select:focus,.field textarea:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,.15)}.disclaimer{color:#77717d}
-    .topbar{background:rgba(16,13,19,.88);border-color:var(--line)}.brand-caption{color:var(--muted)}.live-pill{border-color:rgba(97,214,159,.24);background:rgba(97,214,159,.08);color:var(--mint)}.avatar{background:#2c1d38;color:#d49cff;border:1px solid rgba(168,85,247,.25)}
-    .card,.metric,.quick-action,.master-metric,.tabbar,.modal-card{background:var(--surface);border-color:var(--line);box-shadow:var(--shadow)}.metric{background:var(--surface)}.quick-action{color:var(--text)}.quick-action b{background:rgba(168,85,247,.16)}.quick-action:nth-child(2) b{background:rgba(97,214,159,.12)}.quick-action:nth-child(3) b{background:rgba(231,174,88,.13)}.quick-action:nth-child(4) b{background:rgba(116,157,255,.13)}
-    .balance-card{background:linear-gradient(135deg,#7e09ca 0%,#551183 54%,#35114a 100%);box-shadow:0 20px 45px rgba(91,9,133,.34)}.balance-card:before{background:rgba(255,255,255,.1)}.status-card{background:rgba(97,214,159,.07);border-color:rgba(97,214,159,.2)}.status-icon{background:rgba(97,214,159,.14);color:var(--mint)}
-    .score-ring{background:conic-gradient(#c678ff calc(var(--score-pct)*1%),#342d39 0)}.score-ring:before{background:var(--surface)}.pill{background:rgba(255,255,255,.04);border-color:var(--line)}.pill.mint{background:rgba(97,214,159,.08);border-color:rgba(97,214,159,.2)}.pill.violet{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.25)}.pill.amber{background:rgba(231,174,88,.1);border-color:rgba(231,174,88,.25)}.pill.red{background:rgba(238,112,135,.1);border-color:rgba(238,112,135,.25)}
-    .activity,.request,.user-row,.pix-key{border-color:var(--line)}.activity-icon{background:rgba(168,85,247,.14);color:#c678ff}.activity-icon.in,.key-icon{background:rgba(97,214,159,.12);color:var(--mint)}.activity-main span,.user-main span,.score-copy p,.section-head p,.welcome p,.metric-label,.key-copy span,.request-main span{color:var(--muted)}.empty{border-color:#3b3341;color:var(--muted)}.empty strong{color:var(--text)}
-    .tab{color:var(--muted)}.tab.active{color:#d49cff;background:rgba(168,85,247,.16)}.credit-hero{background:linear-gradient(135deg,#2d1a3b,#1b1720);border-color:rgba(168,85,247,.26)}.progress{background:#3b3341}.progress span{background:#b45cff}.chat-form input,.chat-form select{border-color:#3a3340;background:var(--surface);color:var(--text)}.bubble{background:#29232e;color:var(--text)}.bubble.mine{background:var(--purple)}.support-line{background:#211c25;border-color:var(--line)}.master-banner{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.25)}.bottom-nav{background:rgba(16,13,19,.94);border-color:var(--line)}.nav-item{color:#88818e}.nav-item.active{color:#d49cff;background:rgba(168,85,247,.15)}.close{background:#2a2430;color:var(--muted)}.copy-btn{background:rgba(97,214,159,.12);color:var(--mint)}.footer-note{color:var(--muted-2)}
-    @media(max-width:699px){.topbar{height:68px;padding:12px 18px}.topbar .brand-name{font-size:12px}.topbar .brand-caption{font-size:9px}.live-pill{padding:6px 8px}.main{padding:27px 16px calc(92px + var(--safe-bottom))}.section-head{margin-bottom:20px}.section-head h2{font-size:29px}.welcome h1{font-size:33px}.welcome p{font-size:14px;max-width:100%}.hero-grid{gap:14px}.balance-card{min-height:225px;padding:21px;border-radius:20px}.balance-label{margin-top:36px}.balance-value{font-size:38px}.balance-bottom{margin-top:34px}.quick-actions{gap:7px}.quick-action{min-height:72px;font-size:10px}.quick-action b{width:27px;height:27px}.grid-2{grid-template-columns:1fr}.card-pad{padding:17px}.metric{padding:14px}.score-card{padding:17px}.master-metrics{gap:8px}.master-metric{padding:13px}.master-metric strong{font-size:18px}.bottom-nav{padding-left:7px;padding-right:7px}.nav-item{min-height:53px}.login-screen{padding:24px}.login-wrap{width:100%}.login-card h1{font-size:32px}.login-card .brand-lockup{margin-bottom:30px}}
+/* ---------- login ---------- */
+.auth{height:100%;overflow-y:auto;background:var(--p);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
+.logo b{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--p);display:grid;place-items:center;font-size:19px;letter-spacing:0}
+.auth h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;margin:44px 0 8px}
+.auth>p{margin:0 0 24px;opacity:.85}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,.16);border-radius:12px;padding:4px;margin-bottom:18px}
+.seg button{padding:10px;border-radius:9px;font-weight:700;color:rgba(255,255,255,.85)}
+.seg button.on{background:#fff;color:var(--p)}
+.auth .fld label{color:rgba(255,255,255,.9)}
+.auth input{background:#fff;color:var(--tx)}
+.auth .btn{background:#fff;color:var(--p);margin-top:8px}
+.demo{margin-top:auto;padding-top:26px;font-size:12px;opacity:.9;text-align:center}
+.demo button{display:inline-block;margin:6px 4px 0;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.18);color:#fff;font-weight:700;font-size:12px}
 
-    /* Mobile QA hardening */
-    html,body{width:100%;max-width:100%;overflow-x:hidden}body{min-width:0}.app,.app-shell,.main,.section{width:100%;max-width:100%;min-width:0}.main{overflow-x:hidden}.section>*{min-width:0;max-width:100%}.grid,.hero-grid,.grid-2,.grid-3,.metric-row,.master-metrics{min-width:0;max-width:100%}.card,.card-pad,.balance-card,.credit-hero,.activity-list,.request-list,.user-list,.support-preview,.chat{min-width:0;max-width:100%}.section-head>div{min-width:0}.section-head p,.welcome p,.card-title h3,.activity-main,.request-main,.user-main,.score-copy{min-width:0;overflow-wrap:anywhere}.form-grid>*{min-width:0}.field{min-width:0}.field input,.field select,.field textarea,.chat-form input,.chat-form select{max-width:100%;min-width:0}.form-actions{min-width:0}.form-actions .btn{max-width:100%;white-space:normal}.tabbar{max-width:100%;overflow-x:auto;white-space:nowrap;scrollbar-width:none}.tabbar::-webkit-scrollbar{display:none}.tab{flex:0 0 auto}.activity,.request,.user-row,.pix-key{min-width:0}.activity-amount,.request-right{flex:0 0 auto;max-width:42%;overflow-wrap:anywhere}.activity-main span,.user-main span{max-width:100%}.bottom-nav{width:100%;max-width:100%;overflow:hidden}.nav-inner{min-width:0;max-width:100%}.nav-item{min-width:0;overflow:hidden;white-space:nowrap}.chat-form{min-width:0}.chat-form .chat-send{flex:0 0 45px}.master-banner{min-width:0}.master-banner>div:last-child{min-width:0}.master-banner span{overflow-wrap:anywhere}.modal{overflow-y:auto}.modal-card{max-height:calc(100dvh - 40px);overflow:auto}
-    @media(max-width:699px){.main{padding-left:16px;padding-right:16px}.section-head{align-items:flex-start;flex-direction:column;gap:10px}.section-head>.pill{align-self:flex-start}.card-title{align-items:flex-start}.card-title .pill{flex:0 0 auto}.balance-bottom{gap:12px}.balance-bottom span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.balance-bottom span:last-child{text-align:right}.request-right{max-width:38%}.request-right .pill{font-size:9px}.chat-form{align-items:center}.chat-form input,.chat-form select{width:0}.master-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.master-metric{min-width:0}.master-metric strong{overflow-wrap:anywhere}.credit-foot{gap:8px}.credit-foot span:last-child{text-align:right}.topbar-right{min-width:0}.live-pill{white-space:nowrap}.topbar .brand-lockup{min-width:0}.topbar .brand-lockup>div:last-child{min-width:0}.topbar .brand-name{white-space:nowrap}.login-wrap{max-width:390px}}
-  </style>
+/* ---------- campos e botões ---------- */
+.fld{margin:0 0 14px}
+.fld label{display:block;font-size:12.5px;font-weight:700;color:#5b5563;margin-bottom:6px}
+.fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:14px;background:#fff;outline:0;font-size:16px;transition:border-color .15s,box-shadow .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(130,10,209,.14)}
+.fld textarea{min-height:88px;resize:none}
+.fld small{display:block;color:var(--mu);margin-top:5px;font-size:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border-radius:999px;background:var(--p);color:#fff;font-weight:700;font-size:15.5px;padding:0 22px}
+.btn:active:not(:disabled){filter:brightness(.92)}
+.btn.sec{background:var(--p3);color:var(--p)}
+.btn.out{background:#fff;color:var(--p);border:1.5px solid var(--p)}
+.btn.dng{background:var(--rd2);color:var(--rd)}
+.btn.sm{min-height:38px;font-size:13.5px;padding:0 16px;width:auto}
+.btns{display:grid;gap:10px;margin-top:6px}
+.btns.two{grid-template-columns:1fr 1fr}
+.link{color:var(--p);font-weight:700;font-size:13.5px}
+
+/* ---------- estrutura ---------- */
+.app{height:100%;display:flex;flex-direction:column}
+.view{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:calc(84px + var(--bot))}
+.view.sub{padding-bottom:calc(24px + var(--bot))}
+.hdr{background:var(--p);color:#fff;padding:calc(14px + var(--top)) 18px 22px}
+.hdr.tall{padding-bottom:30px}
+.hdr .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px}
+.hdr .tools{display:flex;gap:4px}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:inherit;position:relative}
+.ib:active{background:rgba(255,255,255,.15)}
+.hdr h1{margin:10px 0 0;font-size:26px;letter-spacing:-.03em;line-height:1.15}
+.hdr p{margin:4px 0 0;opacity:.85;font-size:13.5px}
+.av{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.2);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
+.dot{position:absolute;top:7px;right:7px;min-width:17px;height:17px;border-radius:9px;background:#ff4d6d;color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid var(--p)}
+.wrap{padding:14px 14px 0;display:grid;gap:12px}
+.card{background:var(--card);border-radius:var(--r);padding:16px;box-shadow:0 1px 2px rgba(30,10,50,.04)}
+.card.flush{padding:0;overflow:hidden}
+.ttl{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+.ttl h3{margin:0;font-size:15px}
+.mu{color:var(--mu)}.sm-t{font-size:12.5px}
+.big{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:2px 0}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--ln);background:#fff}
+.row:last-child{border-bottom:0}
+button.row:active{background:#faf8fc}
+.row .ic{width:40px;height:40px;border-radius:50%;background:var(--p3);color:var(--p);display:grid;place-items:center;flex:none}
+.row .ic.g{background:var(--gr2);color:var(--gr)}.row .ic.r{background:var(--rd2);color:var(--rd)}.row .ic.a{background:var(--am2);color:var(--am)}.row .ic.n{background:#efedf2;color:#5b5563}
+.row .mid{flex:1;min-width:0}
+.row .mid b{display:block;font-size:14.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .mid span{display:block;font-size:12.5px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .end{text-align:right;font-weight:700;font-size:14.5px;flex:none;max-width:44%}
+.row .end small{display:block;font-weight:500;font-size:11.5px;color:var(--mu)}
+.in{color:var(--gr)}.out{color:var(--tx)}
+.chev{color:#b4aebb;width:20px;height:20px}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:#efedf2;color:#5b5563}
+.pill.g{background:var(--gr2);color:var(--gr)}.pill.a{background:var(--am2);color:var(--am)}.pill.r{background:var(--rd2);color:var(--rd)}.pill.p{background:var(--p3);color:var(--p)}
+.empty{text-align:center;color:var(--mu);padding:30px 18px;font-size:13.5px}
+.empty b{display:block;color:var(--tx);margin-bottom:4px;font-size:15px}
+.day{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 6px;background:var(--bg)}
+.acts{display:flex;gap:10px;overflow-x:auto;padding:2px 14px 4px;margin:0 -14px;scrollbar-width:none}
+.acts::-webkit-scrollbar{display:none}
+.act{flex:0 0 78px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:650;text-align:center}
+.act i{width:58px;height:58px;border-radius:50%;background:#fff;color:var(--p);display:grid;place-items:center;box-shadow:0 1px 2px rgba(30,10,50,.06)}
+.act:active i{background:var(--p3)}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 14px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;background:#fff;font-weight:700;font-size:13px;color:#5b5563;border:1.5px solid transparent}
+.chip.on{background:var(--p3);color:var(--p);border-color:var(--p)}
+.people{display:flex;gap:14px;overflow-x:auto;scrollbar-width:none}.people::-webkit-scrollbar{display:none}
+.ppl{flex:0 0 64px;text-align:center;font-size:12px;font-weight:600}
+.ppl i{display:grid;place-items:center;width:52px;height:52px;margin:0 auto 5px;border-radius:50%;background:var(--p3);color:var(--p);font-style:normal;font-weight:800}
+.ppl span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar2{height:8px;border-radius:99px;background:#ece8f1;overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:14px}
+.kv:last-child{border-bottom:0}.kv span:first-child{color:var(--mu)}.kv span:last-child{font-weight:650;text-align:right;overflow-wrap:anywhere}
+
+/* ---------- cartão ---------- */
+.plastic{border-radius:20px;padding:20px;color:#fff;min-height:190px;background:linear-gradient(135deg,#9b2be8,#5b0a9a 70%,#3a0766);position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 12px 28px rgba(106,7,174,.3)}
+.plastic:before{content:"";position:absolute;right:-70px;top:-90px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.09)}
+.plastic.off{filter:grayscale(1) brightness(.75)}
+.plastic .nm{font-weight:800;letter-spacing:.14em;font-size:13px;display:flex;justify-content:space-between;align-items:center;position:relative}
+.plastic .num{font-size:19px;letter-spacing:.1em;font-weight:650;position:relative;font-variant-numeric:tabular-nums}
+.plastic .meta{display:flex;justify-content:space-between;font-size:12px;position:relative;gap:10px}
+.plastic .meta span{opacity:.9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- navegação ---------- */
+.nav{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ln);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(6px + var(--bot));z-index:20}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;font-size:11px;font-weight:650;color:#8c8695;border-radius:12px}
+.nav button.on{color:var(--p)}
+.nav button.on svg{stroke-width:2.2}
+
+/* ---------- sheet ---------- */
+.scrim{position:absolute;inset:0;background:rgba(18,8,28,.5);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:#fff;border-radius:22px 22px 0 0;max-height:92%;display:flex;flex-direction:column;transform:translateY(105%);transition:transform .25s cubic-bezier(.2,.8,.2,1);padding-bottom:var(--bot)}
+.sheet.show{transform:none}
+.sheet .grab{width:40px;height:4px;border-radius:9px;background:#d9d5df;margin:9px auto 2px;flex:none}
+.sheet .sh{display:flex;align-items:center;justify-content:space-between;padding:8px 18px 4px;flex:none}
+.sheet .sh h2{margin:0;font-size:19px;letter-spacing:-.02em}
+.sheet .sb{overflow-y:auto;padding:10px 18px 18px;-webkit-overflow-scrolling:touch}
+.x{width:36px;height:36px;border-radius:50%;background:#f0eef3;display:grid;place-items:center;color:#5b5563}
+.amt{display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--ln);padding:6px 0;margin:6px 0 4px}
+.amt:focus-within{border-color:var(--p)}
+.amt b{font-size:24px;color:var(--mu)}
+.amt input{border:0;outline:0;font-size:38px;font-weight:800;width:100%;min-width:0;letter-spacing:-.03em;background:none}
+.ok{width:76px;height:76px;border-radius:50%;background:var(--gr2);color:var(--gr);display:grid;place-items:center;margin:8px auto 14px;animation:pop .35s ease}
+.ok svg{width:38px;height:38px;stroke-width:2.6}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.code{background:var(--p3);border-radius:12px;padding:12px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px;word-break:break-all;color:var(--p2);margin:10px 0}
+
+/* ---------- chat ---------- */
+.chat{display:flex;flex-direction:column;gap:8px;padding:14px;min-height:50vh}
+.msg{max-width:82%;padding:10px 13px;border-radius:16px 16px 16px 4px;background:#fff;font-size:14px;align-self:flex-start;box-shadow:0 1px 2px rgba(30,10,50,.05);overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--p);color:#fff;border-radius:16px 16px 4px 16px}
+.msg small{display:block;font-size:10.5px;opacity:.7;margin-top:3px}
+.composer{position:sticky;bottom:0;display:flex;gap:8px;padding:10px 12px calc(10px + var(--bot));background:var(--bg);border-top:1px solid var(--ln)}
+.composer input{flex:1;min-width:0;border:1.5px solid var(--ln);border-radius:999px;padding:12px 16px;font-size:16px;outline:0;background:#fff}
+.composer input:focus{border-color:var(--p)}
+.composer button{width:46px;height:46px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;flex:none}
+
+/* ---------- toast ---------- */
+.toast{position:absolute;left:14px;right:14px;top:calc(12px + var(--top));z-index:80;padding:13px 16px;border-radius:14px;background:#2a2230;color:#fff;font-weight:650;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25);transform:translateY(-140%);transition:transform .25s;pointer-events:none}
+.toast.show{transform:none}.toast.ok2{background:#0b7a55}.toast.er{background:#b4233d}
+.spin{width:18px;height:18px;border-radius:50%;border:2.5px solid rgba(255,255,255,.4);border-top-color:#fff;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
 <body>
-  <div id="toast" class="toast"></div>
-  <div id="loginScreen" class="login-screen">
-    <div class="login-wrap">
-      <div class="brand-lockup">
-        <div class="brand-mark">A</div>
-        <div><div class="brand-name">ARMIN BANK</div><div class="brand-caption">conta digital</div></div>
-      </div>
-      <form id="loginForm" class="login-card">
-        <div class="eyebrow">Acesso seguro</div>
-        <h1>Acesse sua conta.</h1>
-        <p>Entre no Armin Bank para consultar sua conta, fazer Pix e acompanhar suas opções de crédito.</p>
-        <div class="field"><label for="loginUsername">Usuário ou e-mail</label><input id="loginUsername" autocomplete="username" placeholder="Digite seu usuário" required /></div>
-        <div class="field"><label for="loginPassword">Senha</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Digite sua senha" required /></div>
-        <div class="login-actions"><button class="btn btn-primary" type="submit">Acessar minha conta <span>→</span></button></div>
-        
-        <div class="disclaimer">Ambiente demonstrativo. Nenhum pagamento real é processado.</div>
-      </form>
-    </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h5v-6h4v6h5V10"/></symbol>
+<symbol id="i-pix" viewBox="0 0 24 24"><path d="M12 2.8l4.2 4.2a2 2 0 010 2.8l-1.4 1.4M12 2.8L7.8 7a2 2 0 000 2.8l1.4 1.4M12 21.2L7.8 17a2 2 0 010-2.8l1.4-1.4M12 21.2l4.2-4.2a2 2 0 000-2.8l-1.4-1.4M3 12h4.5l2.2-2.2M21 12h-4.5l-2.2 2.2"/></symbol>
+<symbol id="i-card" viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6 15h4"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r=".6"/><circle cx="3.5" cy="12" r=".6"/><circle cx="3.5" cy="18" r=".6"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 1112 0v6l1.5 2h-15z"/><path d="M10 21a2 2 0 004 0"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A9.6 9.6 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4M6.5 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 004.5-1.1M9.9 9.9a3 3 0 004.2 4.2"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M9.2 9.4a2.9 2.9 0 115 2c-.9.8-2.2 1.2-2.2 2.6M12 17.3v.1"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M17 7L7 17M16 17H7V8"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4.5"/><path d="M11.2 11.8L20 3M16 7l3 3M14 9l2 2"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5V6a2.5 2.5 0 00-2.5-2.5H6A2.5 2.5 0 003.5 6v7A2.5 2.5 0 006 15.5h2.5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5 10-11"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-pig" viewBox="0 0 24 24"><ellipse cx="12" cy="13" rx="8" ry="6"/><path d="M18.5 9l2-2.5M4.2 12H2.5M8 18.5V21M15 18.5V21M10 7.2c.6-.4 1.4-.6 2-.6"/><circle cx="16.5" cy="12" r=".6"/></symbol>
+<symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.500" y="10.500" width="15" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 018 0v2.500"/></symbol>
+<symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4.500" y="10.500" width="15" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 017.600-1.700"/></symbol>
+<symbol id="i-out" viewBox="0 0 24 24"><path d="M9 4H5.500A2.500 2.500 0 003 6.500v11A2.500 2.500 0 005.500 20H9M16 8l4 4-4 4M20 12H9"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 011 1v10a1 1 0 01-1 1h-9l-5 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.700 5.600 6.100.8-4.500 4.200 1.100 6.100L12 16.800 6.600 19.700l1.100-6.100L3.200 9.400l6.100-.8z"/></symbol>
+<symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9.500L12 4l9 5.500M5 10v8M9.500 10v8M14.500 10v8M19 10v8M3 20h18"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.500-3.300 8-8 9-4.700-1-8-4.500-8-9V6z"/><path d="M8.500 12l2.500 2.500 4.500-5"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><path d="M12 3v12M7.500 7.500L12 3l4.500 4.500M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8.500" r="3.500"/><path d="M2.500 20c0-3.800 2.900-6 6.500-6s6.500 2.200 6.500 6M16 5.300a3.500 3.500 0 010 6.400M18 14.300c2.200.7 3.500 2.500 3.500 5.700"/></symbol>
+</defs></svg>
+
+<div id="root"></div>
+
+<script src="/socket.io/socket.io.js" onerror="window.__noWS=true"></script>
+<script>
+'use strict';
+/* =================== utilidades =================== */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ico = (n, cls = '') => `<svg class="i ${cls}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const fmtBRL = (n) => Number(n || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const initials = (name) => String(name || '?').trim().split(/\s+/).map((p) => p[0]).join('').slice(0, 2).toUpperCase();
+const parseMoney = (v) => {
+  let s = String(v ?? '').replace(/[^\d.,-]/g, '');
+  if (!s) return NaN;
+  if (s.includes(',')) s = s.replace(/\./g, '').replace(',', '.');
+  else if ((s.match(/\./g) || []).length > 1) s = s.replace(/\./g, '');
+  const n = Number(s); return Number.isFinite(n) ? Math.round(n * 100) / 100 : NaN;
+};
+const dShort = (iso) => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
+const tShort = (iso) => new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+const dLong = (iso) => new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+function dayLabel(iso) {
+  const d = new Date(iso), t = new Date(); const y = new Date(); y.setDate(t.getDate() - 1);
+  if (d.toDateString() === t.toDateString()) return 'Hoje';
+  if (d.toDateString() === y.toDateString()) return 'Ontem';
+  return d.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+let toastTimer;
+function toast(msg, kind = '') {
+  const t = $('#toast'); if (!t) return;
+  t.textContent = msg; t.className = `toast show ${kind === 'ok' ? 'ok2' : kind === 'err' ? 'er' : ''}`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.className = 'toast'; }, 3200);
+}
+async function api(url, { method = 'GET', body } = {}) {
+  const headers = {};
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
+  if (S.token) headers.Authorization = `Bearer ${S.token}`;
+  let res;
+  try { res = await fetch(url, { method, headers, body: body !== undefined ? JSON.stringify(body) : undefined }); }
+  catch { throw new Error('Sem conexão com o servidor. Verifique sua internet.'); }
+  let data = {}; try { data = await res.json(); } catch {}
+  if (res.status === 401 && S.token && !url.includes('/api/login')) { doLocalLogout(); throw new Error('Sua sessão expirou. Entre novamente.'); }
+  if (!res.ok) throw new Error(data.message || 'Não foi possível concluir. Tente de novo.');
+  return data;
+}
+async function busy(btn, fn) {
+  const old = btn ? btn.innerHTML : ''; if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span>'; }
+  try { return await fn(); } catch (e) { toast(e.message, 'err'); return null; }
+  finally { if (btn && btn.isConnected) { btn.disabled = false; btn.innerHTML = old; } }
+}
+const copyText = async (text, msg = 'Copiado!') => {
+  try { await navigator.clipboard.writeText(text); toast(msg, 'ok'); }
+  catch { const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast(msg, 'ok'); } catch { toast(text); } ta.remove(); }
+};
+
+/* =================== estado =================== */
+const S = { token: localStorage.getItem('armin_token') || '', st: null, page: 'home', back: 'home', hidden: localStorage.getItem('armin_hidden') === '1',
+  filter: 'all', authTab: 'login', master: null, card: null, cardTimer: 0, pix: null, socket: null, sheetKey: '' };
+const U = () => S.st.user;
+const mv = (n) => (S.hidden ? 'R$ ••••' : fmtBRL(n));
+
+/* =================== telas =================== */
+function kindInfo(t) {
+  const m = { pix_in: ['down', 'g'], pix_out: ['up', ''], purchase: ['card', 'n'], invoice_pay: ['receipt', 'n'], savings_in: ['pig', 'a'], savings_out: ['pig', 'a'], savings_yield: ['pig', 'g'], reward: ['star', 'g'], credit_draw: ['bank', 'a'] };
+  return m[t.kind] || [t.amount >= 0 ? 'down' : 'up', ''];
+}
+function txRow(t) {
+  const [ic, cl] = kindInfo(t); const credit = t.method === 'credit';
+  return `<button class="row" data-act="receipt" data-id="${esc(t.id)}"><span class="ic ${cl}">${ico(ic)}</span><span class="mid"><b>${esc(t.title)}</b><span>${esc(t.detail || '')} · ${tShort(t.createdAt)}</span></span><span class="end ${t.amount > 0 ? 'in' : ''}">${t.amount > 0 ? '+' : '−'} ${fmtBRL(Math.abs(t.amount))}${credit ? '<small>no crédito</small>' : ''}</span></button>`;
+}
+function header({ title, sub, back, tools = '' }) {
+  return `<div class="hdr"><div class="bar">${back ? `<button class="ib" data-act="back" aria-label="Voltar">${ico('back')}</button>` : `<button class="av" data-act="nav" data-p="profile" aria-label="Perfil">${esc(initials(U().fullName))}</button>`}<div class="tools">${tools}</div></div>${title ? `<h1>${esc(title)}</h1>` : ''}${sub ? `<p>${esc(sub)}</p>` : ''}</div>`;
+}
+const unread = () => S.st.notifications.filter((n) => !n.read).length;
+function homeTools() {
+  const n = unread();
+  return `<button class="ib" data-act="toggleHide" aria-label="${S.hidden ? 'Mostrar valores' : 'Ocultar valores'}">${ico(S.hidden ? 'eyeoff' : 'eye')}</button><button class="ib" data-act="nav" data-p="support" aria-label="Ajuda">${ico('help')}</button><button class="ib" data-act="notifs" aria-label="Notificações">${ico('bell')}${n ? `<span class="dot">${n > 9 ? '9+' : n}</span>` : ''}</button>`;
+}
+
+function pageHome() {
+  const u = U(), inv = S.st.invoice, sv = S.st.savings, tx = S.st.transactions.slice(0, 5);
+  const first = u.fullName.split(' ')[0];
+  const dt = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+  return `${header({ title: `Olá, ${first}`, sub: dt, tools: homeTools() })}
+<div class="wrap" style="margin-top:-12px">
+  <button class="card row" style="border-radius:16px;border:0;flex-direction:column;align-items:stretch;gap:2px" data-act="nav" data-p="statement"><span class="sm-t mu" style="display:flex;justify-content:space-between;align-items:center"><b style="color:var(--tx);font-size:15px">Conta</b>${ico('chev', 'chev')}</span><span class="big">${mv(u.balance)}</span><span class="sm-t mu">Saldo disponível</span></button>
+  <div class="acts">
+    <button class="act" data-act="pix"><i>${ico('pix')}</i>Pix</button>
+    <button class="act" data-act="invoice"><i>${ico('receipt')}</i>Pagar fatura</button>
+    <button class="act" data-act="savings"><i>${ico('pig')}</i>Cofrinho</button>
+    <button class="act" data-act="charge"><i>${ico('down')}</i>Cobrar</button>
+    <button class="act" data-act="bonus"><i>${ico('star')}</i>Bônus</button>
+    <button class="act" data-act="creditReq"><i>${ico('bank')}</i>Crédito</button>
   </div>
+  <button class="card row" style="border-radius:16px;border:0" data-act="nav" data-p="card"><span class="ic">${ico('card')}</span><span class="mid"><b>Cartão de crédito</b><span>Fatura atual</span><b style="font-size:20px;margin-top:2px;color:var(--p)">${mv(inv.used)}</b><span>Limite disponível ${mv(inv.available)}</span></span>${ico('chev', 'chev')}</button>
+  <button class="card row" style="border-radius:16px;border:0" data-act="savings"><span class="ic a">${ico('pig')}</span><span class="mid"><b>Cofrinho</b><span>Rende 1% ao mês</span><b style="font-size:20px;margin-top:2px">${mv(sv.balance)}</b></span>${ico('chev', 'chev')}</button>
+  <button class="card row" style="border-radius:16px;border:0" data-act="creditReq"><span class="ic g">${ico('shield')}</span><span class="mid"><b>Score ${u.score}</b><span>${u.score >= 800 ? 'Excelente — peça mais limite' : u.score >= 650 ? 'Bom histórico' : 'Pague a fatura em dia para subir'}</span></span>${ico('chev', 'chev')}</button>
+  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Últimas movimentações</h3><button class="link" data-act="nav" data-p="statement">Ver tudo</button></div>${tx.length ? tx.map(txRow).join('') : `<div class="empty"><b>Nada por aqui ainda</b>Faça um Pix ou resgate seu bônus diário.</div>`}</div>
+</div>`;
+}
 
-  <div id="appScreen" class="app-shell hidden">
-    <div class="app">
-      <header class="topbar">
-        <div class="brand-lockup"><div class="brand-mark">A</div><div><div class="brand-name">ARMIN BANK</div><div class="brand-caption">conta digital premium</div></div></div>
-        <div class="topbar-right"><div class="live-pill"><i class="live-dot"></i> ao vivo</div><div id="topAvatar" class="avatar">A</div></div>
-      </header>
+function pagePix() {
+  const keys = U().pixKeys;
+  const seen = new Set(); const recents = [];
+  for (const t of S.st.transactions) if (t.kind === 'pix_out' && t.toKey && !seen.has(t.toKey)) { seen.add(t.toKey); recents.push(t); if (recents.length >= 8) break; }
+  const hist = S.st.transactions.filter((t) => t.kind.startsWith('pix')).slice(0, 8);
+  return `${header({ title: 'Área Pix', sub: 'Envie e receba na hora, 24h por dia.' })}
+<div class="wrap" style="margin-top:-8px">
+  <div class="acts"><button class="act" data-act="pix"><i>${ico('send')}</i>Enviar</button><button class="act" data-act="pixPaste"><i>${ico('copy')}</i>Pagar com código</button><button class="act" data-act="charge"><i>${ico('down')}</i>Cobrar</button><button class="act" data-act="keys"><i>${ico('key')}</i>Minhas chaves</button></div>
+  ${recents.length ? `<div class="card"><div class="ttl"><h3>Enviar novamente</h3></div><div class="people">${recents.map((t) => `<button class="ppl" data-act="pix" data-key="${esc(t.toKey)}"><i>${esc(initials(t.counterparty))}</i><span>${esc((t.counterparty || '').split(' ')[0])}</span></button>`).join('')}</div></div>` : ''}
+  <div class="card"><div class="ttl"><h3>Minhas chaves</h3><button class="link" data-act="keys">Gerenciar</button></div>${keys.map((k) => `<div class="kv"><span style="text-transform:capitalize">${esc(k.type)}</span><span>${esc(k.value)}</span></div>`).join('')}</div>
+  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Movimentações Pix</h3></div>${hist.length ? hist.map(txRow).join('') : `<div class="empty"><b>Sem Pix ainda</b>Seus envios e recebimentos aparecem aqui.</div>`}</div>
+</div>`;
+}
 
-      <main class="main">
-        <section id="homeSection" class="section active">
-          <div class="section-head"><div class="welcome"><div class="eyebrow">terça-feira, 07 de outubro</div><h1>Olá, <span id="homeName">aventureiro</span>.</h1><p>Tudo pronto para você acompanhar sua conta com segurança e autonomia.</p></div></div>
-          <div class="hero-grid">
-            <div>
-              <div class="balance-card">
-                <div class="balance-top"><span class="card-kicker">Armin Black · Premium</span><span class="card-emblem"></span></div>
-                <div class="balance-label">saldo disponível</div>
-                <div id="balanceValue" class="balance-value">R$ 0,00</div>
-                <button id="toggleBalance" class="hide-balance" title="Ocultar saldo">◉</button>
-                <div class="balance-bottom"><span>cartão virtual <strong id="cardNumber">•••• 0000</strong></span><span id="coinsValue">0 moedas</span></div>
-              </div>
-              <div class="quick-actions">
-                <button class="quick-action" data-nav="pix"><b>↗</b>Pix</button>
-                <button class="quick-action" data-action="airdrop"><b>✦</b>Benefícios</button>
-                <button class="quick-action" data-nav="credit"><b>＋</b>Crédito</button>
-                <button class="quick-action" data-nav="support"><b>?</b>Suporte</button>
-              </div>
-            </div>
-            <div class="grid">
-              <div class="card card-pad score-card"><div id="scoreRing" class="score-ring" style="--score-pct: 78"><strong id="scoreValue">782</strong></div><div class="score-copy"><strong id="scoreTier">Score de crédito</strong><p id="scoreMessage">Seu histórico está saudável e pode abrir novas possibilidades.</p></div></div>
-              <div class="metric-row"><div class="metric"><div class="metric-label">limite disponível</div><div id="homeLimit" class="metric-value mint">R$ 0,00</div></div><div class="metric"><div class="metric-label">em uso no crédito</div><div id="homeUsed" class="metric-value violet">R$ 0,00</div></div></div>
-              <div class="status-card"><div class="status-icon">✓</div><div><strong>Conta protegida e conectada</strong><span>Socket.IO ativo · suas atualizações chegam na hora.</span></div></div>
-            </div>
-          </div>
-          <div class="grid grid-2" style="margin-top: 17px;"><div class="card card-pad"><div class="card-title"><h3>Últimas movimentações</h3><button class="text-btn" data-nav="statement">ver extrato</button></div><div id="homeActivity" class="activity-list"></div></div><div class="card card-pad"><div class="card-title"><h3>Resumo da conta</h3><span class="pill violet">jornada</span></div><div id="nextStep"></div></div></div>
-        </section>
+function pageCard() {
+  const u = U(), inv = S.st.invoice; const pct = inv.limit ? Math.min(100, (inv.used / inv.limit) * 100) : 0;
+  const c = S.card; const num = c ? c.cardNumber : `•••• •••• •••• ${u.cardNumber.slice(-4)}`;
+  const buys = S.st.transactions.filter((t) => t.method === 'credit' || t.kind === 'invoice_pay' || t.kind === 'credit_draw').slice(0, 10);
+  const due = new Date(inv.dueDate).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' });
+  return `${header({ title: 'Cartão', sub: u.cardBlocked ? 'Bloqueado — compras suspensas' : 'Crédito Armin Black' })}
+<div class="wrap" style="margin-top:-6px">
+  <div class="plastic ${u.cardBlocked ? 'off' : ''}"><div class="nm"><span>ARMIN</span><span>${u.cardBlocked ? 'BLOQUEADO' : 'BLACK'}</span></div><div class="num">${esc(num)}</div><div class="meta"><span>${esc(u.fullName.toUpperCase())}</span><span>${c ? `${esc(c.exp)} · CVV ${esc(c.cvv)}` : 'VAL ••/•• · CVV •••'}</span></div></div>
+  <div class="acts"><button class="act" data-act="cardReveal"><i>${ico(c ? 'eyeoff' : 'eye')}</i>${c ? 'Ocultar dados' : 'Ver dados'}</button><button class="act" data-act="cardToggle"><i>${ico(u.cardBlocked ? 'unlock' : 'lock')}</i>${u.cardBlocked ? 'Desbloquear' : 'Bloquear'}</button><button class="act" data-act="purchase"><i>${ico('card')}</i>Simular compra</button><button class="act" data-act="draw"><i>${ico('bank')}</i>Sacar crédito</button></div>
+  <div class="card"><div class="ttl"><h3>Fatura atual</h3><span class="pill ${inv.used > 0 ? 'p' : 'g'}">${inv.used > 0 ? `vence ${esc(due)}` : 'zerada'}</span></div><div class="big">${mv(inv.used)}</div><div class="bar2"><span style="width:${pct}%"></span></div><div class="sm-t mu" style="display:flex;justify-content:space-between"><span>Disponível ${mv(inv.available)}</span><span>Limite ${mv(inv.limit)}</span></div><div class="btns two" style="margin-top:14px"><button class="btn" data-act="invoice" ${inv.used > 0 ? '' : 'disabled'}>Pagar fatura</button><button class="btn sec" data-act="creditReq">Mais limite</button></div></div>
+  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Movimentações do cartão</h3></div>${buys.length ? buys.map(txRow).join('') : `<div class="empty"><b>Nenhuma compra</b>Use "Simular compra" para testar seu cartão.</div>`}</div>
+</div>`;
+}
 
-        <section id="pixSection" class="section">
-          <div class="section-head"><div><div class="eyebrow">rápido, simples, simulado</div><h2>Pix</h2><p>Envie valor, organize suas chaves e cobre outros jogadores.</p></div><span class="pill mint">100% local</span></div>
-          <div class="tabbar"><button class="tab active" data-pix-tab="send">Enviar Pix</button><button class="tab" data-pix-tab="keys">Minhas chaves</button><button class="tab" data-pix-tab="charge">Cobrar</button></div>
-          <div id="pixSendPanel" class="grid grid-2"><div class="card card-pad"><div class="card-title"><h3>Novo Pix</h3><span class="pill mint">seguro</span></div><form id="pixForm"><div class="field"><label for="pixRecipient">Chave Pix de destino</label><input id="pixRecipient" placeholder="email, aleatória ou chave RPG" required /></div><div class="form-grid"><div class="field"><label for="pixAmount">Valor</label><input id="pixAmount" inputmode="decimal" type="number" min="1" step="0.01" placeholder="0,00" required /></div><div class="field"><label for="pixDescription">Descrição</label><input id="pixDescription" placeholder="Ex.: poção" /></div></div><div class="form-actions"><button class="btn btn-primary" type="submit">Enviar Pix <span>→</span></button></div></form></div><div class="card card-pad"><div class="card-title"><h3>Antes de enviar</h3><span class="pill violet">dica</span></div><div class="empty" style="text-align:left;"><strong>Confira os detalhes</strong>O Pix é instantâneo no universo RPG. Sempre revise a chave e o valor antes de confirmar.<br /><br /><span style="color:var(--mint)">Saldo disponível: <b id="pixAvailable">R$ 0,00</b></span></div></div></div>
-          <div id="pixKeysPanel" class="grid grid-2 hidden"><div class="card card-pad"><div class="card-title"><h3>Chaves cadastradas</h3><span class="pill mint">pix</span></div><div id="pixKeysList"></div></div><div class="card card-pad"><div class="card-title"><h3>Adicionar chave</h3><span class="pill violet">novo</span></div><form id="keyForm"><div class="field"><label for="keyType">Tipo de chave</label><select id="keyType"><option value="aleatória">Chave aleatória</option><option value="email">E-mail</option></select></div><div id="keyEmailField" class="field hidden"><label for="keyEmail">Seu e-mail</label><input id="keyEmail" type="email" placeholder="voce@aventura.rpg" /></div><div class="form-actions"><button class="btn btn-mint" type="submit">Gerar chave</button></div></form></div></div>
-          <div id="pixChargePanel" class="hidden"><div class="card card-pad"><div class="card-title"><h3>Receber por Pix</h3><span class="pill amber">cobrança</span></div><div class="empty" style="text-align:left;"><strong>Compartilhe sua chave</strong>Escolha uma chave abaixo e envie para outro jogador. O recebimento é simulado no banco RPG.<div id="chargeKeyList" style="margin-top:14px"></div></div></div></div>
-        </section>
+function pageStatement() {
+  const f = S.filter; const all = S.st.transactions;
+  const list = all.filter((t) => f === 'all' || (f === 'in' && t.amount > 0) || (f === 'out' && t.amount < 0 && t.method !== 'credit') || (f === 'card' && (t.method === 'credit' || t.kind === 'invoice_pay')));
+  let last = '', html = '';
+  for (const t of list) { const l = dayLabel(t.createdAt); if (l !== last) { html += `<div class="day">${esc(l)}</div>`; last = l; } html += txRow(t); }
+  const chip = (k, l) => `<button class="chip ${f === k ? 'on' : ''}" data-act="filter" data-f="${k}">${l}</button>`;
+  return `${header({ title: 'Extrato', sub: `Saldo ${mv(U().balance)}` })}
+<div style="padding:14px 0 6px"><div class="chips">${chip('all', 'Tudo')}${chip('in', 'Entradas')}${chip('out', 'Saídas')}${chip('card', 'Cartão')}</div></div>
+${list.length ? `<div>${html}</div>` : `<div class="empty"><b>Nada encontrado</b>Nenhuma movimentação neste filtro.</div>`}`;
+}
 
-        <section id="creditSection" class="section">
-          <div class="section-head"><div><div class="eyebrow">decisão do Armin Master</div><h2>Crédito RPG</h2><p>Peça uma análise, acompanhe seu score e evolua seu limite.</p></div><span class="pill amber">análise humana</span></div>
-          <div class="grid grid-2"><div class="credit-hero"><div class="credit-hero-top"><div><div class="eyebrow" style="color:var(--mint)">limite total</div><h3>Seu poder de compra</h3></div><span id="creditHeroPill" class="pill mint">ativo</span></div><div id="creditLimit" class="limit-number">R$ 0,00</div><div class="progress"><span id="creditProgress" style="width: 0%"></span></div><div class="credit-foot"><span>usado <b id="creditUsed">R$ 0,00</b></span><span>score <b id="creditScore">0</b></span></div></div><div class="card card-pad"><div class="card-title"><h3>Como o score funciona</h3><span class="pill violet">Armin IA</span></div><div class="activity-list"><div class="activity"><div class="activity-icon in">↗</div><div class="activity-main"><strong>Histórico de pagamentos</strong><span>Missões pagas em dia aumentam sua confiança.</span></div><b class="amount-in">+35%</b></div><div class="activity"><div class="activity-icon">◌</div><div class="activity-main"><strong>Uso do limite</strong><span>Equilíbrio mantém seu score saudável.</span></div><b class="amount-in">+25%</b></div><div class="activity"><div class="activity-icon">✦</div><div class="activity-main"><strong>Tempo de jornada</strong><span>Quanto mais você joga, mais contexto o Armin tem.</span></div><b class="amount-in">+40%</b></div></div></div></div>
-          <div class="grid grid-2" style="margin-top:17px"><div class="card card-pad"><div class="card-title"><h3>Solicitar análise</h3><span class="pill amber">fila do Armin</span></div><form id="creditForm"><div class="field"><label for="creditAmountInput">Quanto você precisa?</label><input id="creditAmountInput" type="number" inputmode="decimal" min="100" max="20000" step="50" placeholder="Ex.: 1.500" required /></div><div class="field"><label for="creditPurpose">Para qual missão?</label><textarea id="creditPurpose" placeholder="Conte ao Armin como este crédito vai ajudar sua jornada." required></textarea></div><div class="form-actions"><button class="btn btn-primary" type="submit">Enviar para análise <span>→</span></button></div></form></div><div class="card card-pad"><div class="card-title"><h3>Minhas análises</h3><span class="pill violet">histórico</span></div><div id="creditRequests" class="request-list"></div></div></div>
-        </section>
+function pageProfile() {
+  const u = U(); const row = (i, t, s, a, extra = '', cl = '') => `<button class="row" data-act="${a}" ${extra}><span class="ic ${cl}">${ico(i)}</span><span class="mid"><b>${t}</b>${s ? `<span>${s}</span>` : ''}</span>${ico('chev', 'chev')}</button>`;
+  return `${header({ title: u.fullName, sub: `@${u.username}` })}
+<div class="wrap" style="margin-top:-6px">
+  <div class="card flush">${row('key', 'Minhas chaves Pix', `${u.pixKeys.length} cadastrada${u.pixKeys.length > 1 ? 's' : ''}`, 'keys')}${row('bell', 'Notificações', unread() ? `${unread()} nova${unread() > 1 ? 's' : ''}` : 'Tudo em dia', 'notifs')}${row('chat', 'Suporte', 'Fale com o Armin', 'nav', 'data-p="support"')}${row('lock', 'Alterar senha', '', 'password')}</div>
+  ${u.role === 'admin' ? `<div class="card flush">${row('users', 'Central Master', 'Crédito, jogadores e suporte', 'nav', 'data-p="master"', 'a')}</div>` : ''}
+  <div class="card"><div class="kv"><span>Cartão final</span><span>${esc(u.cardNumber.slice(-4))}</span></div><div class="kv"><span>Cliente desde</span><span>${esc(dLong(u.createdAt))}</span></div><div class="kv"><span>Score</span><span>${u.score}</span></div></div>
+  <button class="btn dng" data-act="logout">${ico('out')} Sair da conta</button>
+  <p class="empty" style="padding:6px 10px 0">Ambiente demonstrativo. Nenhum dinheiro real é movimentado.</p>
+</div>`;
+}
 
-        <section id="statementSection" class="section">
-          <div class="section-head"><div><div class="eyebrow">tudo sob controle</div><h2>Extrato</h2><p>Veja como suas moedas e seu saldo se movimentaram.</p></div><span class="pill violet">últimos lançamentos</span></div>
-          <div class="card card-pad"><div class="card-title"><h3>Movimentações da conta</h3><span id="statementCount" class="pill">0 itens</span></div><div id="statementList" class="activity-list"></div></div>
-        </section>
+function pageSupport() {
+  const msgs = S.st.supportMessages;
+  return `${header({ title: 'Suporte', sub: 'Converse com o Armin Master', back: true })}
+<div class="chat" id="chatList">${msgs.length ? msgs.map((m) => `<div class="msg ${m.role === 'support' ? '' : 'me'}">${esc(m.text)}<small>${dShort(m.createdAt)} · ${tShort(m.createdAt)}</small></div>`).join('') : `<div class="empty"><b>Como podemos ajudar?</b>Mande sua dúvida sobre Pix, cartão ou crédito.</div>`}</div>
+<form class="composer" data-form="support"><input id="chatIn" placeholder="Escreva sua mensagem" maxlength="500" autocomplete="off" aria-label="Mensagem" /><button type="submit" aria-label="Enviar">${ico('send')}</button></form>`;
+}
 
-        <section id="supportSection" class="section">
-          <div class="section-head"><div><div class="eyebrow">conversa em tempo real</div><h2>Suporte</h2><p>Fale com o Armin Master sobre sua conta, Pix ou próxima missão.</p></div><span class="pill mint"><i class="live-dot"></i> online</span></div>
-          <div class="grid grid-2"><div class="card card-pad chat"><div class="card-title"><h3>Chat com Armin</h3><span class="pill mint">responde rápido</span></div><div id="chatMessages" class="chat-messages"></div><form id="chatForm" class="chat-form"><input id="chatInput" placeholder="Escreva uma mensagem..." maxlength="500" autocomplete="off" /><button class="btn btn-primary chat-send" type="submit">↑</button></form></div><div class="card card-pad"><div class="card-title"><h3>Central de ajuda</h3><span class="pill violet">atalhos</span></div><div class="activity-list"><div class="activity"><div class="activity-icon">?</div><div class="activity-main"><strong>Pix não caiu?</strong><span>Confira a chave e o histórico. Aqui tudo é instantâneo.</span></div></div><div class="activity"><div class="activity-icon in">✦</div><div class="activity-main"><strong>Quer aumentar o score?</strong><span>Use seu limite com equilíbrio e pague suas missões.</span></div></div><div class="activity"><div class="activity-icon">A</div><div class="activity-main"><strong>Precisa de análise?</strong><span>Envie um pedido de crédito e aguarde o Armin.</span></div></div></div><p class="footer-note">Atendimento e operações são simulados para o universo RPG. Nenhum dado financeiro real é processado.</p></div></div>
-        </section>
+function pageMaster() {
+  const m = S.master;
+  if (!m) return `${header({ title: 'Central Master', back: true })}<div class="empty">Carregando…</div>`;
+  const met = m.metrics;
+  return `${header({ title: 'Central Master', sub: 'Visão geral da guilda', back: true })}
+<div class="wrap" style="margin-top:-6px">
+  <div class="card" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"><div><div class="sm-t mu">Jogadores</div><b style="font-size:22px">${met.players}</b></div><div><div class="sm-t mu">Análises abertas</div><b style="font-size:22px">${met.pendingCredits}</b></div><div><div class="sm-t mu">Saldo em jogo</div><b style="font-size:22px">${fmtBRL(met.moneyInPlay)}</b></div><div><div class="sm-t mu">Score médio</div><b style="font-size:22px">${met.avgScore}</b></div></div>
+  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Fila de crédito</h3></div>${m.pending.length ? m.pending.map((r) => `<div class="row" style="align-items:flex-start"><span class="mid" style="white-space:normal"><b style="white-space:normal">${esc(r.fullName)} · ${fmtBRL(r.amount)}</b><span style="white-space:normal">${esc(r.purpose)} · score ${r.score}</span><span class="btns two" style="margin-top:10px"><button class="btn sm" data-act="decide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="decide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></span></span></div>`).join('') : `<div class="empty"><b>Fila limpa</b>Nenhuma análise pendente.</div>`}</div>
+  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Jogadores</h3></div>${m.users.map((p) => `<button class="row" data-act="deposit" data-id="${esc(p.id)}"><span class="ic">${esc(initials(p.fullName))}</span><span class="mid"><b>${esc(p.fullName)}</b><span>@${esc(p.username)} · score ${p.score}</span></span><span class="end">${fmtBRL(p.balance)}<small>depositar</small></span></button>`).join('')}</div>
+  <div class="card flush"><div class="ttl" style="padding:14px 16px 4px"><h3>Conversas de suporte</h3></div>${m.threads.length ? m.threads.map((t) => `<button class="row" data-act="thread" data-id="${esc(t.userId)}"><span class="ic ${t.awaiting ? 'a' : ''}">${ico('chat')}</span><span class="mid"><b>${esc(t.name)}</b><span>${esc(t.last)}</span></span>${t.awaiting ? '<span class="pill a">responder</span>' : ''}</button>`).join('') : `<div class="empty"><b>Sem conversas</b>Mensagens dos jogadores aparecem aqui.</div>`}</div>
+</div>`;
+}
 
-        <section id="masterSection" class="section">
-          <div class="master-banner"><div class="brand-mark">A</div><div><strong>Painel do Armin Master</strong><span>Você tem visão completa da guilda e decide as análises de crédito.</span></div></div>
-          <div class="section-head"><div><div class="eyebrow">controle da guilda</div><h2>Central Master</h2><p>Monitore jogadores, score e aprovações em tempo real.</p></div><span class="pill mint">admin</span></div>
-          <div id="masterMetrics" class="master-metrics"></div>
-          <div class="grid grid-2"><div class="card card-pad"><div class="card-title"><h3>Fila de análises</h3><span id="pendingPill" class="pill amber">0 pendentes</span></div><div id="masterRequests" class="request-list"></div></div><div class="card card-pad"><div class="card-title"><h3>Jogadores da guilda</h3><span class="pill violet">contas</span></div><div id="masterUsers" class="user-list"></div></div></div>
-          <div class="card card-pad" style="margin-top:17px"><div class="card-title"><h3>Atividade de suporte</h3><span class="pill mint">tempo real</span></div><div id="masterSupport" class="support-preview"></div><form id="masterReplyForm" class="chat-form"><select id="masterReplyUser" aria-label="Jogador do suporte"></select><input id="masterReplyText" placeholder="Responder como Armin..." maxlength="500" autocomplete="off" /><button class="btn btn-primary chat-send" type="submit">↑</button></form></div>
-        </section>
-      </main>
-      <nav class="bottom-nav"><div class="nav-inner"><button class="nav-item active" data-nav="home"><b>⌂</b>Início</button><button class="nav-item" data-nav="pix"><b>↗</b>Pix</button><button class="nav-item" data-nav="credit"><b>＋</b>Crédito</button><button class="nav-item" data-nav="support"><b>?</b>Suporte<span id="supportDot" class="notification-dot hidden"></span></button><button id="masterNav" class="nav-item master-nav" data-nav="master"><b>✦</b>Master</button></div></nav>
-    </div>
-  </div>
+/* =================== render =================== */
+const MAIN = ['home', 'pix', 'card', 'statement', 'profile'];
+function authView() {
+  const reg = S.authTab === 'register';
+  return `<div class="auth"><div class="logo"><b>A</b>ARMIN BANK</div><h1>${reg ? 'Abra sua conta em segundos.' : 'Que bom ter você de volta.'}</h1><p>${reg ? 'Sem papelada e sem taxa de manutenção.' : 'Entre para ver seu saldo, fazer Pix e controlar seu cartão.'}</p>
+<div class="seg"><button data-act="authTab" data-t="login" class="${reg ? '' : 'on'}">Entrar</button><button data-act="authTab" data-t="register" class="${reg ? 'on' : ''}">Criar conta</button></div>
+<form data-form="${reg ? 'register' : 'login'}" autocomplete="on">
+${reg ? `<div class="fld"><label for="fName">Nome completo</label><input id="fName" name="fullName" autocomplete="name" required minlength="3" /></div>` : ''}
+<div class="fld"><label for="fUser">${reg ? 'Escolha um usuário' : 'Usuário ou e-mail'}</label><input id="fUser" name="username" autocomplete="username" autocapitalize="none" autocorrect="off" required ${reg ? 'pattern="[a-zA-Z0-9_.]{3,20}" placeholder="ex.: lia.aventura"' : ''} /></div>
+<div class="fld"><label for="fPass">Senha</label><input id="fPass" name="password" type="password" autocomplete="${reg ? 'new-password' : 'current-password'}" required ${reg ? 'minlength="6" placeholder="mínimo 6 caracteres"' : ''} /></div>
+<button class="btn" type="submit">${reg ? 'Criar minha conta' : 'Entrar'}</button></form>
+<div class="demo">Ambiente demonstrativo — nenhum dinheiro real.<br />${reg ? '' : `<button data-act="demo" data-u="aventureiro" data-p="1234">Entrar como jogadora</button><button data-act="demo" data-u="master" data-p="master">Entrar como Master</button>`}</div></div>`;
+}
+function appView() {
+  const p = S.page; const main = MAIN.includes(p); const sub = !main;
+  const pages = { home: pageHome, pix: pagePix, card: pageCard, statement: pageStatement, profile: pageProfile, support: pageSupport, master: pageMaster };
+  const navItems = [['home', 'home', 'Início'], ['pix', 'pix', 'Pix'], ['card', 'card', 'Cartão'], ['statement', 'list', 'Extrato'], ['profile', 'user', 'Perfil']];
+  return `<div class="app"><div class="view ${sub ? 'sub' : ''}" id="view">${pages[p]()}</div>${main ? `<nav class="nav" aria-label="Principal">${navItems.map(([k, i, l]) => `<button class="${p === k ? 'on' : ''}" data-act="nav" data-p="${k}" ${p === k ? 'aria-current="page"' : ''}>${ico(i)}${l}</button>`).join('')}</nav>` : ''}</div>`;
+}
+function shell() {
+  return `<div id="screen"></div><div class="scrim" id="scrim" data-act="closeSheet"></div><div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"><div class="grab"></div><div class="sh"><h2 id="sheetTitle"></h2><button class="x" data-act="closeSheet" aria-label="Fechar">${ico('x')}</button></div><div class="sb" id="sheetBody"></div></div><div class="toast" id="toast" role="status" aria-live="polite"></div>`;
+}
+function render() {
+  const screen = $('#screen'); if (!screen) return;
+  const ae = document.activeElement; const keep = ae && ae.id && screen.contains(ae) ? { id: ae.id, v: ae.value, s: ae.selectionStart, e: ae.selectionEnd } : null;
+  const scroll = $('#view') ? $('#view').scrollTop : 0;
+  screen.style.height = '100%';
+  screen.innerHTML = S.st ? appView() : authView();
+  const v = $('#view'); if (v) v.scrollTop = scroll;
+  if (S.page === 'support' || S.page === 'master') { const c = $('#chatList'); if (c) c.parentElement.scrollTop = c.parentElement.scrollHeight; }
+  if (keep) { const el = document.getElementById(keep.id); if (el) { el.value = keep.v; el.focus({ preventScroll: true }); try { el.setSelectionRange(keep.s, keep.e); } catch {} } }
+  if (S.sheetKey === 'notifs') openNotifs(true);
+  if (S.sheetKey === 'keys') openKeys(true);
+  if (S.sheetKey === 'cofre') openSavings(true);
+  if (S.sheetKey === 'thread') openThread(S.threadId, true);
+}
 
-  <div id="keyModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><div class="eyebrow">cobrança RPG</div><h3>Chave pronta para compartilhar</h3></div><button class="close" data-close-modal="keyModal">×</button></div><div id="modalKeyValue" style="padding:16px;border-radius:14px;border:1px dashed rgba(114,241,190,.35);background:rgba(114,241,190,.05);color:var(--mint);font-weight:850;word-break:break-all"></div><div class="form-actions"><button id="modalCopyKey" class="btn btn-mint">Copiar chave</button><button class="btn btn-ghost" data-close-modal="keyModal">Fechar</button></div></div></div>
+/* =================== sheet =================== */
+function sheet(title, html, key = '') {
+  $('#sheetTitle').textContent = title; $('#sheetBody').innerHTML = html; S.sheetKey = key;
+  $('#scrim').classList.add('show'); $('#sheet').classList.add('show');
+  const f = $('#sheetBody [autofocus], #sheetBody input:not([type=hidden])'); if (f && !('ontouchstart' in window)) setTimeout(() => f.focus(), 260);
+}
+function closeSheet() { S.sheetKey = ''; S.pix = null; $('#scrim').classList.remove('show'); $('#sheet').classList.remove('show'); }
+const sheetOpen = () => $('#sheet').classList.contains('show');
+const amountField = (id, value = '', label = '') => `<div class="fld" style="margin-bottom:6px">${label ? `<label for="${id}">${label}</label>` : ''}<div class="amt"><b>R$</b><input id="${id}" name="amount" inputmode="decimal" autocomplete="off" placeholder="0,00" value="${esc(value)}" aria-label="Valor" /></div></div>`;
 
-  <script>
-    const app = { token: localStorage.getItem('armin_token') || '', state: null, overview: null, socket: null, active: 'home', balanceVisible: true, pixTab: 'send' };
-    const $ = (selector) => document.querySelector(selector);
-    const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;' }[char]));
-    const money = (value) => `R$ ${Number(value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-    const date = (value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '');
-    const time = (value) => new Date(value).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const notify = (message, type = 'info') => { const toast = $('#toast'); toast.textContent = message; toast.className = `toast show ${type}`; clearTimeout(notify.timer); notify.timer = setTimeout(() => { toast.className = 'toast'; }, 3200); };
-    const api = async (url, options = {}) => { const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) }; if (app.token) headers.Authorization = `Bearer ${app.token}`; const response = await fetch(url, { ...options, headers }); let body = {}; try { body = await response.json(); } catch (_) {} if (!response.ok) throw new Error(body.message || body.msg || 'Não foi possível concluir a ação.'); return body; };
-    const user = () => app.state?.user || {};
-    const setLogged = (logged) => { $('#loginScreen').classList.toggle('hidden', logged); $('#appScreen').classList.toggle('hidden', !logged); };
-    const initials = (name) => String(name || 'A').split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase();
-    const statusPill = (status) => ({ pending: '<span class="pill amber">aguardando</span>', approved: '<span class="pill mint">aprovado</span>', rejected: '<span class="pill red">reprovado</span>' }[status] || '<span class="pill">encerrado</span>');
+/* ---- recibo ---- */
+function openReceipt(id) {
+  const t = S.st.transactions.find((x) => x.id === id); if (!t) return;
+  const rows = [['Tipo', t.title], t.counterparty ? [t.amount < 0 ? 'Para' : 'De', t.counterparty] : null, t.detail && !t.counterparty ? ['Detalhe', t.detail] : null, t.note ? ['Mensagem', t.note] : null, ['Data', `${dLong(t.createdAt)} às ${tShort(t.createdAt)}`], ['Forma', t.method === 'credit' ? 'Cartão de crédito' : t.method === 'savings' ? 'Cofrinho' : 'Saldo em conta'], ['Situação', 'Concluída'], ['Código', t.id]].filter(Boolean);
+  sheet('Comprovante', `<div style="text-align:center;margin-bottom:8px"><div class="sm-t mu">${esc(t.title)}</div><div class="big ${t.amount > 0 ? 'in' : ''}">${t.amount > 0 ? '+' : '−'} ${fmtBRL(Math.abs(t.amount))}</div></div>${rows.map(([k, v]) => `<div class="kv"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join('')}<div class="btns" style="margin-top:14px"><button class="btn sec" data-act="shareReceipt" data-id="${esc(t.id)}">${ico('share')} Compartilhar comprovante</button></div>`);
+}
+/* ---- notificações ---- */
+function openNotifs(refresh = false) {
+  const list = S.st.notifications;
+  const html = list.length ? `<div class="card flush" style="box-shadow:none;border:1px solid var(--ln)">${list.map((n) => `<div class="row"><span class="ic ${n.type === 'success' ? 'g' : n.type === 'warning' ? 'a' : ''}">${ico(n.type === 'success' ? 'check' : 'bell')}</span><span class="mid"><b style="white-space:normal">${esc(n.title)}${n.read ? '' : ' <span class="pill p">nova</span>'}</b><span style="white-space:normal">${esc(n.text)}</span><span>${dShort(n.createdAt)} · ${tShort(n.createdAt)}</span></span></div>`).join('')}</div>` : `<div class="empty"><b>Sem notificações</b>Avisaremos aqui sobre Pix, crédito e fatura.</div>`;
+  sheet('Notificações', html, 'notifs');
+  if (!refresh && unread()) api('/api/notifications/read', { method: 'POST' }).then((r) => { S.st = r.state; render(); }).catch(() => {});
+}
+/* ---- Pix: enviar ---- */
+function pixStep1(msg = '') {
+  sheet('Enviar Pix', `<form data-form="pixLookup"><p class="mu" style="margin-top:0">Para quem você quer enviar?</p><div class="fld"><label for="pk">Chave Pix</label><input id="pk" name="key" placeholder="E-mail, telefone, CPF ou chave aleatória" value="${esc(S.pix?.key || '')}" autocomplete="off" autocapitalize="none" required /><small>Dica: cole um código "Pix copia e cola" aqui.</small></div><div class="btns"><button class="btn" type="submit">Continuar</button><button class="btn sec" type="button" data-act="pasteKey">${ico('copy')} Colar da área de transferência</button></div></form>`, 'pix');
+}
+function pixStep2() {
+  const r = S.pix.rec;
+  sheet('Quanto enviar?', `<form data-form="pixReview"><div class="row" style="padding:0 0 12px;border:0"><span class="ic">${esc(r.initials)}</span><span class="mid"><b>${esc(r.name)}</b><span>${esc(r.key)}</span></span></div>${amountField('pa', S.pix.amount || '')}<div class="sm-t mu" style="margin-bottom:14px">Saldo disponível: ${fmtBRL(U().balance)}</div><div class="fld"><label for="pn">Mensagem (opcional)</label><input id="pn" name="note" maxlength="80" value="${esc(S.pix.note || '')}" placeholder="Ex.: almoço" /></div><div class="btns"><button class="btn" type="submit">Revisar</button><button class="btn sec" type="button" data-act="pixBack1">Trocar destinatário</button></div></form>`, 'pix');
+}
+function pixStep3() {
+  const p = S.pix, r = p.rec;
+  sheet('Confirmar Pix', `<div style="text-align:center;margin-bottom:6px"><div class="sm-t mu">Você vai enviar</div><div class="big">${fmtBRL(p.value)}</div></div><div class="kv"><span>Para</span><span>${esc(r.name)}</span></div><div class="kv"><span>Chave</span><span>${esc(r.key)}</span></div>${p.note ? `<div class="kv"><span>Mensagem</span><span>${esc(p.note)}</span></div>` : ''}<div class="kv"><span>Quando</span><span>Agora</span></div><div class="kv"><span>Saldo após</span><span>${fmtBRL(U().balance - p.value)}</span></div><div class="btns" style="margin-top:14px"><button class="btn" data-act="pixConfirm">Confirmar e enviar</button><button class="btn sec" data-act="pixBack2">Voltar</button></div>`, 'pix');
+}
+function pixDone(tx) {
+  sheet('Pix enviado', `<div class="ok">${ico('check')}</div><div style="text-align:center"><div class="big">${fmtBRL(Math.abs(tx.amount))}</div><div class="mu">enviado para <b style="color:var(--tx)">${esc(tx.counterparty)}</b></div></div><div class="btns" style="margin-top:18px"><button class="btn sec" data-act="receipt" data-id="${esc(tx.id)}">Ver comprovante</button><button class="btn" data-act="closeSheet">Concluir</button></div>`);
+}
+/* ---- Pix: chaves ---- */
+function openKeys(refresh = false) {
+  const keys = U().pixKeys;
+  sheet('Minhas chaves Pix', `<div class="card flush" style="box-shadow:none;border:1px solid var(--ln);margin-bottom:14px">${keys.map((k) => `<div class="row"><span class="ic g">${ico('key')}</span><span class="mid"><b>${esc(k.value)}</b><span style="text-transform:capitalize">${esc(k.type)}</span></span><button class="ib" style="color:var(--p)" data-act="copyKey" data-v="${esc(k.value)}" aria-label="Copiar chave">${ico('copy')}</button>${keys.length > 1 ? `<button class="ib" style="color:var(--rd)" data-act="delKey" data-id="${esc(k.id)}" aria-label="Remover chave">${ico('trash')}</button>` : ''}</div>`).join('')}</div>${keys.length < 5 ? `<form data-form="addKey"><div class="fld"><label for="kt">Nova chave</label><select id="kt" name="type" data-change="keyType"><option value="aleatória">Chave aleatória</option><option value="email">E-mail</option><option value="telefone">Telefone</option><option value="cpf">CPF</option></select></div><div class="fld hidden" id="kvWrap"><label for="kv">Valor da chave</label><input id="kv" name="value" autocomplete="off" autocapitalize="none" /></div><button class="btn" type="submit">${ico('plus')} Cadastrar chave</button></form>` : '<p class="mu sm-t">Você atingiu o limite de 5 chaves.</p>'}`, 'keys');
+}
+/* ---- Pix: cobrar ---- */
+function openCharge() {
+  const keys = U().pixKeys;
+  sheet('Cobrar por Pix', `<form data-form="charge"><div class="fld"><label for="ck">Receber na chave</label><select id="ck" name="key">${keys.map((k) => `<option value="${esc(k.value)}">${esc(k.value)} (${esc(k.type)})</option>`).join('')}</select></div>${amountField('ca', '', 'Valor (opcional)')}<button class="btn" type="submit">Gerar código de cobrança</button></form><div id="chargeOut"></div>`);
+}
+/* ---- cofrinho ---- */
+function openSavings(refresh = false) {
+  const sv = S.st.savings; const m = Math.round(sv.balance * sv.monthlyRate * 100) / 100;
+  sheet('Cofrinho', `<div style="text-align:center;margin-bottom:12px"><div class="sm-t mu">Guardado</div><div class="big">${fmtBRL(sv.balance)}</div><div class="sm-t mu">Rendimento estimado: ${fmtBRL(m)} por mês (1% a.m.)</div></div><form data-form="savings">${amountField('sa', '', 'Quanto?')}<div class="sm-t mu" style="margin-bottom:14px">Conta: ${fmtBRL(U().balance)} · Cofrinho: ${fmtBRL(sv.balance)}</div><div class="btns two"><button class="btn" type="submit" data-dir="in">Guardar</button><button class="btn out" type="submit" data-dir="out">Resgatar</button></div></form>`, 'cofre');
+}
+/* ---- fatura / saque / compra / crédito ---- */
+function openInvoice() {
+  const inv = S.st.invoice; if (inv.used <= 0) return toast('Sua fatura está zerada.');
+  sheet('Pagar fatura', `<div style="text-align:center"><div class="sm-t mu">Fatura atual</div><div class="big">${fmtBRL(inv.used)}</div><div class="sm-t mu">Saldo em conta: ${fmtBRL(U().balance)}</div></div><form data-form="invoice">${amountField('ia', String(inv.used).replace('.', ','), 'Valor a pagar')}<div class="btns"><button class="btn" type="submit">Pagar fatura</button><button class="btn sec" type="button" data-act="fillAll" data-v="${inv.used}">Pagar valor total</button></div></form>`);
+}
+function openDraw() {
+  sheet('Sacar do crédito', `<p class="mu" style="margin-top:0">O dinheiro cai na sua conta na hora. Cobramos <b>3%</b> sobre o valor, somados à fatura.</p><div class="sm-t mu">Limite disponível: <b style="color:var(--tx)">${fmtBRL(S.st.invoice.available)}</b></div><form data-form="draw">${amountField('da', '', 'Quanto você precisa?')}<button class="btn" type="submit">Sacar</button></form>`);
+}
+function openPurchase() {
+  sheet('Simular compra', `<p class="mu" style="margin-top:0">Teste seu cartão: a compra entra na fatura. Disponível: <b style="color:var(--tx)">${fmtBRL(S.st.invoice.available)}</b></p><form data-form="purchase"><div class="fld"><label for="pm">Onde foi a compra?</label><input id="pm" name="merchant" maxlength="50" placeholder="Ex.: Taberna do Dragão" required /></div>${amountField('pv', '', 'Valor')}<button class="btn" type="submit">Comprar no crédito</button></form>`);
+}
+function openCreditReq() {
+  const u = U(), reqs = S.st.creditRequests; const pending = reqs.some((r) => r.status === 'pending');
+  const pill = (s) => s === 'pending' ? '<span class="pill a">em análise</span>' : s === 'approved' ? '<span class="pill g">aprovado</span>' : '<span class="pill r">reprovado</span>';
+  sheet('Limite de crédito', `<div class="card" style="background:var(--p3);box-shadow:none;margin-bottom:14px"><div class="sm-t mu">Limite atual</div><div class="big" style="color:var(--p2)">${fmtBRL(S.st.invoice.limit)}</div><div class="sm-t mu">Score ${u.score} · Usado ${fmtBRL(S.st.invoice.used)}</div></div>${pending ? '<div class="empty" style="padding:10px"><b>Análise em andamento</b>O Armin vai decidir em breve — você será avisado.</div>' : `<form data-form="creditReq">${amountField('cra', '', 'Qual limite você quer?')}<div class="fld"><label for="crp">Para quê?</label><textarea id="crp" name="purpose" maxlength="100" required placeholder="Conte como vai usar o crédito"></textarea></div><button class="btn" type="submit">Enviar para análise</button></form>`}${reqs.length ? `<h3 style="margin:18px 0 4px;font-size:15px">Meus pedidos</h3>${reqs.map((r) => `<div class="kv"><span>${fmtBRL(r.amount)} · ${dShort(r.createdAt)}${r.decisionNote ? `<br><small>${esc(r.decisionNote)}</small>` : ''}</span><span>${pill(r.status)}</span></div>`).join('')}` : ''}`);
+}
+function openPassword() {
+  sheet('Alterar senha', `<form data-form="password"><div class="fld"><label for="p0">Senha atual</label><input id="p0" name="current" type="password" autocomplete="current-password" required /></div><div class="fld"><label for="p1">Nova senha</label><input id="p1" name="next" type="password" autocomplete="new-password" minlength="6" required /><small>Mínimo de 6 caracteres.</small></div><button class="btn" type="submit">Salvar nova senha</button></form>`);
+}
+/* ---- master ---- */
+function openThread(userId, refresh = false) {
+  const t = S.master && S.master.threads.find((x) => x.userId === userId); if (!t) return;
+  S.threadId = userId;
+  sheet(t.name, `<div class="chat" style="padding:0 0 8px;min-height:0;max-height:46vh;overflow-y:auto">${t.messages.map((m) => `<div class="msg ${m.role === 'support' ? 'me' : ''}">${esc(m.text)}<small>${dShort(m.createdAt)} · ${tShort(m.createdAt)}</small></div>`).join('')}</div><form data-form="reply" class="composer" style="position:static;padding:8px 0 0;background:none;border:0"><input type="hidden" name="userId" value="${esc(userId)}" /><input id="ri" name="text" placeholder="Responder como Armin" maxlength="500" autocomplete="off" /><button type="submit" aria-label="Enviar">${ico('send')}</button></form>`, 'thread');
+}
+function openDeposit(id) {
+  const p = S.master.users.find((x) => x.id === id); if (!p) return;
+  sheet(`Depositar para ${p.fullName.split(' ')[0]}`, `<form data-form="deposit"><input type="hidden" name="userId" value="${esc(id)}" />${amountField('dv', '', 'Valor')}<div class="fld"><label for="dn">Motivo</label><input id="dn" name="note" maxlength="60" placeholder="Recompensa da guilda" /></div><button class="btn" type="submit">Depositar</button></form>`);
+}
 
-    function switchSection(section) {
-      app.active = section;
-      document.querySelectorAll('.section').forEach((el) => el.classList.toggle('active', el.id === `${section}Section`));
-      document.querySelectorAll('.nav-item').forEach((el) => el.classList.toggle('active', el.dataset.nav === section));
-      if (section === 'master') loadMaster();
-      if (section === 'support') $('#supportDot').classList.add('hidden');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-    function render() {
-      if (!app.state) return;
-      const u = user();
-      $('#homeName').textContent = (u.fullName || u.username || 'aventureiro').split(' ')[0];
-      $('#topAvatar').textContent = initials(u.fullName || u.username);
-      $('#balanceValue').textContent = app.balanceVisible ? money(u.balance) : 'R$ •••••';
-      $('#coinsValue').textContent = `${Number(u.coins || 0).toLocaleString('pt-BR')} moedas`;
-      $('#cardNumber').textContent = `•••• ${String(u.cardNumber || '0000').slice(-4)}`;
-      $('#scoreValue').textContent = Number(u.score || 0).toLocaleString('pt-BR');
-      $('#scoreRing').style.setProperty('--score-pct', Math.min(100, Math.round(Number(u.score || 0) / 10)));
-      $('#scoreTier').textContent = Number(u.score || 0) >= 800 ? 'Score lendário' : Number(u.score || 0) >= 650 ? 'Score de crédito' : 'Score em evolução';
-      $('#scoreMessage').textContent = Number(u.score || 0) >= 750 ? 'Seu histórico está saudável e pode abrir novas possibilidades.' : 'Cada missão paga melhora sua próxima análise.';
-      $('#homeLimit').textContent = money(Math.max(0, Number(u.creditLimit || 0) - Number(u.creditUsed || 0)));
-      $('#homeUsed').textContent = money(u.creditUsed);
-      $('#pixAvailable').textContent = money(u.balance);
-      $('#creditLimit').textContent = money(u.creditLimit);
-      $('#creditUsed').textContent = money(u.creditUsed);
-      $('#creditScore').textContent = Number(u.score || 0).toLocaleString('pt-BR');
-      const usedPct = u.creditLimit ? Math.min(100, (Number(u.creditUsed || 0) / Number(u.creditLimit)) * 100) : 0;
-      $('#creditProgress').style.width = `${usedPct}%`;
-      $('#masterNav').classList.toggle('visible', u.role === 'admin');
-      renderActivities(); renderPix(); renderCredit(); renderSupport();
-      const pending = (app.state.creditRequests || []).some((request) => request.status === 'pending');
-      $('#nextStep').innerHTML = pending ? `<div class="empty" style="text-align:left"><strong>Análise em andamento</strong>O Armin recebeu seu pedido. Você receberá a decisão sem precisar atualizar.</div>` : `<div class="empty" style="text-align:left"><strong>Quer desbloquear mais possibilidades?</strong>Peça uma análise de crédito e deixe o Armin conhecer sua próxima missão.<br /><button class="btn btn-small btn-primary" data-nav="credit" style="margin-top:13px">Ver meu crédito →</button></div>`;
-    }
-    function renderActivities() {
-      const items = app.state.transactions || [];
-      const html = items.length ? items.slice(0, 5).map((item) => `<div class="activity"><div class="activity-icon ${item.type === 'in' ? 'in' : ''}">${item.type === 'in' ? '↙' : '↗'}</div><div class="activity-main"><strong>${esc(item.title)}</strong><span>${esc(item.detail)} · ${date(item.createdAt)} ${time(item.createdAt)}</span></div><div class="activity-amount ${item.amount >= 0 ? 'amount-in' : 'amount-out'}">${item.amount >= 0 ? '+' : ''}${money(item.amount)}</div></div>`).join('') : '<div class="empty"><strong>Nenhuma movimentação ainda</strong>Suas próximas ações aparecerão aqui.</div>';
-      $('#homeActivity').innerHTML = html;
-      $('#statementList').innerHTML = items.length ? items.map((item) => `<div class="activity"><div class="activity-icon ${item.type === 'in' ? 'in' : ''}">${item.type === 'in' ? '↙' : '↗'}</div><div class="activity-main"><strong>${esc(item.title)}</strong><span>${esc(item.detail)} · ${date(item.createdAt)} ${time(item.createdAt)}</span></div><div class="activity-amount ${item.amount >= 0 ? 'amount-in' : 'amount-out'}">${item.amount >= 0 ? '+' : ''}${money(item.amount)}</div></div>`).join('') : '<div class="empty"><strong>Extrato vazio</strong>Faça um Pix ou resgate um bônus para começar.</div>';
-      $('#statementCount').textContent = `${items.length} itens`;
-    }
-    function renderPix() {
-      const keys = user().pixKeys || [];
-      $('#pixKeysList').innerHTML = keys.length ? keys.map((key) => `<div class="pix-key"><div class="key-icon">⌁</div><div class="key-copy"><strong>${esc(key.value)}</strong><span>${esc(key.type)} · cadastrada ${date(key.createdAt)}</span></div><button class="copy-btn" data-copy-key="${esc(key.value)}" title="Copiar chave">⧉</button></div>`).join('') : '<div class="empty"><strong>Nenhuma chave</strong>Crie sua primeira chave aleatória.</div>';
-      $('#chargeKeyList').innerHTML = keys.map((key) => `<div class="pix-key"><div class="key-icon">⌁</div><div class="key-copy"><strong>${esc(key.value)}</strong><span>${esc(key.type)}</span></div><button class="btn btn-small btn-ghost" data-share-key="${esc(key.value)}">compartilhar</button></div>`).join('');
-    }
-    function renderCredit() {
-      const requests = app.state.creditRequests || [];
-      $('#creditHeroPill').outerHTML = requests.some((request) => request.status === 'pending') ? '<span id="creditHeroPill" class="pill amber">em análise</span>' : '<span id="creditHeroPill" class="pill mint">ativo</span>';
-      $('#creditRequests').innerHTML = requests.length ? requests.map((request) => `<div class="request"><div class="request-main"><strong>${money(request.amount)} · ${esc(request.purpose)}</strong><span>Pedido em ${date(request.createdAt)}${request.decisionNote ? ` · ${esc(request.decisionNote)}` : ''}</span></div><div class="request-right"><strong>${statusPill(request.status)}</strong><span class="pill">score ${request.score}</span></div></div>`).join('') : '<div class="empty"><strong>Sem análises</strong>Seu histórico de crédito aparecerá aqui.</div>';
-    }
-    function renderSupport() {
-      const messages = app.state.supportMessages || [];
-      $('#chatMessages').innerHTML = messages.length ? messages.map((message) => `<div class="bubble ${message.userId === user().id && message.role !== 'support' ? 'mine' : ''}"><b>${esc(message.author)}</b><br />${esc(message.text)}<small>${date(message.createdAt)} · ${time(message.createdAt)}</small></div>`).join('') : '<div class="empty"><strong>Comece a conversa</strong>O Armin está online para ajudar.</div>';
-      $('#chatMessages').scrollTop = $('#chatMessages').scrollHeight;
-    }
-    async function loadMaster() {
-      if (user().role !== 'admin') return;
-      try { const response = await api('/api/master/overview'); app.overview = response; renderMaster(); } catch (error) { notify(error.message, 'error'); }
-    }
-    function renderMaster() {
-      if (!app.overview) return;
-      const { metrics, pending, users, support } = app.overview;
-      $('#masterMetrics').innerHTML = `<div class="master-metric"><span>jogadores</span><strong>${metrics.players}</strong></div><div class="master-metric"><span>análises abertas</span><strong class="mint">${metrics.pendingCredits}</strong></div><div class="master-metric"><span>saldo em jogo</span><strong>${money(metrics.moneyInPlay)}</strong></div><div class="master-metric"><span>score médio</span><strong>${metrics.avgScore}</strong></div>`;
-      $('#pendingPill').textContent = `${pending.length} pendentes`;
-      $('#masterRequests').innerHTML = pending.length ? pending.map((request) => `<div class="request"><div class="request-main"><strong>${esc(request.fullName)} · ${money(request.amount)}</strong><span>${esc(request.purpose)} · score ${request.score} · ${date(request.createdAt)}</span><div class="admin-request-actions"><button class="btn btn-small btn-mint" data-credit-action="approve" data-request-id="${request.id}">Aprovar</button><button class="btn btn-small btn-danger" data-credit-action="reject" data-request-id="${request.id}">Reprovar</button></div></div><span class="pill amber">análise</span></div>`).join('') : '<div class="empty"><strong>Fila limpa</strong>Nenhuma análise esperando sua decisão.</div>';
-      $('#masterUsers').innerHTML = users.length ? users.map((player) => `<div class="user-row"><div class="avatar">${initials(player.fullName)}</div><div class="user-main"><strong>${esc(player.fullName)}</strong><span>${esc(player.username)} · score ${player.score}</span></div><div style="text-align:right"><strong>${money(player.balance)}</strong><span class="pill mint" style="margin-top:4px">ativo</span></div></div>`).join('') : '<div class="empty">Nenhum jogador ainda.</div>';
-      $('#masterSupport').innerHTML = support.length ? support.slice(0, 10).map((message) => `<div class="support-line"><strong>${esc(message.author)} · ${date(message.createdAt)} ${time(message.createdAt)}</strong><span>${esc(message.text)}</span></div>`).join('') : '<div class="empty">Nenhuma conversa recente.</div>';
-      $('#masterReplyUser').innerHTML = users.length ? users.map((player) => `<option value="${player.id}">${esc(player.fullName)} · ${esc(player.username)}</option>`).join('') : '<option value="">Nenhum jogador</option>';
-    }
-    function connectSocket() {
-      if (app.socket) app.socket.disconnect();
-      app.socket = io({ auth: { token: app.token } });
-      app.socket.on('connect', () => $('.live-pill').innerHTML = '<i class="live-dot"></i> ao vivo');
-      app.socket.on('disconnect', () => $('.live-pill').innerHTML = '<i class="live-dot" style="background:var(--amber)"></i> reconectando');
-      app.socket.on('account:updated', (payload) => { if (payload.state) { app.state = payload.state; render(); } });
-      app.socket.on('support:new', (payload) => { if (payload.message && payload.message.userId === user().id) { app.state.supportMessages = [...(app.state.supportMessages || []), payload.message]; renderSupport(); if (app.active !== 'support') $('#supportDot').classList.remove('hidden'); } });
-      app.socket.on('bank:refresh', () => refreshState(false));
-      app.socket.on('credit:updated', () => { refreshState(false); if (user().role === 'admin') loadMaster(); });
-    }
-    async function refreshState(showError = true) { try { const response = await api('/api/me'); app.state = response.state; render(); } catch (error) { if (showError) notify(error.message, 'error'); } }
-    async function enter(response) { app.token = response.token || app.token; if (app.token) localStorage.setItem('armin_token', app.token); app.state = response.state || (await api('/api/me')).state; setLogged(true); connectSocket(); render(); if (user().role === 'admin') loadMaster(); }
-    async function logout() { try { await api('/api/logout'); } catch (_) {} localStorage.removeItem('armin_token'); app.token = ''; app.state = null; if (app.socket) app.socket.disconnect(); setLogged(false); }
-    function showModal(key) { $('#keyModal').classList.remove('hidden'); $('#modalKeyValue').textContent = key; $('#modalCopyKey').dataset.copyKey = key; }
+/* =================== ações =================== */
+async function loadMaster() { if (!S.st || U().role !== 'admin') return; try { S.master = await api('/api/master/overview'); render(); } catch (e) { toast(e.message, 'err'); } }
+function go(p) {
+  if (!MAIN.includes(p)) S.back = MAIN.includes(S.page) ? S.page : S.back;
+  S.page = p; closeSheet(); render(); const v = $('#view'); if (v) v.scrollTop = 0;
+  if (p === 'master') loadMaster();
+}
+const setState = (r) => { if (r && r.state) { S.st = r.state; render(); } };
+const A = {
+  nav: (el) => go(el.dataset.p),
+  back: () => go(S.back || 'home'),
+  closeSheet,
+  authTab: (el) => { S.authTab = el.dataset.t; render(); },
+  demo: async (el) => { await busy(el, () => doLogin(el.dataset.u, el.dataset.p)); },
+  toggleHide: () => { S.hidden = !S.hidden; localStorage.setItem('armin_hidden', S.hidden ? '1' : '0'); render(); },
+  filter: (el) => { S.filter = el.dataset.f; render(); },
+  receipt: (el) => openReceipt(el.dataset.id),
+  shareReceipt: async (el) => {
+    const t = S.st.transactions.find((x) => x.id === el.dataset.id); if (!t) return;
+    const text = `Comprovante Armin Bank\n${t.title}: ${fmtBRL(Math.abs(t.amount))}\n${t.counterparty ? `${t.amount < 0 ? 'Para' : 'De'}: ${t.counterparty}\n` : ''}${dLong(t.createdAt)} ${tShort(t.createdAt)}\nCódigo: ${t.id}`;
+    if (navigator.share) { try { await navigator.share({ title: 'Comprovante', text }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+    copyText(text, 'Comprovante copiado!');
+  },
+  notifs: () => openNotifs(),
+  logout: async () => { try { await api('/api/logout', { method: 'POST' }); } catch {} doLocalLogout(); },
+  password: openPassword,
+  /* pix */
+  pix: async (el) => { S.pix = { key: el.dataset.key || '' }; if (S.pix.key) { await lookupAndGo(S.pix.key); } else pixStep1(); },
+  pixPaste: () => { S.pix = {}; pixStep1(); pasteInto(); },
+  pasteKey: () => pasteInto(),
+  pixBack1: () => { S.pix = { key: '' }; pixStep1(); },
+  pixBack2: () => pixStep2(),
+  pixConfirm: async (el) => {
+    const p = S.pix; if (!p) return;
+    const r = await busy(el, () => api('/api/pix/send', { method: 'POST', body: { key: p.rec.key, amount: p.value, description: p.note } }));
+    if (r) { setState(r); pixDone(r.tx); }
+  },
+  keys: () => openKeys(),
+  copyKey: (el) => copyText(el.dataset.v, 'Chave copiada!'),
+  delKey: async (el) => { const r = await busy(el, () => api(`/api/pix/key/${encodeURIComponent(el.dataset.id)}`, { method: 'DELETE' })); if (r) { setState(r); toast('Chave removida.', 'ok'); } },
+  charge: openCharge,
+  copyCode: (el) => copyText(el.dataset.v, 'Código copiado!'),
+  /* dinheiro */
+  savings: () => openSavings(),
+  invoice: openInvoice, draw: openDraw, purchase: openPurchase, creditReq: openCreditReq,
+  fillAll: (el) => { const i = $('#ia'); if (i) i.value = String(el.dataset.v).replace('.', ','); },
+  bonus: async (el) => { const r = await busy(el, () => api('/api/bonus', { method: 'POST' })); if (r) { setState(r); toast(`Você ganhou ${fmtBRL(r.reward)} de bônus!`, 'ok'); } },
+  /* cartão */
+  cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method: 'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
+  cardReveal: async (el) => {
+    if (S.card) { S.card = null; clearTimeout(S.cardTimer); return render(); }
+    const r = await busy(el, () => api('/api/card/secret')); if (!r) return;
+    S.card = r.card; render(); clearTimeout(S.cardTimer); S.cardTimer = setTimeout(() => { S.card = null; render(); }, 20000);
+  },
+  /* master */
+  decide: async (el) => { const r = await busy(el, () => api(`/api/master/credit/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method: 'POST', body: {} })); if (r) { toast(el.dataset.d === 'approve' ? 'Crédito aprovado.' : 'Análise reprovada.', 'ok'); loadMaster(); } },
+  thread: (el) => openThread(el.dataset.id),
+  deposit: (el) => openDeposit(el.dataset.id),
+};
+async function pasteInto() {
+  try { const t = await navigator.clipboard.readText(); const i = $('#pk'); if (i && t) { i.value = t.trim(); toast('Colado!', 'ok'); } else toast('Nada para colar.'); }
+  catch { toast('Seu navegador bloqueou a área de transferência. Cole manualmente no campo.'); $('#pk') && $('#pk').focus(); }
+}
+async function lookupAndGo(raw) {
+  let key = String(raw || '').trim(), amount = '';
+  if (key.startsWith('ZKPIX|')) { const [, k, a] = key.split('|'); key = k; if (a && Number(a) > 0) amount = String(a).replace('.', ','); }
+  const r = await busy($('#sheetBody button[type=submit]'), () => api('/api/pix/lookup', { method: 'POST', body: { key } }));
+  if (!r) { if (!sheetOpen()) pixStep1(); return; }
+  S.pix = { ...S.pix, key, rec: r.recipient, amount }; pixStep2();
+}
+const CH = { keyType: (el) => { $('#kvWrap').classList.toggle('hidden', el.value === 'aleatória'); const k = $('#kv'); if (k) { k.required = el.value !== 'aleatória'; k.placeholder = { email: 'voce@email.com', telefone: '(11) 91234-5678', cpf: '000.000.000-00' }[el.value] || ''; } } };
 
-    document.addEventListener('click', async (event) => {
-      const nav = event.target.closest('[data-nav]'); if (nav) { switchSection(nav.dataset.nav); return; }
-      const close = event.target.closest('[data-close-modal]'); if (close) { $(`#${close.dataset.closeModal}`).classList.add('hidden'); return; }
-      const copy = event.target.closest('[data-copy-key], #modalCopyKey'); if (copy) { const key = copy.dataset.copyKey; try { await navigator.clipboard.writeText(key); notify('Chave copiada para sua área de transferência.', 'success'); } catch (_) { notify(key, 'success'); } return; }
-      const share = event.target.closest('[data-share-key]'); if (share) { showModal(share.dataset.shareKey); return; }
-      const action = event.target.closest('[data-action]'); if (action?.dataset.action === 'airdrop') { try { const response = await api('/api/airdrop', { method: 'POST' }); app.state = response.state; render(); notify(`Você recebeu ${response.reward} moedas RPG.`, 'success'); } catch (error) { notify(error.message, 'warning'); } return; }
-      const creditAction = event.target.closest('[data-credit-action]'); if (creditAction) { const requestId = creditAction.dataset.requestId; const actionName = creditAction.dataset.creditAction; try { await api(`/api/master/credit/${requestId}/${actionName}`, { method: 'POST', body: JSON.stringify({}) }); notify(actionName === 'approve' ? 'Crédito aprovado. O jogador foi notificado.' : 'Análise reprovada e registrada.', actionName === 'approve' ? 'success' : 'warning'); await loadMaster(); } catch (error) { notify(error.message, 'error'); } return; }
-      if (event.target.closest('#toggleBalance')) { app.balanceVisible = !app.balanceVisible; render(); }
-    });
-    document.querySelectorAll('[data-pix-tab]').forEach((tab) => tab.addEventListener('click', () => { app.pixTab = tab.dataset.pixTab; document.querySelectorAll('[data-pix-tab]').forEach((item) => item.classList.toggle('active', item === tab)); $('#pixSendPanel').classList.toggle('hidden', app.pixTab !== 'send'); $('#pixKeysPanel').classList.toggle('hidden', app.pixTab !== 'keys'); $('#pixChargePanel').classList.toggle('hidden', app.pixTab !== 'charge'); }));
-    $('#loginForm').addEventListener('submit', async (event) => { event.preventDefault(); const button = event.target.querySelector('button'); button.disabled = true; button.textContent = 'Conectando...'; try { const response = await api('/api/login', { method: 'POST', body: JSON.stringify({ username: $('#loginUsername').value, password: $('#loginPassword').value }) }); await enter(response); notify(`Bem-vindo, ${user().fullName.split(' ')[0]}.`, 'success'); } catch (error) { notify(error.message, 'error'); } finally { button.disabled = false; button.innerHTML = 'Acessar minha conta <span>→</span>'; } });
-    $('#pixForm').addEventListener('submit', async (event) => { event.preventDefault(); try { const response = await api('/api/pix/send', { method: 'POST', body: JSON.stringify({ recipientKey: $('#pixRecipient').value, amount: $('#pixAmount').value, description: $('#pixDescription').value }) }); app.state = response.state; render(); event.target.reset(); notify(response.message, 'success'); } catch (error) { notify(error.message, 'error'); } });
-    $('#keyForm').addEventListener('submit', async (event) => { event.preventDefault(); try { const type = $('#keyType').value; const response = await api('/api/pix/key', { method: 'POST', body: JSON.stringify({ type, value: $('#keyEmail').value }) }); app.state = response.state; render(); showModal(response.key.value); event.target.reset(); $('#keyEmailField').classList.add('hidden'); notify('Chave Pix criada.', 'success'); } catch (error) { notify(error.message, 'error'); } });
-    $('#keyType').addEventListener('change', (event) => $('#keyEmailField').classList.toggle('hidden', event.target.value !== 'email'));
-    $('#creditForm').addEventListener('submit', async (event) => { event.preventDefault(); try { const response = await api('/api/credit/request', { method: 'POST', body: JSON.stringify({ amount: $('#creditAmountInput').value, purpose: $('#creditPurpose').value }) }); app.state = response.state; render(); event.target.reset(); notify(response.message, 'success'); } catch (error) { notify(error.message, 'error'); } });
-    $('#chatForm').addEventListener('submit', (event) => { event.preventDefault(); const text = $('#chatInput').value.trim(); if (!text) return; if (app.socket?.connected) { app.socket.emit('support:send', { text }, (response) => { if (!response.ok) notify(response.message, 'error'); }); } else { api('/api/support/messages', { method: 'POST', body: JSON.stringify({ text }) }).catch((error) => notify(error.message, 'error')); } $('#chatInput').value = ''; });
-    $('#masterReplyForm').addEventListener('submit', async (event) => { event.preventDefault(); const userId = $('#masterReplyUser').value; const text = $('#masterReplyText').value.trim(); if (!userId || !text) return; try { await api('/api/master/support/reply', { method: 'POST', body: JSON.stringify({ userId, text }) }); $('#masterReplyText').value = ''; notify('Resposta enviada ao jogador em tempo real.', 'success'); await loadMaster(); } catch (error) { notify(error.message, 'error'); } });
-    window.addEventListener('keydown', (event) => { if (event.key === 'Escape') document.querySelectorAll('.modal').forEach((modal) => modal.classList.add('hidden')); });
-    (async function boot() { if (!app.token) return; try { await enter(await api('/api/me')); } catch (_) { localStorage.removeItem('armin_token'); app.token = ''; setLogged(false); } })();
-  </script>
+/* ---- formulários ---- */
+const F = {
+  login: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); await busy(ev.submitter, () => doLogin(d.username, d.password)); },
+  register: async (f, ev) => {
+    const d = Object.fromEntries(new FormData(f));
+    const r = await busy(ev.submitter, () => api('/api/register', { method: 'POST', body: d })); if (r) { enter(r); toast('Conta criada! Bem-vindo(a).', 'ok'); }
+  },
+  pixLookup: (f) => lookupAndGo(new FormData(f).get('key')),
+  pixReview: (f) => {
+    const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount);
+    if (!(v > 0)) return toast('Digite um valor válido.', 'err');
+    if (v > U().balance) return toast('Saldo insuficiente para este Pix.', 'err');
+    S.pix.value = v; S.pix.amount = d.amount; S.pix.note = (d.note || '').trim(); pixStep3();
+  },
+  addKey: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/pix/key', { method: 'POST', body: d })); if (r) { setState(r); toast('Chave cadastrada!', 'ok'); } },
+  charge: (f) => {
+    const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const hasV = d.amount.trim() !== '';
+    if (hasV && !(v > 0)) return toast('Valor inválido.', 'err');
+    const code = `ZKPIX|${d.key}|${hasV ? v.toFixed(2) : '0'}`;
+    $('#chargeOut').innerHTML = `<div class="code">${esc(code)}</div><div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(code)}">${ico('copy')} Copiar código</button></div><p class="mu sm-t">Envie este código. Quem for pagar cola em <b>Pix → Pagar com código</b>.</p>`;
+  },
+  savings: async (f, ev) => {
+    const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err');
+    const dir = (ev.submitter && ev.submitter.dataset.dir) || 'in';
+    const r = await busy(ev.submitter, () => api(`/api/savings/${dir}`, { method: 'POST', body: { amount: v } }));
+    if (r) { setState(r); openSavings(); toast(dir === 'in' ? 'Guardado com sucesso!' : 'Resgate feito — dinheiro na conta.', 'ok'); }
+  },
+  invoice: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/pay', { method: 'POST', body: { amount: v } })); if (r) { setState(r); closeSheet(); toast('Fatura paga!', 'ok'); } },
+  draw: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v >= 10)) return toast('O valor mínimo é R$ 10,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/draw', { method: 'POST', body: { amount: v } })); if (r) { setState(r); closeSheet(); toast(`${fmtBRL(v)} na sua conta!`, 'ok'); } },
+  purchase: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/card/purchase', { method: 'POST', body: { merchant: d.merchant, amount: v } })); if (r) { setState(r); closeSheet(); toast('Compra aprovada!', 'ok'); } },
+  creditReq: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v >= 100)) return toast('Peça pelo menos R$ 100,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/request', { method: 'POST', body: { amount: v, purpose: d.purpose } })); if (r) { setState(r); openCreditReq(); toast(r.message, 'ok'); } },
+  password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method: 'POST', body: d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); closeSheet(); toast('Senha alterada!', 'ok'); } },
+  support: async (f, ev) => {
+    const text = new FormData(f).get('text') ?? $('#chatIn').value; const t = String(text).trim(); if (!t) return;
+    const r = await busy(ev.submitter, () => api('/api/support/messages', { method: 'POST', body: { text: t } })); if (r) { $('#chatIn').value = ''; setState(r); }
+  },
+  reply: async (f, ev) => {
+    const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return;
+    const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method: 'POST', body: d })); if (r) { await loadMaster(); openThread(d.userId, true); }
+  },
+  deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method: 'POST', body: { userId: d.userId, amount: v, note: d.note } })); if (r) { closeSheet(); toast('Depósito feito.', 'ok'); loadMaster(); } },
+};
+
+/* =================== sessão e tempo real =================== */
+async function doLogin(username, password) { const r = await api('/api/login', { method: 'POST', body: { username, password } }); enter(r); toast(`Olá, ${r.state.user.fullName.split(' ')[0]}!`, 'ok'); }
+function enter(r) { S.token = r.token; localStorage.setItem('armin_token', S.token); S.st = r.state; S.page = 'home'; S.master = null; render(); connectSocket(); }
+function doLocalLogout() {
+  localStorage.removeItem('armin_token'); S.token = ''; S.st = null; S.master = null; S.card = null; S.page = 'home'; S.authTab = 'login';
+  if (S.socket) { S.socket.disconnect(); S.socket = null; } closeSheet(); render();
+}
+function connectSocket() {
+  if (S.socket) { S.socket.disconnect(); S.socket = null; }
+  if (typeof io === 'undefined' || !S.token) return;
+  S.socket = io({ auth: { token: S.token }, reconnectionDelayMax: 8000 });
+  S.socket.on('account:updated', (p) => { if (p.state) { S.st = p.state; render(); } });
+  S.socket.on('master:refresh', () => { if (S.page === 'master') loadMaster(); });
+}
+async function poll() { if (!S.token || !S.st || document.hidden) return; try { const r = await api('/api/me'); if (JSON.stringify(r.state) !== JSON.stringify(S.st)) { S.st = r.state; render(); } } catch {} }
+
+/* =================== eventos globais =================== */
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
+  const fn = A[el.dataset.act]; if (!fn) { console.warn('Ação sem handler:', el.dataset.act); return; }
+  e.preventDefault(); fn(el, e);
+});
+document.addEventListener('submit', (e) => {
+  const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault();
+  const fn = F[f.dataset.form]; if (fn) fn(f, e); else console.warn('Form sem handler:', f.dataset.form);
+});
+document.addEventListener('change', (e) => { const el = e.target.closest('[data-change]'); if (el && CH[el.dataset.change]) CH[el.dataset.change](el); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && sheetOpen()) closeSheet(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+setInterval(poll, 25000);
+
+/* =================== boot =================== */
+$('#root').innerHTML = shell();
+(async function boot() {
+  render();
+  if (!S.token) return;
+  try { const r = await api('/api/me'); S.st = r.state; render(); connectSocket(); }
+  catch (e) { if (S.token) { /* erro de rede: mantém token, mostra login */ } render(); }
+})();
+</script>
 </body>
-  </html>
+</html>
