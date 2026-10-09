@@ -20,7 +20,6 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .hidden{display:none!important}
 #root{height:100vh;height:100dvh;max-width:480px;margin:0 auto;position:relative;background:var(--bg)}
 @media(min-width:520px){body{background:#000}#root{height:min(100dvh,900px);margin-top:max(0px,calc((100dvh - 900px)/2));border-radius:24px;box-shadow:0 0 0 1px #1e1e22;overflow:hidden}}
-/* login */
 .auth{height:100%;overflow-y:auto;background:var(--bg);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
 .logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
 .logo b{width:38px;height:38px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;font-size:19px;letter-spacing:0}
@@ -45,7 +44,6 @@ svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stro
 .lnk{color:#c77dff;font-weight:700;font-size:13.5px}
 .demo{margin-top:auto;padding-top:26px;font-size:12px;color:var(--mu);text-align:center}
 .demo button{display:inline-block;margin:6px 4px 0;padding:8px 12px;border-radius:999px;background:var(--card2);color:#fff;font-weight:700;font-size:12px}
-/* app */
 .app{height:100%;display:flex;flex-direction:column}
 .view{flex:1;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(92px + var(--bot))}
 .hdr{background:var(--bg);color:#fff;padding:calc(14px + var(--top)) 18px 22px}
@@ -90,6 +88,10 @@ button.row:active{background:var(--card2)}
 .act:active i{background:var(--p3)}
 .pixgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .pixgrid .btn{flex-direction:column;min-height:70px;border-radius:14px;font-size:12.5px;gap:6px;padding:10px}
+.chart{display:flex;gap:8px;align-items:flex-end;height:120px;padding-top:8px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chart .bar{width:100%;max-width:26px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--p2),var(--p));min-height:4px}
+.chart .col span{font-size:10px;color:var(--mu);font-weight:700}
 .bar2{height:8px;border-radius:99px;background:var(--ln);overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:14px}
 .kv:last-child{border-bottom:0}.kv span:first-child{color:var(--mu)}.kv span:last-child{font-weight:650;text-align:right;color:#fff;overflow-wrap:anywhere}
@@ -100,7 +102,6 @@ button.row:active{background:var(--card2)}
 .plastic .num{position:absolute;left:20px;right:20px;bottom:44px;font-family:'Courier New',monospace;font-size:clamp(14px,4.6vw,19px);letter-spacing:.1em;font-weight:700;white-space:nowrap}
 .plastic .foot{position:absolute;left:20px;right:20px;bottom:18px;display:flex;justify-content:space-between;font-size:12px;gap:8px}
 .blocked{filter:grayscale(.85) brightness(.75)}
-/* chat de suporte */
 .chatscroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
 .chatscroll::-webkit-scrollbar{display:none}
 .msgrow{display:flex;gap:8px;align-items:flex-end}
@@ -114,12 +115,10 @@ button.row:active{background:var(--card2)}
 .composer input:focus{border-color:var(--p)}
 .composer .send{width:46px;height:46px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;flex:none}
 .composer .send:active{filter:brightness(.9)}
-/* menu inferior */
-.tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--bg);border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot));z-index:20}
+.tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot));z-index:20}
 .tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;font-size:10.5px;font-weight:700;color:var(--mu)}
 .tab.on{color:#c77dff}
 .tab i{width:24px;height:24px}
-/* sheet */
 .sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:0 18px calc(18px + var(--bot));box-shadow:0 -8px 24px rgba(0,0,0,.6);transform:translateY(100%);transition:transform .25s ease-out;z-index:30;max-height:85%;overflow-y:auto;overscroll-behavior:contain}
 .sheet.open{transform:translateY(0)}
 .sheet .grip{width:38px;height:4px;border-radius:2px;background:var(--ln);margin:10px auto 14px}
@@ -153,10 +152,10 @@ const parseMoney = (s) => { const n = Number(String(s).replace(/\./g,'').replace
 const U = () => (S.st && S.st.user) || {};
 const ini = () => ((U().fullName || U().username || '?')[0] || '?').toUpperCase();
 
-const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', back:'<path d="M19 12H5M12 19l-7-7 7-7"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', bonus:'<path d="M12 2l3 7h7l-5.5 4.5 2 7.5L12 17l-6.5 4 2-7.5L2 9h7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
+const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', back:'<path d="M19 12H5M12 19l-7-7 7-7"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', gift:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
 const ico = (k) => `<svg class="i" viewBox="0 0 24 24">${ICO[k] || ''}</svg>`;
 
-const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, page: 'home', authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'' }, toastTimer: null, sheetEl: null };
+const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, page: 'home', authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'', n:1 }, toastTimer: null, sheetEl: null };
 
 async function api(p, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
@@ -187,6 +186,22 @@ function sheetClose() { if (S.sheetEl) { S.sheetEl.remove(); S.sheetEl = null; }
 function setState(r) { if (r && r.state) S.st = r.state; render(); }
 async function loadMaster() { try { const m = await api('/api/master/overview'); S.master = m; render(); } catch (e) { toast(e.message, 'err'); } }
 
+function chartHtml(title, txs, kinds) {
+  const pos = kinds.includes('savings_yield') || kinds.includes('referral');
+  const buckets = [];
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i); buckets.push({ label:'DSTQQSS'[d.getDay()], key:d.toDateString(), total:0 }); }
+  (txs||[]).forEach(t => {
+    if (!kinds.includes(t.kind||'')) return;
+    if (pos ? (t.amount||0) <= 0 : (t.amount||0) >= 0) return;
+    const k = new Date(t.createdAt); k.setHours(0,0,0,0);
+    const b = buckets.find(x => x.key === k.toDateString()); if (b) b.total += Math.abs(t.amount||0);
+  });
+  const max = Math.max(...buckets.map(b => b.total), 1);
+  const total = buckets.reduce((s,b) => s+b.total, 0);
+  return `<div class="ttl"><h3>${title}</h3><span class="pill p">${fmtBRL(total)}</span></div>
+  <div class="chart">${buckets.map(b => `<div class="col"><div class="bar" style="height:${Math.max(4, Math.round((b.total/max)*100))}%"></div><span>${b.label}</span></div>`).join('')}</div>`;
+}
+
 function shell() { return `<div class="app"><div id="view" class="view"></div><nav class="tabs" id="tabs"></nav></div>`; }
 function render() {
   sheetClose();
@@ -198,13 +213,14 @@ function render() {
   if (S.page === 'master' && U().role === 'admin') renderMaster();
   else if (S.page === 'support') renderSupport();
   else if (S.page === 'pixhub') renderPixHub();
+  else if (S.page === 'savings') renderSavings();
   else if (S.page === 'pix') renderExtract();
   else if (S.page === 'card') renderCardPage();
   else if (S.page === 'more') renderMore();
   else renderHome();
 }
 function tabsHtml() {
-  return [ {id:'home',l:'Início',i:'home'}, {id:'pixhub',l:'Pix',i:'pix'}, {id:'pix',l:'Extrato',i:'list'}, {id:'card',l:'Cartão',i:'card'}, {id:'more',l:'Mais',i:'plus'} ]
+  return [ {id:'home',l:'Início',i:'home'}, {id:'pix',l:'Extrato',i:'list'}, {id:'card',l:'Cartão',i:'card'}, {id:'more',l:'Mais',i:'plus'} ]
     .map(t => `<button class="tab ${S.page===t.id?'on':''}" data-act="goPage" data-page="${t.id}">${ico(t.i)}${t.l}</button>`).join('');
 }
 function renderAuth() {
@@ -238,7 +254,7 @@ function renderAuth() {
 }
 function txRow(tx) {
   const isIn = (tx.amount || 0) >= 0;
-  const icon = (tx.kind||'').includes('pix') ? 'pix' : tx.kind === 'card' ? 'card' : tx.kind === 'savings_yield' ? 'pig' : tx.kind === 'deposit' ? 'bonus' : 'arrow';
+  const icon = (tx.kind||'').includes('pix') ? 'pix' : tx.kind === 'card' ? 'card' : (tx.kind === 'savings_yield' || tx.kind === 'savings') ? 'pig' : tx.kind === 'installment' ? 'credit' : tx.kind === 'referral' ? 'gift' : tx.kind === 'deposit' ? 'bonus' : 'arrow';
   return `<div class="row"><div class="ic ${isIn?'g':'r'}">${ico(icon)}</div><div class="mid"><b>${esc(tx.description || tx.title || 'Movimentação')}</b><span>${fmtDate(tx.createdAt)}</span></div><div class="end ${isIn?'in':'out'}">${isIn?'+':'-'}${fmtBRL(Math.abs(tx.amount))}</div></div>`;
 }
 function renderHome() {
@@ -258,17 +274,33 @@ function renderHome() {
     <div class="card"><div class="acts">
       <button class="act" data-act="openPixHub"><i>${ico('pix')}</i>Área Pix</button>
       <button class="act" data-act="openPix"><i>${ico('arrow')}</i>Enviar</button>
-      <button class="act" data-act="openSavings"><i>${ico('pig')}</i>Cofrinho</button>
+      <button class="act" data-act="goPage" data-page="savings"><i>${ico('pig')}</i>Cofrinho</button>
       <button class="act" data-act="openCard"><i>${ico('card')}</i>Cartão</button>
-      <button class="act" data-act="bonus"><i>${ico('bonus')}</i>Bônus</button>
+      <button class="act" data-act="openReferral"><i>${ico('gift')}</i>Indique</button>
     </div></div>
     <button class="row" style="border-radius:var(--r);border-bottom:0" data-act="openPixHub">
       <div class="ic">${ico('pix')}</div>
       <div class="mid"><b>Área Pix</b><span>Enviar, cobrar e gerenciar chaves</span></div>${ico('chev')}
     </button>
-    ${(u.savings||0) > 0 ? `<div class="card"><div class="ttl"><h3>Cofrinho</h3><span class="pill g">rendendo</span></div><div class="big">${fmtBRL(u.savings)}</div><p class="mu sm-t">Rende ~1% ao mês</p></div>` : ''}
+    ${(u.savings||0) > 0 ? `<button class="card" style="width:100%;text-align:left" data-act="goPage" data-page="savings"><div class="ttl"><h3>Cofrinho</h3><span class="pill g">rendendo</span></div><div class="big">${fmtBRL(u.savings)}</div><p class="mu sm-t">Toque para acompanhar o rendimento</p></button>` : ''}
     <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Últimas movimentações</h3><button class="lnk" data-act="goPage" data-page="pix">Ver tudo</button></div>
       ${txs.length ? txs.map(txRow).join('') : '<div class="empty"><b>Nada por aqui ainda</b>Suas movimentações aparecem aqui.</div>'}</div>
+  </div>`;
+}
+function renderSavings() {
+  const u = U(); const yields = (S.st.transactions || []).filter(t => t.kind === 'savings_yield');
+  const gained = yields.reduce((s,t) => s + Math.abs(t.amount||0), 0);
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button><div class="tools"><span class="pill g">rendendo</span></div></div>
+    <h1>Cofrinho</h1><p>Guardado e rendendo ~1% ao mês</p></div>
+  <div class="wrap">
+    <div class="card"><div class="big">${fmtBRL(u.savings||0)}</div>
+      <div class="kv"><span>Rendimento acumulado</span><span class="in">+${fmtBRL(gained)}</span></div>
+      <div class="kv"><span>Projeção p/ próximo mês</span><span>${fmtBRL((u.savings||0)*1.01)}</span></div>
+      <div class="btns two"><button class="btn" data-act="openSavings">${ico('pig')} Guardar</button><button class="btn sec" data-act="openSavings">Resgatar</button></div></div>
+    <div class="card">${chartHtml('Rendimento por dia', S.st.transactions || [], ['savings_yield'])}</div>
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Histórico de rendimento</h3></div>
+      ${yields.length ? yields.slice(0,8).map(txRow).join('') : '<div class="empty"><b>Sem rendimentos ainda</b>Guarde dinheiro para começar a render.</div>'}</div>
   </div>`;
 }
 function msgRow(m) {
@@ -320,10 +352,13 @@ function renderExtract() {
   const txs = S.st.transactions || []; let last = '';
   $('#view').innerHTML = `
   <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="goPage" data-page="home">${ico('close')}</button></div></div><h1>Extrato</h1><p>${txs.length} movimentações</p></div>
-  <div class="wrap"><div class="card flush">${txs.length ? txs.map(t => { const d = new Date(t.createdAt).toLocaleDateString('pt-BR'); const h = d !== last ? `<div class="day">${d}</div>` : ''; last = d; return h + txRow(t); }).join('') : '<div class="empty"><b>Nada por aqui ainda</b></div>'}</div></div>`;
+  <div class="wrap">
+    <div class="card">${chartHtml('Gastos nos últimos 7 dias', txs, ['pix_out','card','installment'])}</div>
+    <div class="card flush">${txs.length ? txs.map(t => { const d = new Date(t.createdAt).toLocaleDateString('pt-BR'); const h = d !== last ? `<div class="day">${d}</div>` : ''; last = d; return h + txRow(t); }).join('') : '<div class="empty"><b>Nada por aqui ainda</b></div>'}</div>
+  </div>`;
 }
 function renderCardPage() {
-  const u = U(); const c = S.card;
+  const u = U(); const c = S.card; const loans = u.loans || [];
   $('#view').innerHTML = `
   <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="cardReveal">${ico('eye')}</button></div></div><h1>Cartão</h1><p>${u.cardBlocked ? 'Bloqueado' : 'Ativo'}</p></div>
   <div class="wrap">
@@ -333,6 +368,10 @@ function renderCardPage() {
     ${c ? `<div class="card"><div class="kv"><span>CVV</span><span>${esc(c.cvv)}</span></div><div class="kv"><span>Validade</span><span>${esc(c.expiry)}</span></div></div>` : '<p class="mu sm-t">Toque no olho para revelar número e CVV por 20s.</p>'}
     <div class="card"><div class="kv"><span>Limite</span><span>${fmtBRL(u.creditLimit)}</span></div><div class="kv"><span>Usado</span><span>${fmtBRL(u.creditUsed)}</span></div><div class="kv"><span>Disponível</span><span>${fmtBRL((u.creditLimit||0)-(u.creditUsed||0))}</span></div>
       <div class="bar2"><span style="width:${Math.min(100, u.creditLimit ? (u.creditUsed/u.creditLimit*100) : 0)}%"></span></div></div>
+    ${loans.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Pix parcelado</h3></div>
+      ${loans.map(l => { const due = new Date(l.createdAt); due.setMonth(due.getMonth() + l.paid + 1);
+        return `<div class="row"><div class="ic a">${ico('credit')}</div><div class="mid"><b>${esc(l.description)}</b><span>${l.paid}/${l.n} pagas • próx. ${l.paid < l.n ? due.toLocaleDateString('pt-BR') : '—'}</span></div>
+        <div class="end">${fmtBRL(l.monthly)}${l.paid < l.n ? `<small><button class="lnk" data-act="payInstallment" data-id="${esc(l.id)}">pagar parcela</button></small>` : '<small>quitado</small>'}</div></div>`; }).join('')}</div>` : ''}
     <div class="btns">
       <button class="btn" data-act="openPurchase">${ico('card')} Simular compra</button>
       <button class="btn ${u.cardBlocked?'':'dng'}" data-act="cardToggle">${ico('lock')} ${u.cardBlocked ? 'Desbloquear' : 'Bloquear'} cartão</button>
@@ -345,7 +384,7 @@ function renderMore() {
   $('#view').innerHTML = `
   <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="logout">${ico('logout')}</button></div></div><h1>Mais</h1><p>@${esc(u.username)}</p></div>
   <div class="wrap"><div class="card flush">
-    ${item('openPixHub','pix','Área Pix')}${item('openSavings','pig','Cofrinho')}${item('openCredit','credit','Crédito e fatura')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
+    ${item('openPixHub','pix','Área Pix')}${item('goPage','pig','Cofrinho','data-page="savings"')}${item('openReferral','gift','Indique e ganhe')}${item('openCredit','credit','Crédito e fatura')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
   </div><div class="btns"><button class="btn dng" data-act="logout">${ico('logout')} Sair da conta</button></div></div>`;
 }
 function renderMaster() {
@@ -373,15 +412,31 @@ function pixStep1() { sheetOpen(`<h2>Enviar Pix</h2><div id="sheetBody">
   <div class="btns two" style="margin-top:10px"><button class="btn out sm" data-act="openCharge">Cobrar</button><button class="btn out sm" data-act="openKeys">Minhas chaves</button></div></div>`); }
 function pixStep2() { const p = S.pix; sheetOpen(`<h2>Enviar Pix</h2><div id="sheetBody">
   <div class="card" style="background:var(--card2)"><div class="row" style="background:none;border:0;padding:6px 0"><div class="ic g">${ico('check')}</div><div class="mid"><b>${esc(p.rec.fullName)}</b><span>@${esc(p.rec.username)}</span></div></div></div>
-  <form data-form="pixReview"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00" value="${esc(p.amount)}"></div>
-  <div class="fld"><label>Descrição (opcional)</label><input name="note" maxlength="80" placeholder="Ex: aluguel"></div>
-  <button class="btn" type="submit">${ico('arrow')} Revisar</button></form></div>`); }
+  <form data-form="pixReview">
+    <div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00" value="${esc(p.amount)}"></div>
+    <div class="fld"><label>Parcelas</label><select name="installments">${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `<option value="${n}" ${p.n===n?'selected':''}>${n}x${n>1 ? ' — no limite do cartão' : ' — à vista do saldo'}</option>`).join('')}</select></div>
+    <div class="fld"><label>Descrição (opcional)</label><input name="note" maxlength="80" placeholder="Ex: aluguel"></div>
+    <button class="btn" type="submit">${ico('arrow')} Revisar</button></form></div>`); }
 function pixStep3() { const p = S.pix; sheetOpen(`<h2>Confirmar Pix</h2><div id="sheetBody">
   <div class="kv"><span>Para</span><span>${esc(p.rec.fullName)}</span></div>
   <div class="kv"><span>Chave</span><span>${esc(p.key)}</span></div>
   <div class="kv"><span>Valor</span><span>${fmtBRL(p.value)}</span></div>
+  ${p.n > 1 ? `<div class="kv"><span>Parcelamento</span><span>${p.n}x de ${fmtBRL(p.value/p.n)} no cartão</span></div>` : ''}
   ${p.note ? `<div class="kv"><span>Descrição</span><span>${esc(p.note)}</span></div>` : ''}
   <div class="btns"><button class="btn" data-act="pixConfirm">${ico('check')} Confirmar e enviar</button><button class="btn sec" data-act="closeSheet">Cancelar</button></div></div>`); }
+function openReferral() {
+  const u = U();
+  sheetOpen(`<h2>Indique e ganhe</h2><div id="sheetBody">
+    <p class="mu sm-t" style="margin:0 0 10px">Você e quem usar seu código ganham <b style="color:var(--gr)">R$ 25,00</b> na hora.</p>
+    <div class="code" style="text-align:center;font-size:16px;letter-spacing:.08em;font-weight:700">${esc(u.refCode||'')}</div>
+    <div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(u.refCode||'')}">${ico('copy')} Copiar meu código</button></div>
+    <div class="kv" style="margin-top:10px"><span>Já indicou</span><span>${u.refCount||0} pessoa(s)</span></div>
+    ${u.refUsed ? '<p class="mu sm-t" style="margin-top:10px">Você já usou um código de indicação.</p>' : `
+    <h3 style="margin:14px 0 8px;font-size:14px">Tem um código?</h3>
+    <form data-form="referral"><div class="fld"><input name="code" placeholder="Ex: IND-1A2B3C" required></div>
+    <button class="btn sec" type="submit">${ico('gift')} Usar código e ganhar R$ 25</button></form>`}
+  </div>`);
+}
 function openSavings() { const u = U(); sheetOpen(`<h2>Cofrinho</h2><div id="sheetBody">
   <div class="big">${fmtBRL(u.savings||0)}</div><p class="mu sm-t">Rende ~1% ao mês, creditado por hora.</p>
   <form data-form="savings"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div>
@@ -434,6 +489,7 @@ const A = {
   openPixHub: () => { S.page = 'pixhub'; render(); },
   openPix: () => pixStep1(),
   openSavings: () => openSavings(),
+  openReferral: () => openReferral(),
   openCard: () => { S.page = 'card'; render(); },
   openCredit: () => openCreditReq(),
   openPurchase: () => openPurchase(),
@@ -443,14 +499,14 @@ const A = {
   openSupport: () => { S.page = 'support'; render(); },
   openPassword: () => openPassword(),
   pasteCode: async () => { pixStep1(); setTimeout(() => A.pasteInto(), 150); },
-  bonus: async (el) => { const r = await busy(el, () => api('/api/bonus', { method:'POST' })); if (r) { setState(r); toast(`Você ganhou ${fmtBRL(r.reward)} de bônus!`, 'ok'); } },
+  payInstallment: async (el) => { const r = await busy(el, () => api('/api/pix/installment/pay', { method:'POST', body:{ loanId: el.dataset.id } })); if (r) { setState(r); toast('Parcela paga!', 'ok'); } },
   cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method:'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
   cardReveal: async (el) => {
     if (S.card) { S.card = null; clearTimeout(S.cardTimer); render(); return; }
     const r = await busy(el, () => api('/api/card/secret')); if (!r) return;
     S.card = r.card; render(); clearTimeout(S.cardTimer); S.cardTimer = setTimeout(() => { S.card = null; render(); }, 20000);
   },
-  pixConfirm: async (el) => { const p = S.pix; const r = await busy(el, () => api('/api/pix/send', { method:'POST', body:{ key:p.key, amount:p.value, description:p.note } })); if (r) { setState(r); sheetClose(); toast('Pix enviado!', 'ok'); } },
+  pixConfirm: async (el) => { const p = S.pix; const r = await busy(el, () => api('/api/pix/send', { method:'POST', body:{ key:p.key, amount:p.value, description:p.note, installments:p.n } })); if (r) { setState(r); sheetClose(); toast(p.n > 1 ? `Pix enviado em ${p.n}x!` : 'Pix enviado!', 'ok'); } },
   pasteInto: async () => { try { const t = await navigator.clipboard.readText(); const i = $('#pk'); if (i && t) { i.value = t.trim(); toast('Colado!', 'ok'); } else toast('Nada para colar.'); } catch { toast('Cole manualmente no campo.'); const i = $('#pk'); if (i) i.focus(); } },
   copyCode: (el) => { if (navigator.clipboard) navigator.clipboard.writeText(el.dataset.v).then(() => toast('Código copiado!', 'ok'), () => toast('Copie manualmente.')); else toast('Copie manualmente.'); },
   removeKey: async (el) => { const fromHub = S.page === 'pixhub'; const r = await busy(el, () => api('/api/pix/key/' + encodeURIComponent(el.dataset.id), { method:'DELETE' })); if (r) { setState(r); toast('Chave removida.', 'ok'); if (!fromHub) openKeys(); } },
@@ -465,8 +521,15 @@ const A = {
 const F = {
   login: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/login', { method:'POST', body:{ username:d.username, password:d.password } })); if (r) { enter(r); toast(`Olá, ${((r.state&&r.state.user&&r.state.user.fullName)||'').split(' ')[0] || 'bem-vindo'}!`, 'ok'); } },
   register: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/register', { method:'POST', body:d })); if (r) { enter(r); toast('Conta criada! Bem-vindo(a).', 'ok'); } },
+  referral: async (f, ev) => { const code = new FormData(f).get('code'); const r = await busy(ev.submitter, () => api('/api/referral/apply', { method:'POST', body:{ code } })); if (r) { setState(r); openReferral(); toast(`Você ganhou ${fmtBRL(r.reward)} com o código!`, 'ok'); } },
   pixLookup: async (f, ev) => { const key = new FormData(f).get('key'); const r = await busy(ev.submitter, () => api('/api/pix/lookup', { method:'POST', body:{ key } })); if (r) { S.pix = { ...S.pix, key, rec:r.recipient, amount:'' }; pixStep2(); } },
-  pixReview: (f) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); if (v > U().balance) return toast('Saldo insuficiente para este Pix.', 'err'); S.pix.value = v; S.pix.amount = d.amount; S.pix.note = (d.note||'').trim(); pixStep3(); },
+  pixReview: (f) => {
+    const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const n = parseInt(d.installments, 10) || 1;
+    if (!(v > 0)) return toast('Digite um valor válido.', 'err');
+    if (n > 1) { if (v > ((U().creditLimit||0) - (U().creditUsed||0))) return toast('Limite do cartão insuficiente para parcelar.', 'err'); }
+    else if (v > U().balance) return toast('Saldo insuficiente para este Pix.', 'err');
+    S.pix.value = v; S.pix.amount = d.amount; S.pix.note = (d.note||'').trim(); S.pix.n = n; pixStep3();
+  },
   addKey: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/pix/key', { method:'POST', body:d })); if (r) { setState(r); openKeys(); toast('Chave cadastrada!', 'ok'); } },
   charge: (f) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const hasV = String(d.amount||'').trim() !== ''; if (hasV && !(v > 0)) return toast('Valor inválido.', 'err'); const code = `ZKPIX|${d.key}|${hasV ? v.toFixed(2) : '0'}`; $('#chargeOut').innerHTML = `<div class="code">${esc(code)}</div><div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(code)}">${ico('copy')} Copiar código</button></div><p class="mu sm-t">Quem paga cola em Pix → Colar código.</p>`; },
   savings: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const dir = (ev.submitter && ev.submitter.dataset.dir) || 'in'; const r = await busy(ev.submitter, () => api(`/api/savings/${dir}`, { method:'POST', body:{ amount:v } })); if (r) { setState(r); openSavings(); toast(dir === 'in' ? 'Guardado com sucesso!' : 'Resgate feito — dinheiro na conta.', 'ok'); } },
@@ -509,4 +572,4 @@ $('#root').innerHTML = shell();
 })();
 </script>
 </body>
-</html>
+  </html>
