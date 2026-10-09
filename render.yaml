@@ -1,12 +1,17 @@
 services:
   - type: web
-    name: armin-bank-rpg
+    name: armin-bank
     runtime: node
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DATA_DIR          # onde o db.json é salvo (precisa ficar no disco persistente)
+        value: /data
+      - key: MASTER_PASSWORD   # senha inicial do usuário "master" (defina no painel da Render)
+        sync: false
     disk:
       name: armin-bank-data
       mountPath: /data
