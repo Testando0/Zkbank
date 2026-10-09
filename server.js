@@ -30,12 +30,14 @@ function registerRoutes(app, bank, rt) {
   app.get('/api/me', auth, (req, res) => res.json({ ok: true, ...st(req.user) }));
   app.post('/api/logout', auth, (req, res) => res.json({ ok: true }));
   app.post('/api/password', auth, (req, res) => wrap(res, () => { const d = req.body || {}; const token = bank.changePassword(req.user, d.current, d.next); res.json({ ok: true, token, ...st(req.user) }); }));
-  app.post('/api/bonus', auth, (req, res) => wrap(res, () => { const reward = bank.claimBonus(req.user); res.json({ ok: true, reward, ...st(req.user) }); }));
+
+  app.post('/api/referral/apply', auth, (req, res) => wrap(res, () => { const r = bank.applyReferral(req.user, (req.body||{}).code); res.json({ ok: true, reward: r.reward, ...st(req.user) }); }));
 
   app.post('/api/pix/lookup', auth, (req, res) => { const u = bank.lookupKey(req.user, (req.body||{}).key); if (!u) return res.status(404).json({ ok: false, message: 'Chave não encontrada.' }); res.json({ ok: true, recipient: pub(u) }); });
   app.post('/api/pix/send', auth, (req, res) => wrap(res, () => { const d = req.body || {}; const rec = bank.lookupKey(req.user, d.key); bank.pixSend(req.user, d); res.json({ ok: true, ...st(req.user) }); emit([req.user.id, rec ? rec.id : '']); }));
   app.post('/api/pix/key', auth, (req, res) => wrap(res, () => { bank.addKey(req.user, req.body || {}); res.json({ ok: true, ...st(req.user) }); }));
   app.delete('/api/pix/key/:keyId', auth, (req, res) => wrap(res, () => { bank.removeKey(req.user, req.params.keyId); res.json({ ok: true, ...st(req.user) }); }));
+  app.post('/api/pix/installment/pay', auth, (req, res) => wrap(res, () => { bank.payInstallment(req.user, (req.body||{}).loanId); res.json({ ok: true, ...st(req.user) }); }));
 
   app.post('/api/savings/:dir', auth, (req, res) => wrap(res, () => { const d = req.params.dir; if (d !== 'in' && d !== 'out') return res.status(400).json({ ok: false, message: 'Direção inválida.' }); bank.savingsMove(req.user, d, (req.body||{}).amount); res.json({ ok: true, ...st(req.user) }); emit([req.user.id]); }));
 
@@ -101,4 +103,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-    }
+           }
