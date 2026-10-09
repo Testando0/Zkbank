@@ -1,302 +1,213 @@
 'use strict';
 const fs = require('fs');
-const path = require('path');
 const crypto = require('crypto');
 
-class BankError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = 'BankError';
-  }
-}
+class BankError extends Error { constructor(m){ super(m); this.name='BankError'; } }
 
 const now = () => new Date().toISOString();
 const money = (v) => Number(Number(v || 0).toFixed(2));
 const id = (p) => `${p}_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
 const randomKey = () => `${crypto.randomBytes(4).toString('hex')}-${crypto.randomBytes(2).toString('hex')}`.toUpperCase();
-
-function hashPassword(pwd) {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hash = crypto.scryptSync(pwd, salt, 64).toString('hex');
-  return `scrypt$${salt}$${hash}`;
-}
-
-function verifyPassword(pwd, stored) {
-  if (!stored || !stored.startsWith('scrypt$')) return stored === pwd;
-  const parts = stored.split('$');
-  const hash = crypto.scryptSync(pwd, parts[1], 64).toString('hex');
-  return parts[2] === hash;
-}
+const normKey = (v) => { const s = String(v||'').trim().toLowerCase(); return /^[0-9()+\s.\-]+$/.test(s) ? s.replace(/\D/g,'') : s; };
+const hashPassword = (pwd) => { const salt = crypto.randomBytes(16).toString('hex'); return `scrypt$${salt}$${crypto.scryptSync(pwd, salt, 64).toString('hex')}`; };
+const verifyPassword = (pwd, stored) => { if (!stored || !stored.startsWith('scrypt$')) return stored === pwd; const p = stored.split('$'); return crypto.scryptSync(pwd, p[1], 64).toString('hex') === p[2]; };
 
 function createBank(options) {
-  const file = options.file || 'db.json';
-  let db = {
-    version: 2,
-    users: [],
-    transactions: [],
-    creditRequests: [],
-    supportMessages: [],
-    notifications: []
-  };
+  const file = (options && options.file) || 'db.json';
+  let db = { version: 2, users: [], transactions: [], creditRequests: [], supportMessages: [], notifications: [] };
 
-  if (fs.existsSync(file)) {
-    try { db = JSON.parse(fs.readFileSync(file, 'utf8')); } catch(e) {}
-  } else {
+  if (fs.existsSync(file)) { try { db = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) {} }
+  else {
     const created = now();
-    db.users.push({
-      id: 'usr_aventureiro', username: 'aventureiro', password: hashPassword('1234'),
-      fullName: 'Lia Aventureira', role: 'user', balance: 1000, savings: 0,
-      creditLimit: 500, creditUsed: 0, score: 650,
-      cardNumber: '5298 4012 2410 7723', cvv: '123', cardBlocked: false,
-      pixKeys: [{ id: id('key'), type: 'email', value: 'lia@aventura.rpg', createdAt: created }],
-      createdAt: created, lastBonus: 0, loginAttempts: 0, locked: false
-    });
-    db.users.push({
-      id: 'usr_master', username: 'master', password: hashPassword('master'),
-      fullName: 'Armin Master', role: 'admin', balance: 0, savings: 0,
-      creditLimit: 0, creditUsed: 0, score: 1000,
-      cardNumber: '5298 4000 0099 0001', cvv: '999', cardBlocked: false,
-      pixKeys: [{ id: id('key'), type: 'email', value: 'armin@arminbank.rpg', createdAt: created }],
-      createdAt: created, lastBonus: 0, loginAttempts: 0, locked: false
-    });
+    db.users.push(
+      { id:'usr_aventureiro', username:'aventureiro', password:hashPassword('1234'), fullName:'Lia Aventureira', role:'user', balance:1000, savings:0, creditLimit:500, creditUsed:0, score:650, cardNumber:'5298 4012 2410 7723', cvv:'123', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'lia@aventura.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false },
+      { id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false }
+    );
   }
 
   db.users.forEach(u => {
-     if (!u.password.startsWith('scrypt$')) u.password = hashPassword(u.password === 'master' ? 'master' : '1234');
-     if (u.loginAttempts === undefined) u.loginAttempts = 0;
-     if (u.locked === undefined) u.locked = false;
-     if (u.cvv === undefined) u.cvv = '123';
-     if (u.cardBlocked === undefined) u.cardBlocked = false;
-     if (u.savings === undefined) u.savings = 0;
-     if (u.savingsAt === undefined) u.savingsAt = u.createdAt;
+    if (!u.password || !u.password.startsWith('scrypt$')) u.password = hashPassword(u.password === 'master' ? 'master' : '1234');
+    if (u.loginAttempts === undefined) u.loginAttempts = 0;
+    if (u.locked === undefined) u.locked = false;
+    if (u.cvv === undefined) u.cvv = '123';
+    if (u.expiry === undefined) u.expiry = '12/29';
+    if (u.cardBlocked === undefined) u.cardBlocked = false;
+    if (u.savings === undefined) u.savings = 0;
+    if (u.savingsAt === undefined) u.savingsAt = u.createdAt || now();
   });
 
-  function saveDB() { fs.writeFileSync(file, JSON.stringify(db, null, 2)); }
+  const saveDB = () => fs.writeFileSync(file, JSON.stringify(db, null, 2));
   saveDB();
 
-  function byId(id) { return db.users.find(u => u.id === id); }
-  function userFromToken(token) { return db.users.find(u => u.token === token) || null; }
+  const byId = (uid) => db.users.find(u => u.id === uid);
+  const userFromToken = (t) => db.users.find(u => u.token === t) || null;
 
-  function login(usernameOrEmail, password) {
-    let u = db.users.find(x => x.username === usernameOrEmail || x.pixKeys.some(k => k.value.toLowerCase() === String(usernameOrEmail).toLowerCase()));
+  function login(nameOrKey, password) {
+    const n = String(nameOrKey||'').trim().toLowerCase();
+    const u = db.users.find(x => x.username.toLowerCase() === n || x.pixKeys.some(k => normKey(k.value) === normKey(n)));
     if (!u) throw new BankError('Credenciais inválidas');
     if (u.locked) throw new BankError('Muitas tentativas. Conta bloqueada.');
     if (!verifyPassword(password, u.password)) {
-      u.loginAttempts = (u.loginAttempts || 0) + 1;
+      u.loginAttempts = (u.loginAttempts||0) + 1;
       if (u.loginAttempts >= 5) u.locked = true;
-      saveDB();
-      throw new BankError('Credenciais inválidas');
+      saveDB(); throw new BankError('Credenciais inválidas');
     }
-    u.loginAttempts = 0;
-    u.token = crypto.randomBytes(32).toString('hex');
-    saveDB();
+    u.loginAttempts = 0; u.token = crypto.randomBytes(32).toString('hex'); saveDB();
     return { token: u.token, user: u };
   }
 
   function register({ fullName, username, password }) {
     if (!fullName || !/^[^ ]+ [^ ]+/.test(fullName)) throw new BankError('Informe nome completo');
     if (!username || !/^[a-zA-Z0-9_]+$/.test(username)) throw new BankError('Usuário inválido');
-    if (!password || password.length < 4) throw new BankError('Senha muito curta');
-    if (db.users.find(u => u.username === username)) throw new BankError('Usuário já existe');
-    const u = {
-      id: id('usr'), username, password: hashPassword(password), fullName, role: 'user',
-      balance: 0, savings: 0, creditLimit: 500, creditUsed: 0, score: 650,
-      cardNumber: '5298 ' + Math.random().toString().slice(2,6) + ' ' + Math.random().toString().slice(2,6) + ' ' + Math.random().toString().slice(2,6),
-      cvv: Math.floor(Math.random()*900+100).toString(), cardBlocked: false,
-      pixKeys: [{ id: id('key'), type: 'aleatória', value: 'ARMIN-' + randomKey(), createdAt: now() }],
-      createdAt: now(), lastBonus: 0, loginAttempts: 0, locked: false, savingsAt: now()
-    };
-    db.users.push(u);
-    saveDB();
-    return { user: u };
+    if (!password || String(password).length < 4) throw new BankError('Senha muito curta');
+    if (db.users.find(u => u.username.toLowerCase() === String(username).toLowerCase())) throw new BankError('Usuário já existe');
+    const u = { id:id('usr'), username, password:hashPassword(password), fullName, role:'user', balance:0, savings:0, creditLimit:500, creditUsed:0, score:650,
+      cardNumber:`5298 ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)}`,
+      cvv:String(Math.floor(Math.random()*900)+100), expiry:'12/29', cardBlocked:false,
+      pixKeys:[{ id:id('key'), type:'aleatória', value:`ARMIN-${randomKey()}`, createdAt:now() }], createdAt:now(), savingsAt:now(), lastBonus:0, loginAttempts:0, locked:false };
+    db.users.push(u); saveDB(); return { user: u };
   }
 
-  function lookupKey(user, keyVal) {
-    const val = String(keyVal).toLowerCase();
-    return db.users.find(u => u.pixKeys.some(k => k.value.toLowerCase() === val));
-  }
+  const lookupKey = (_u, val) => db.users.find(u => u.pixKeys.some(k => normKey(k.value) === normKey(val)));
 
   function pixSend(sender, { key, amount, description }) {
-    if (!Number.isFinite(amount) || amount <= 0) throw new BankError('Digite um valor válido');
-    if (amount > sender.balance) throw new BankError('Saldo insuficiente');
-    const val = String(key).toLowerCase();
-    const recipient = db.users.find(u => u.pixKeys.some(k => k.value.toLowerCase() === val));
-    if (!recipient) throw new BankError('Chave não encontrada');
-    if (recipient.id === sender.id) throw new BankError('Não pode enviar para você mesmo');
-    sender.balance = money(sender.balance - amount);
-    recipient.balance = money(recipient.balance + amount);
-    db.transactions.push({ id: id('tx'), userId: sender.id, kind: 'pix_out', amount: -money(amount), description, createdAt: now() });
-    db.transactions.push({ id: id('tx'), userId: recipient.id, kind: 'pix_in', amount: money(amount), description, createdAt: now() });
+    const v = Number(amount);
+    if (!Number.isFinite(v) || v <= 0) throw new BankError('Digite um valor válido');
+    if (v > sender.balance) throw new BankError('Saldo insuficiente');
+    const rec = lookupKey(sender, key);
+    if (!rec) throw new BankError('Chave não encontrada');
+    if (rec.id === sender.id) throw new BankError('Não pode enviar para você mesmo');
+    sender.balance = money(sender.balance - v); rec.balance = money(rec.balance + v);
+    db.transactions.push({ id:id('tx'), userId:sender.id, kind:'pix_out', amount:-money(v), description, createdAt:now() });
+    db.transactions.push({ id:id('tx'), userId:rec.id, kind:'pix_in', amount:money(v), description, createdAt:now() });
     saveDB();
   }
 
   function addKey(user, { type, value }) {
     if (type === 'email' && (!value || !String(value).includes('@'))) throw new BankError('E-mail inválido');
-    const val = String(value).toLowerCase();
-    if (db.users.some(u => u.pixKeys.some(k => k.value.toLowerCase() === val))) throw new BankError('Chave já está cadastrada');
-    user.pixKeys.push({ id: id('key'), type, value: val, createdAt: now() });
-    saveDB();
+    const nv = normKey(value);
+    if (db.users.some(u => u.pixKeys.some(k => normKey(k.value) === nv))) throw new BankError('Chave já está cadastrada');
+    user.pixKeys.push({ id:id('key'), type, value:String(value).trim(), createdAt:now() }); saveDB();
   }
 
   function removeKey(user, keyId) {
-    if (user.pixKeys.length <= 1) throw new BankError('Deve manter ao menos uma chave');
-    user.pixKeys = user.pixKeys.filter(k => k.id !== keyId);
-    saveDB();
+    if (user.pixKeys.length <= 1) throw new BankError('Mantenha ao menos uma chave');
+    user.pixKeys = user.pixKeys.filter(k => k.id !== keyId); saveDB();
   }
 
   function cardPurchase(user, { merchant, amount }) {
     if (user.cardBlocked) throw new BankError('Cartão bloqueado');
-    if (user.creditUsed + amount > user.creditLimit) throw new BankError('Limite insuficiente');
-    user.creditUsed = money(user.creditUsed + amount);
-    db.transactions.push({ id: id('tx'), userId: user.id, kind: 'card', amount: -money(amount), description: merchant, createdAt: now() });
-    saveDB();
+    if (user.creditUsed + Number(amount) > user.creditLimit) throw new BankError('Limite insuficiente');
+    user.creditUsed = money(user.creditUsed + Number(amount));
+    db.transactions.push({ id:id('tx'), userId:user.id, kind:'card', amount:-money(amount), description:merchant, createdAt:now() }); saveDB();
   }
-
-  function toggleCard(user) {
-    user.cardBlocked = !user.cardBlocked;
-    saveDB();
-  }
+  const toggleCard = (user) => { user.cardBlocked = !user.cardBlocked; saveDB(); };
 
   function payInvoice(user, amount) {
     if (user.creditUsed === 0) throw new BankError('Fatura já zerada');
-    if (amount > user.creditUsed) throw new BankError('Valor informado maior que a fatura');
-    if (amount > user.balance) throw new BankError('Saldo insuficiente para pagamento');
-    user.balance = money(user.balance - amount);
-    user.creditUsed = money(user.creditUsed - amount);
-    user.score = (user.score || 0) + 15;
-    saveDB();
+    if (Number(amount) > user.creditUsed) throw new BankError('Valor informado maior que a fatura');
+    if (Number(amount) > user.balance) throw new BankError('Saldo insuficiente para pagamento');
+    user.balance = money(user.balance - Number(amount)); user.creditUsed = money(user.creditUsed - Number(amount)); user.score = (user.score||0) + 15; saveDB();
   }
 
   function creditDraw(user, amount) {
-    if (amount < 10) throw new BankError('Valor mínimo R$ 10');
-    if (user.creditUsed + amount * 1.03 > user.creditLimit) throw new BankError('Limite insuficiente');
-    user.balance = money(user.balance + amount);
-    user.creditUsed = money(user.creditUsed + amount * 1.03);
-    saveDB();
+    if (!(Number(amount) >= 10)) throw new BankError('Valor mínimo R$ 10');
+    if (user.creditUsed + Number(amount) * 1.03 > user.creditLimit) throw new BankError('Limite insuficiente');
+    user.balance = money(user.balance + Number(amount)); user.creditUsed = money(user.creditUsed + Number(amount) * 1.03); saveDB();
   }
 
   function savingsMove(user, dir, amount) {
-    if (dir === 'in') {
-      if (amount > user.balance) throw new BankError('Saldo insuficiente');
-      user.balance = money(user.balance - amount);
-      user.savings = money(user.savings + amount);
-    } else {
-      if (amount > user.savings) throw new BankError('Valor maior que o guardado');
-      user.savings = money(user.savings - amount);
-      user.balance = money(user.balance + amount);
-    }
+    const v = Number(amount);
+    if (dir === 'in') { if (v > user.balance) throw new BankError('Saldo insuficiente'); user.balance = money(user.balance - v); user.savings = money(user.savings + v); }
+    else { if (v > user.savings) throw new BankError('Valor maior que o guardado'); user.savings = money(user.savings - v); user.balance = money(user.balance + v); }
     saveDB();
   }
 
-  function accountState(user) {
-    const months = (Date.now() - new Date(user.savingsAt || user.createdAt).getTime()) / (30 * 24 * 3600 * 1000);
+  function applyYield(user) {
+    const months = (Date.now() - new Date(user.savingsAt || user.createdAt).getTime()) / (30*24*3600*1000);
     if (months > 0.05 && user.savings > 0) {
-       const oldSavings = user.savings;
-       user.savings = money(user.savings * Math.pow(1.01, months));
-       user.savingsAt = now();
-       db.transactions.push({ id: id('tx'), userId: user.id, kind: 'savings_yield', amount: money(user.savings - oldSavings), description: 'Rendimento', createdAt: now() });
-       saveDB();
+      const old = user.savings;
+      user.savings = money(user.savings * Math.pow(1.01, months)); user.savingsAt = now();
+      db.transactions.push({ id:id('tx'), userId:user.id, kind:'savings_yield', amount:money(user.savings - old), description:'Rendimento do cofrinho', createdAt:now() });
+      saveDB();
     }
+  }
+
+  function accountState(user) {
+    applyYield(user);
+    const safe = { ...user }; delete safe.password;
     return {
-      user,
-      transactions: db.transactions.filter(t => t.userId === user.id),
+      user: safe,
+      transactions: db.transactions.filter(t => t.userId === user.id).sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt))),
       notifications: db.notifications.filter(n => n.userId === user.id),
-      supportMessages: db.supportMessages.filter(m => m.userId === user.id)
+      supportMessages: db.supportMessages.filter(m => m.userId === user.id),
+      creditRequests: db.creditRequests.filter(r => r.userId === user.id),
+      unread: db.notifications.filter(n => n.userId === user.id && !n.read).length,
     };
   }
 
   function claimBonus(user) {
-    const day = 24 * 3600 * 1000;
-    if (Date.now() - (user.lastBonus || 0) < day) throw new BankError('Bônus volta em 24h');
-    const reward = Math.floor(Math.random() * 61) + 20;
-    user.balance = money(user.balance + reward);
-    user.lastBonus = Date.now();
-    saveDB();
-    return reward;
+    if (Date.now() - (user.lastBonus||0) < 24*3600*1000) throw new BankError('O bônus volta em 24h');
+    const reward = Math.floor(Math.random()*61) + 20;
+    user.balance = money(user.balance + reward); user.lastBonus = Date.now(); saveDB(); return reward;
   }
 
   function creditRequest(user, { amount, purpose }) {
-    if (amount < 50) throw new BankError('Mínimo R$ 50');
-    if (db.creditRequests.some(r => r.userId === user.id && r.status === 'pending')) throw new BankError('Já existe uma análise aguardando');
-    const req = { id: id('req'), userId: user.id, amount, purpose, status: 'pending', createdAt: now() };
-    db.creditRequests.push(req);
-    saveDB();
-    return req;
+    if (!(Number(amount) >= 50)) throw new BankError('Mínimo R$ 50');
+    if (db.creditRequests.some(r => r.userId === user.id && r.status === 'pending')) throw new BankError('Você já tem uma análise aguardando');
+    const r = { id:id('req'), userId:user.id, username:user.username, fullName:user.fullName, amount:money(amount), purpose, status:'pending', createdAt:now() };
+    db.creditRequests.push(r); saveDB(); return r;
   }
 
   function creditDecide(requestId, decision, reason) {
-    const req = db.creditRequests.find(r => r.id === requestId);
-    if (!req || req.status !== 'pending') throw new BankError('Análise já decidida ou não encontrada');
-    req.status = decision;
-    req.decidedAt = now();
-    req.reason = reason;
-    if (decision === 'approve') {
-      const u = byId(req.userId);
-      if (u) {
-        u.creditLimit = Math.max(u.creditLimit, req.amount);
-        db.notifications.push({ id: id('note'), userId: u.id, title: 'Crédito aprovado', text: reason, createdAt: now() });
-      }
-    } else {
-      const u = byId(req.userId);
-      if (u) db.notifications.push({ id: id('note'), userId: u.id, title: 'Análise encerrada', text: reason, createdAt: now() });
+    const r = db.creditRequests.find(x => x.id === requestId);
+    if (!r || r.status !== 'pending') throw new BankError('Análise já decidida ou não encontrada');
+    r.status = decision; r.decidedAt = now(); r.decisionNote = reason || '';
+    const u = byId(r.userId);
+    if (u) {
+      if (decision === 'approve') { u.creditLimit = Math.max(u.creditLimit, r.amount); db.notifications.push({ id:id('note'), userId:u.id, title:'Crédito aprovado', text:`Limite atualizado para ${money(r.amount).toFixed(2)}.`, read:false, createdAt:now() }); }
+      else db.notifications.push({ id:id('note'), userId:u.id, title:'Análise encerrada', text:reason || 'Reprovado nesta rodada.', read:false, createdAt:now() });
     }
     saveDB();
   }
 
   function supportSend(user, message) {
-    if (!message || !String(message).trim()) throw new BankError('Mensagem vazia');
-    db.supportMessages.push({ id: id('msg'), userId: user.id, text: String(message).trim(), role: user.role, createdAt: now(), awaiting: true });
-    saveDB();
+    if (!message || !String(message).trim()) throw new BankError('Escreva uma mensagem');
+    db.supportMessages.push({ id:id('msg'), userId:user.id, author:user.fullName, role:user.role, text:String(message).trim().slice(0,500), awaiting:true, createdAt:now() }); saveDB();
   }
-
   function supportReply(userId, message) {
-    db.supportMessages.push({ id: id('msg'), userId: userId, text: String(message), role: 'support', createdAt: now() });
-    const thread = db.supportMessages.filter(m => m.userId === userId);
-    if (thread.length > 0) {
-      for(let i = thread.length-1; i>=0; i--) {
-        if(thread[i].awaiting) { thread[i].awaiting = false; break; }
-      }
-    }
+    db.supportMessages.push({ id:id('msg'), userId, author:'Armin Master', role:'support', text:String(message).trim().slice(0,500), awaiting:false, createdAt:now() });
+    const th = db.supportMessages.filter(m => m.userId === userId);
+    for (let i = th.length-1; i >= 0; i--) if (th[i].awaiting) { th[i].awaiting = false; break; }
     saveDB();
   }
+  const markNotifsRead = (user) => { db.notifications.forEach(n => { if (n.userId === user.id) n.read = true; }); saveDB(); };
 
   function masterOverview() {
-    const threads = [];
-    const users = db.users.filter(u => u.role !== 'admin');
-    for(const u of users) {
-       const msgs = db.supportMessages.filter(m => m.userId === u.id);
-       if(msgs.length > 0) {
-         const last = msgs[msgs.length-1];
-         threads.push({ userId: u.id, awaiting: !!last.awaiting });
-       }
-    }
-    return { threads };
+    const players = db.users.filter(u => u.role !== 'admin');
+    const threads = players.map(u => { const msgs = db.supportMessages.filter(m => m.userId === u.id); return msgs.length ? { userId:u.id, awaiting: msgs.some(m => m.awaiting) } : null; }).filter(Boolean);
+    return {
+      threads,
+      metrics: { players: players.length, pendingCredits: db.creditRequests.filter(r => r.status==='pending').length, moneyInPlay: money(players.reduce((s,u)=>s+u.balance,0)), avgScore: players.length ? Math.round(players.reduce((s,u)=>s+u.score,0)/players.length) : 0 },
+      pending: db.creditRequests.filter(r => r.status==='pending'),
+      users: players.map(u => { const c={...u}; delete c.password; return c; }),
+      support: db.supportMessages.slice(-30),
+    };
   }
 
   function masterDeposit(userId, amount, reason) {
-    const u = byId(userId);
-    if (!u) throw new BankError('Usuário não encontrado');
-    u.balance = money(u.balance + amount);
-    db.transactions.push({ id: id('tx'), userId: u.id, kind: 'deposit', amount: money(amount), description: reason, createdAt: now() });
-    saveDB();
+    const u = byId(userId); if (!u) throw new BankError('Usuário não encontrado');
+    u.balance = money(u.balance + Number(amount));
+    db.transactions.push({ id:id('tx'), userId:u.id, kind:'deposit', amount:money(amount), description:reason||'Depósito master', createdAt:now() }); saveDB();
   }
 
   function changePassword(user, oldPassword, newPassword) {
-    if (!verifyPassword(oldPassword, user.password)) throw new BankError('Senha incorreta');
-    user.password = hashPassword(newPassword);
-    user.token = crypto.randomBytes(32).toString('hex');
-    saveDB();
-    return user.token;
+    if (!verifyPassword(oldPassword, user.password)) throw new BankError('Senha atual incorreta');
+    if (!newPassword || String(newPassword).length < 4) throw new BankError('Senha muito curta');
+    user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  function dbRef() { return db; }
-
-  return {
-    byId, userFromToken, login, register, lookupKey, pixSend, addKey, removeKey,
-    cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState,
-    claimBonus, creditRequest, creditDecide, supportSend, supportReply, masterOverview,
-    masterDeposit, changePassword, db: dbRef
-  };
+  return { byId, userFromToken, login, register, lookupKey, pixSend, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
