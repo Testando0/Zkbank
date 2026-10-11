@@ -8,6 +8,7 @@ const IMGBB_API_KEY = process.env.IMGBB_API_KEY || '599411b1c02c7129d1b0da9bd463
 
 function registerRoutes(app, bank, rt) {
   const pub = (u) => { if (!u) return null; const c = { ...u }; delete c.password; delete c.token; return c; };
+  const put = app.put ? app.put.bind(app) : app.post.bind(app);
   const st = (u) => ({ state: bank.accountState(u) });
   const emit = (ids) => { if (rt && rt.users) rt.users(ids); };
   const wrap = (res, fn) => { try { return fn(); } catch (e) { return res.status(400).json({ ok: false, message: e.message }); } };
@@ -19,6 +20,7 @@ function registerRoutes(app, bank, rt) {
     req.user = u; next();
   };
   const admin = (req, res, next) => { if (req.user.role !== 'admin') return res.status(403).json({ ok: false, message: 'Área exclusiva do master.' }); next(); };
+  const storeManager = (req, res, next) => { if (!['admin','seller'].includes(req.user.role)) return res.status(403).json({ ok:false, message:'Apenas o master ou vendedores podem gerenciar a loja.' }); next(); };
 
   app.post('/api/register', (req, res) => wrap(res, () => {
     const d = req.body || {};
@@ -82,10 +84,14 @@ function registerRoutes(app, bank, rt) {
   app.post('/api/master/deposit', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterDeposit(d.userId, d.amount, d.note); res.json({ ok: true }); emit([d.userId]); }));
   app.post('/api/master/users/:userId/balance', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustBalance(req.params.userId, d.amount, d.note); res.json({ ok:true }); emit([req.params.userId]); }));
   app.post('/api/master/users/:userId/ban', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterSetBan(req.user, req.params.userId, d.banned !== false, d.note); res.json({ ok:true }); emit([req.params.userId]); if (rt && rt.masters) rt.masters(); }));
+  app.post('/api/master/users/:userId/role', auth, admin, (req, res) => wrap(res, () => { bank.masterSetRole(req.user, req.params.userId, (req.body||{}).role); res.json({ ok:true }); if (rt && rt.masters) rt.masters(); }));
+  app.post('/api/master/users/:userId/credit-limit', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustCredit(req.params.userId, d.limit, d.note); res.json({ ok:true }); emit([req.params.userId]); if (rt && rt.masters) rt.masters(); }));
   app.get('/api/payments', auth, (req, res) => res.json({ ok:true, ...bank.paymentCatalog(req.user) }));
   app.post('/api/payments/auto-debit', auth, (req, res) => wrap(res, () => { bank.configureAutoDebit(req.user, req.body || {}); res.json({ ok:true, ...st(req.user) }); }));
   app.get('/api/products', auth, (req, res) => res.json({ ok:true, products:bank.products() }));
-  app.post('/api/products', auth, admin, (req, res) => wrap(res, () => res.json({ ok:true, product:bank.createProduct(req.user, req.body || {}) })));
+  app.post('/api/products', auth, storeManager, (req, res) => wrap(res, () => res.json({ ok:true, product:bank.createProduct(req.user, req.body || {}) })));
+  put('/api/products/:productId', auth, storeManager, (req, res) => wrap(res, () => res.json({ ok:true, product:bank.updateProduct(req.user, req.params.productId, req.body || {}) })));
+  app.delete('/api/products/:productId', auth, storeManager, (req, res) => wrap(res, () => res.json({ ok:true, product:bank.deleteProduct(req.user, req.params.productId) })));
   app.post('/api/products/:productId/purchase', auth, (req, res) => wrap(res, () => { bank.purchaseProduct(req.user, req.params.productId, (req.body||{}).method); res.json({ ok:true, ...st(req.user) }); emit([req.user.id]); }));
 }
 
@@ -126,4 +132,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-      }
+}
