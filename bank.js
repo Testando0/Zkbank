@@ -22,17 +22,18 @@ function createBank(options) {
     const created = now();
     db.users.push(
       { id:'usr_aventureiro', username:'aventureiro', password:hashPassword('1234'), fullName:'Lia Aventureira', role:'user', balance:5000, savings:0, creditLimit:500, creditUsed:0, score:650, cardNumber:'5298 4012 2410 7723', cvv:'123', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'lia@aventura.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 },
-      { id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 }
+      { id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 }
     );
   }
 
   if (!db.products) db.products = [];
+  db.products.forEach(p => { if (!p.sellerId) p.sellerId = 'usr_master'; if (p.active === undefined) p.active = true; if (!p.imageUrl) p.imageUrl = ''; });
   if (!db.creditRequests) db.creditRequests = [];
   if (!db.supportMessages) db.supportMessages = [];
   if (!db.notifications) db.notifications = [];
   if (!db.users.some(u => u.role === 'admin')) {
     const created = now();
-    db.users.push({ id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 });
+    db.users.push({ id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 });
   }
   db.users.forEach(u => {
     if (!u.password || !u.password.startsWith('scrypt$')) u.password = hashPassword(u.password === 'master' ? 'master' : '1234');
@@ -55,6 +56,7 @@ function createBank(options) {
     if (u.avatarUrl === undefined) u.avatarUrl = '';
     if (u.banned === undefined) u.banned = false;
     if (u.bannedAt === undefined) u.bannedAt = null;
+    if (u.unlimitedFunds === undefined) u.unlimitedFunds = u.role === 'admin';
   });
 
   const saveDB = () => fs.writeFileSync(file, JSON.stringify(db, null, 2));
@@ -83,7 +85,7 @@ function createBank(options) {
     if (!username || !/^[a-zA-Z0-9_]+$/.test(username)) throw new BankError('Usuário inválido');
     if (!password || String(password).length < 4) throw new BankError('senha muito curta');
     if (db.users.find(u => u.username.toLowerCase() === String(username).toLowerCase())) throw new BankError('Usuário já existe');
-    const u = { id:id('usr'), username, password:hashPassword(password), fullName, role:'user', balance:0, savings:0, creditLimit:500, creditUsed:0, score:650,
+    const u = { id:id('usr'), username, password:hashPassword(password), fullName, role:'user', unlimitedFunds:false, balance:0, savings:0, creditLimit:500, creditUsed:0, score:650,
       cardNumber:`5298 ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)}`,
       cvv:String(Math.floor(Math.random()*900)+100), expiry:'12/29', cardBlocked:false,
       pixKeys:[{ id:id('key'), type:'aleatória', value:`ARMIN-${randomKey()}`, createdAt:now() }], avatarUrl:'', banned:false, bannedAt:null, createdAt:now(), savingsAt:now(), lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 };
@@ -105,8 +107,8 @@ function createBank(options) {
       sender.loans.push({ id:id('loan'), total:money(v), n, paid:0, monthly:money(v/n), description:description||'Pix parcelado', recipient:rec.fullName, createdAt:now() });
       db.transactions.push({ id:id('tx'), userId:sender.id, kind:'pix_parcelado', amount:-money(v), description:`Pix parcelado em ${n}x para ${rec.fullName}`, createdAt:now() });
     } else {
-      if (v > sender.balance) throw new BankError('Saldo insuficiente');
-      sender.balance = money(sender.balance - v);
+      if (!sender.unlimitedFunds && v > sender.balance) throw new BankError('Saldo insuficiente');
+      if (!sender.unlimitedFunds) sender.balance = money(sender.balance - v);
       db.transactions.push({ id:id('tx'), userId:sender.id, kind:'pix_out', amount:-money(v), description, createdAt:now() });
     }
     rec.balance = money(rec.balance + v);
@@ -258,6 +260,17 @@ function createBank(options) {
     u.banned = !!banned; u.bannedAt = u.banned ? now() : null; if (u.banned) u.token = null;
     db.notifications.push({ id:id('note'), userId:u.id, title:u.banned ? 'Conta banida' : 'Conta reativada', text:reason || (u.banned ? 'Sua conta foi banida pelo master.' : 'Sua conta foi reativada pelo master.'), read:false, createdAt:now() }); saveDB(); return u;
   }
+  function masterSetRole(admin, userId, role) {
+    const u = byId(userId); if (!u) throw new BankError('Usuário não encontrado');
+    if (u.id === admin.id || u.role === 'admin') throw new BankError('O master não pode alterar o próprio cargo');
+    if (!['user','seller'].includes(role)) throw new BankError('Cargo inválido');
+    u.role = role; saveDB(); return u;
+  }
+  function masterAdjustCredit(userId, limit, reason) {
+    const u = byId(userId); const v = Number(limit); if (!u) throw new BankError('Usuário não encontrado');
+    if (!Number.isFinite(v) || v < 0 || v < u.creditUsed) throw new BankError('O limite não pode ser menor que o crédito usado');
+    u.creditLimit = money(v); db.notifications.push({ id:id('note'), userId:u.id, title:'Limite de crédito atualizado', text:reason || `Seu limite agora é ${money(v).toFixed(2)}.`, read:false, createdAt:now() }); saveDB(); return u;
+  }
   const paymentMethods = [
     { id:'money', label:'Dinheiro', currency:'BRL', mode:'balance' }, { id:'debit_card', label:'Cartão de débito', currency:'BRL', mode:'balance' },
     { id:'credit_card', label:'Cartão de crédito', currency:'BRL', mode:'credit' }, { id:'pix', label:'PIX', currency:'BRL', mode:'balance' },
@@ -265,11 +278,24 @@ function createBank(options) {
     { id:'auto_debit', label:'Débito automático', currency:'BRL', mode:'balance' }, { id:'store_credit', label:'Vale / crédito da loja', currency:'STORE', mode:'store' },
     { id:'virtual_coin', label:'Moeda virtual do servidor', currency:'VIRTUAL', mode:'virtual' }, { id:'magic_coin', label:'Moeda mágica para a loja de itens', currency:'MAGIC', mode:'magic' },
   ];
-  function paymentCatalog(user) { return { methods:paymentMethods, balances:{ money:money(user.balance), storeCredit:money(user.storeCredit), virtualCoins:user.virtualCoins, magicCoins:user.magicCoins }, autoDebit:user.autoDebit }; }
+  function paymentCatalog(user) { return { methods:paymentMethods, balances:{ money:user.unlimitedFunds ? null : money(user.balance), storeCredit:money(user.storeCredit), virtualCoins:user.virtualCoins, magicCoins:user.magicCoins }, autoDebit:user.autoDebit }; }
   function createProduct(admin, data) {
+    if (!admin || !['admin','seller'].includes(admin.role)) throw new BankError('Apenas o master ou vendedores podem publicar produtos');
     if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe nome e preço válido');
     const p = { id:id('product'), name:String(data.name).trim().slice(0,80), description:String(data.description||'').trim().slice(0,240), imageUrl:String(data.imageUrl||'').trim().slice(0,500), price:money(data.price), currency:['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : 'BRL', stock:Math.max(0, parseInt(data.stock,10) || 0), active:data.active !== false, sellerId:admin.id, createdAt:now() };
     db.products.push(p); saveDB(); return p;
+  }
+  function canManageProduct(actor, product) { return actor && (actor.role === 'admin' || (actor.role === 'seller' && product.sellerId === actor.id)); }
+  function updateProduct(actor, productId, data) {
+    const p = db.products.find(x => x.id === productId); if (!p) throw new BankError('Produto não encontrado');
+    if (!canManageProduct(actor, p)) throw new BankError('Você não pode editar este produto');
+    if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe nome e preço válido');
+    p.name = String(data.name).trim().slice(0,80); p.description = String(data.description||'').trim().slice(0,240); p.imageUrl = String(data.imageUrl||'').trim().slice(0,500); p.price = money(data.price); p.currency = ['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : p.currency; p.stock = Math.max(0, parseInt(data.stock,10) || 0); saveDB(); return p;
+  }
+  function deleteProduct(actor, productId) {
+    const p = db.products.find(x => x.id === productId); if (!p) throw new BankError('Produto não encontrado');
+    if (!canManageProduct(actor, p)) throw new BankError('Você não pode excluir este produto');
+    p.active = false; p.deletedAt = now(); saveDB(); return p;
   }
   function products() { return db.products.filter(p => p.active && p.stock >= 0).map(p => ({...p})); }
   function purchaseProduct(user, productId, method) {
@@ -279,7 +305,7 @@ function createBank(options) {
     if (p.currency !== m.currency) throw new BankError('A moeda não corresponde ao produto');
     const v = p.price;
     if (m.mode === 'credit') { if (user.creditUsed + v > user.creditLimit) throw new BankError('Limite de crédito insuficiente'); user.creditUsed = money(user.creditUsed + v); }
-    else if (m.mode === 'balance') { if (user.balance < v) throw new BankError('Saldo insuficiente'); user.balance = money(user.balance - v); }
+    else if (m.mode === 'balance') { if (!user.unlimitedFunds && user.balance < v) throw new BankError('Saldo insuficiente'); if (!user.unlimitedFunds) user.balance = money(user.balance - v); }
     else if (m.mode === 'store') { if (user.storeCredit < v) throw new BankError('Vale/crédito da loja insuficiente'); user.storeCredit = money(user.storeCredit - v); }
     else if (m.mode === 'virtual') { if (user.virtualCoins < v) throw new BankError('Moeda virtual insuficiente'); user.virtualCoins -= v; }
     else if (m.mode === 'magic') { if (user.magicCoins < v) throw new BankError('Moeda mágica insuficiente'); user.magicCoins -= v; }
@@ -296,7 +322,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, paymentCatalog, createProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
