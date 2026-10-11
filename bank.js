@@ -15,7 +15,7 @@ const verifyPassword = (pwd, stored) => { if (!stored || !stored.startsWith('scr
 
 function createBank(options) {
   const file = (options && options.file) || 'db.json';
-  let db = { version: 3, users: [], transactions: [], creditRequests: [], supportMessages: [], notifications: [], products: [] };
+  let db = { version: 4, users: [], transactions: [], creditRequests: [], supportMessages: [], notifications: [], products: [] };
 
   if (fs.existsSync(file)) { try { db = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) {} }
   else {
@@ -52,18 +52,22 @@ function createBank(options) {
     if (u.virtualCoins === undefined) u.virtualCoins = 0;
     if (u.magicCoins === undefined) u.magicCoins = 0;
     if (u.autoDebit === undefined) u.autoDebit = { enabled:false, description:'', amount:0, nextRun:null };
+    if (u.avatarUrl === undefined) u.avatarUrl = '';
+    if (u.banned === undefined) u.banned = false;
+    if (u.bannedAt === undefined) u.bannedAt = null;
   });
 
   const saveDB = () => fs.writeFileSync(file, JSON.stringify(db, null, 2));
   saveDB();
 
   const byId = (uid) => db.users.find(u => u.id === uid);
-  const userFromToken = (t) => db.users.find(u => u.token === t) || null;
+  const userFromToken = (t) => t ? (db.users.find(u => u.token === t) || null) : null;
 
   function login(nameOrKey, password) {
     const n = String(nameOrKey||'').trim().toLowerCase();
     const u = db.users.find(x => x.username.toLowerCase() === n || x.pixKeys.some(k => normKey(k.value) === normKey(n)));
     if (!u) throw new BankError('Credenciais inválidos');
+    if (u.banned) throw new BankError('Conta banida pelo master.');
     if (u.locked) throw new BankError('Muitas tentativas. Conta bloqueada.');
     if (!verifyPassword(password, u.password)) {
       u.loginAttempts = (u.loginAttempts||0) + 1;
@@ -82,7 +86,7 @@ function createBank(options) {
     const u = { id:id('usr'), username, password:hashPassword(password), fullName, role:'user', balance:0, savings:0, creditLimit:500, creditUsed:0, score:650,
       cardNumber:`5298 ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)}`,
       cvv:String(Math.floor(Math.random()*900)+100), expiry:'12/29', cardBlocked:false,
-      pixKeys:[{ id:id('key'), type:'aleatória', value:`ARMIN-${randomKey()}`, createdAt:now() }], createdAt:now(), savingsAt:now(), lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 };
+      pixKeys:[{ id:id('key'), type:'aleatória', value:`ARMIN-${randomKey()}`, createdAt:now() }], avatarUrl:'', banned:false, bannedAt:null, createdAt:now(), savingsAt:now(), lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 };
     db.users.push(u); saveDB(); return { user: u };
   }
 
@@ -182,7 +186,7 @@ function createBank(options) {
   }
   function accountState(user) {
     applyYield(user);
-    const safe = { ...user }; delete safe.password;
+    const safe = { ...user }; delete safe.password; delete safe.token;
     return {
       user: safe,
       transactions: db.transactions.filter(t => t.userId === user.id).sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt))),
@@ -232,7 +236,7 @@ function createBank(options) {
       threads,
       metrics: { players: players.length, pendingCredits: db.creditRequests.filter(r => r.status==='pending').length, moneyInPlay: money(players.reduce((s,u)=>s+u.balance,0)), avgScore: players.length ? Math.round(players.reduce((s,u)=>s+u.score,0)/players.length) : 0 },
       pending: db.creditRequests.filter(r => r.status==='pending'),
-      users: players.map(u => { const c={...u}; delete c.password; return c; }),
+      users: players.map(u => { const c={...u}; delete c.password; delete c.token; return c; }),
       support: db.supportMessages.slice(-30),
     };
   }
@@ -240,6 +244,19 @@ function createBank(options) {
     const u = byId(userId); if (!u) throw new BankError('Usuário não encontrado');
     u.balance = money(u.balance + Number(amount));
     db.transactions.push({ id:id('tx'), userId:u.id, kind:'deposit', amount:money(amount), description:reason||'Depósito master', createdAt:now() }); saveDB();
+  }
+  function updateAvatar(user, avatarUrl) { user.avatarUrl = String(avatarUrl || '').trim().slice(0,500); saveDB(); return user.avatarUrl; }
+  function masterAdjustBalance(userId, amount, reason) {
+    const u = byId(userId); const v = Number(amount); if (!u) throw new BankError('Usuário não encontrado');
+    if (!Number.isFinite(v) || v === 0) throw new BankError('Informe um valor diferente de zero');
+    if (u.balance + v < 0) throw new BankError('Saldo do usuário não pode ficar negativo');
+    u.balance = money(u.balance + v); db.transactions.push({ id:id('tx'), userId:u.id, kind:v > 0 ? 'master_credit' : 'master_debit', amount:money(v), description:reason || (v > 0 ? 'Saldo adicionado pelo master' : 'Saldo removido pelo master'), createdAt:now() }); saveDB(); return u;
+  }
+  function masterSetBan(admin, userId, banned, reason) {
+    const u = byId(userId); if (!u) throw new BankError('Usuário não encontrado');
+    if (u.id === admin.id || u.role === 'admin') throw new BankError('O master não pode banir outro master');
+    u.banned = !!banned; u.bannedAt = u.banned ? now() : null; if (u.banned) u.token = null;
+    db.notifications.push({ id:id('note'), userId:u.id, title:u.banned ? 'Conta banida' : 'Conta reativada', text:reason || (u.banned ? 'Sua conta foi banida pelo master.' : 'Sua conta foi reativada pelo master.'), read:false, createdAt:now() }); saveDB(); return u;
   }
   const paymentMethods = [
     { id:'money', label:'Dinheiro', currency:'BRL', mode:'balance' }, { id:'debit_card', label:'Cartão de débito', currency:'BRL', mode:'balance' },
@@ -251,7 +268,7 @@ function createBank(options) {
   function paymentCatalog(user) { return { methods:paymentMethods, balances:{ money:money(user.balance), storeCredit:money(user.storeCredit), virtualCoins:user.virtualCoins, magicCoins:user.magicCoins }, autoDebit:user.autoDebit }; }
   function createProduct(admin, data) {
     if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe nome e preço válido');
-    const p = { id:id('product'), name:String(data.name).trim().slice(0,80), description:String(data.description||'').trim().slice(0,240), price:money(data.price), currency:['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : 'BRL', stock:Math.max(0, parseInt(data.stock,10) || 0), active:data.active !== false, sellerId:admin.id, createdAt:now() };
+    const p = { id:id('product'), name:String(data.name).trim().slice(0,80), description:String(data.description||'').trim().slice(0,240), imageUrl:String(data.imageUrl||'').trim().slice(0,500), price:money(data.price), currency:['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : 'BRL', stock:Math.max(0, parseInt(data.stock,10) || 0), active:data.active !== false, sellerId:admin.id, createdAt:now() };
     db.products.push(p); saveDB(); return p;
   }
   function products() { return db.products.filter(p => p.active && p.stock >= 0).map(p => ({...p})); }
@@ -279,7 +296,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, paymentCatalog, createProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, paymentCatalog, createProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
