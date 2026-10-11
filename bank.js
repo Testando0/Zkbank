@@ -248,6 +248,11 @@ function createBank(options) {
     db.transactions.push({ id:id('tx'), userId:u.id, kind:'deposit', amount:money(amount), description:reason||'Depósito master', createdAt:now() }); saveDB();
   }
   function updateAvatar(user, avatarUrl) { user.avatarUrl = String(avatarUrl || '').trim().slice(0,500); saveDB(); return user.avatarUrl; }
+  function updateProfileName(user, fullName) {
+    const name = String(fullName || '').trim().replace(/\s+/g, ' ');
+    if (!/^[^ ]+ [^ ]+/.test(name) || name.length > 80) throw new BankError('Informe nome e sobrenome válidos');
+    user.fullName = name; saveDB(); return user.fullName;
+  }
   function masterAdjustBalance(userId, amount, reason) {
     const u = byId(userId); const v = Number(amount); if (!u) throw new BankError('Usuário não encontrado');
     if (!Number.isFinite(v) || v === 0) throw new BankError('Informe um valor diferente de zero');
@@ -322,7 +327,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
