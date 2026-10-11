@@ -155,7 +155,7 @@ const ini = () => ((U().fullName || U().username || '?')[0] || '?').toUpperCase(
 const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', back:'<path d="M19 12H5M12 19l-7-7 7-7"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', gift:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
 const ico = (k) => `<svg class="i" viewBox="0 0 24 24">${ICO[k] || ''}</svg>`;
 
-const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, page: 'home', authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'', n:1 }, toastTimer: null, sheetEl: null };
+const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, products: [], payments: null, page: 'home', authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'', n:1 }, toastTimer: null, sheetEl: null };
 
 async function api(p, opts = {}) {
   const headers = { 'Content-Type': 'application/json' };
@@ -185,6 +185,7 @@ function sheetOpen(html) {
 function sheetClose() { if (S.sheetEl) { S.sheetEl.remove(); S.sheetEl = null; } }
 function setState(r) { if (r && r.state) S.st = r.state; render(); }
 async function loadMaster() { try { const m = await api('/api/master/overview'); S.master = m; render(); } catch (e) { toast(e.message, 'err'); } }
+async function loadShop() { try { const [p, pay] = await Promise.all([api('/api/products'), api('/api/payments')]); S.products = p.products || []; S.payments = pay; render(); } catch (e) { toast(e.message, 'err'); } }
 
 function chartHtml(title, txs, kinds) {
   const pos = kinds.includes('savings_yield') || kinds.includes('referral');
@@ -216,6 +217,7 @@ function render() {
   else if (S.page === 'savings') renderSavings();
   else if (S.page === 'pix') renderExtract();
   else if (S.page === 'card') renderCardPage();
+  else if (S.page === 'shop') renderShop();
   else if (S.page === 'more') renderMore();
   else renderHome();
 }
@@ -384,8 +386,17 @@ function renderMore() {
   $('#view').innerHTML = `
   <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="logout">${ico('logout')}</button></div></div><h1>Mais</h1><p>@${esc(u.username)}</p></div>
   <div class="wrap"><div class="card flush">
-    ${item('openPixHub','pix','Área Pix')}${item('goPage','pig','Cofrinho','data-page="savings"')}${item('openReferral','gift','Indique e ganhe')}${item('openCredit','credit','Crédito e fatura')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
+    ${item('openShop','gift','Loja e formas de pagamento')}${item('openPixHub','pix','Área Pix')}${item('goPage','pig','Cofrinho','data-page="savings"')}${item('openReferral','gift','Indique e ganhe')}${item('openCredit','credit','Crédito e fatura')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
   </div><div class="btns"><button class="btn dng" data-act="logout">${ico('logout')} Sair da conta</button></div></div>`;
+}
+function renderShop() {
+  if (!S.payments) { $('#view').innerHTML = '<div class="empty">Carregando loja…</div>'; loadShop(); return; }
+  const cur = { BRL:'R$', STORE:'Vale', VIRTUAL:'Moedas', MAGIC:'Mágicas' };
+  $('#view').innerHTML = `<div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="more">${ico('back')}</button></div><h1>Loja e pagamentos</h1><p>Escolha como pagar cada item</p></div><div class="wrap">
+    <div class="card"><div class="kv"><span>Dinheiro / saldo</span><span>${fmtBRL(S.payments.balances.money)}</span></div><div class="kv"><span>Vale da loja</span><span>${fmtBRL(S.payments.balances.storeCredit)}</span></div><div class="kv"><span>Moeda virtual</span><span>${S.payments.balances.virtualCoins}</span></div><div class="kv"><span>Moeda mágica</span><span>${S.payments.balances.magicCoins}</span></div></div>
+    <div class="card"><div class="ttl"><h3>Formas aceitas</h3></div><p class="mu sm-t">${S.payments.methods.map(x => x.label).join(' · ')}</p></div>
+    ${S.products.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Produtos publicados</h3></div>${S.products.map(p => `<div class="row"><div class="ic">${ico('gift')}</div><div class="mid"><b>${esc(p.name)}</b><span>${esc(p.description||'')} • ${p.stock > 0 ? `${p.stock} em estoque` : 'estoque infinito'}</span></div><div class="end">${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${cur[p.currency]}`}<small><button class="lnk" data-act="buyProduct" data-id="${esc(p.id)}">comprar</button></small></div></div>`).join('')}</div>` : '<div class="card empty"><b>Nenhum produto publicado</b>O master pode adicionar itens para a comunidade.</div>'}
+    ${U().role==='admin' ? '<button class="btn" data-act="openProduct">+ Publicar produto</button>' : ''}<button class="btn sec" data-act="openAutoDebit">Configurar débito automático</button></div>`;
 }
 function renderMaster() {
   if (!S.master) { $('#view').innerHTML = '<div class="empty">Carregando painel…</div>'; loadMaster(); return; }
@@ -478,6 +489,9 @@ function openDeposit(userId) { sheetOpen(`<h2>Depósito master</h2><div id="shee
   <form data-form="deposit"><input type="hidden" name="userId" value="${esc(userId)}"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Motivo</label><input name="note" maxlength="80" placeholder="Ex: prêmio do evento"></div><button class="btn" type="submit">Depositar</button></form></div>`); }
 function openPassword() { sheetOpen(`<h2>Alterar senha</h2><div id="sheetBody">
   <form data-form="password"><div class="fld"><label>Senha atual</label><input name="current" type="password" required></div><div class="fld"><label>Nova senha</label><input name="next" type="password" required minlength="4"></div><button class="btn" type="submit">Salvar nova senha</button></form></div>`); }
+function openProduct() { sheetOpen(`<h2>Publicar produto</h2><div id="sheetBody"><form data-form="product"><div class="fld"><label>Nome</label><input name="name" required></div><div class="fld"><label>Descrição</label><input name="description"></div><div class="fld"><label>Preço</label><input name="price" inputmode="decimal" required></div><div class="fld"><label>Moeda</label><select name="currency"><option value="BRL">Reais</option><option value="STORE">Vale / crédito da loja</option><option value="VIRTUAL">Moeda virtual</option><option value="MAGIC">Moeda mágica</option></select></div><div class="fld"><label>Estoque (0 = infinito)</label><input name="stock" type="number" min="0" value="0"></div><button class="btn" type="submit">Publicar</button></form></div>`); }
+function openBuy(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const options = S.payments.methods.filter(m => m.currency === p.currency); sheetOpen(`<h2>Comprar ${esc(p.name)}</h2><div id="sheetBody"><p class="mu">${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${p.currency}`}</p><form data-form="buy"><input type="hidden" name="productId" value="${esc(productId)}"><div class="fld"><label>Forma de pagamento</label><select name="method">${options.map(m => `<option value="${m.id}">${m.label}</option>`).join('')}</select></div><button class="btn" type="submit">Confirmar compra</button></form></div>`); }
+function openAutoDebit() { const a = (S.payments && S.payments.autoDebit) || {}; sheetOpen(`<h2>Débito automático</h2><div id="sheetBody"><form data-form="autoDebit"><div class="fld"><label><input type="checkbox" name="enabled" ${a.enabled?'checked':''}> Ativar cobrança recorrente</label></div><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" value="${a.amount||''}"></div><div class="fld"><label>Descrição</label><input name="description" value="${esc(a.description||'')}" placeholder="Ex: mensalidade"></div><button class="btn" type="submit">Salvar configuração</button></form></div>`); }
 
 /* ---------- ações ---------- */
 const A = {
@@ -498,6 +512,10 @@ const A = {
   openNotifs: () => openNotifs(),
   openSupport: () => { S.page = 'support'; render(); },
   openPassword: () => openPassword(),
+  openShop: () => { S.page = 'shop'; S.payments = null; render(); },
+  openProduct: () => openProduct(),
+  buyProduct: (el) => openBuy(el.dataset.id),
+  openAutoDebit: () => openAutoDebit(),
   pasteCode: async () => { pixStep1(); setTimeout(() => A.pasteInto(), 150); },
   payInstallment: async (el) => { const r = await busy(el, () => api('/api/pix/installment/pay', { method:'POST', body:{ loanId: el.dataset.id } })); if (r) { setState(r); toast('Parcela paga!', 'ok'); } },
   cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method:'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
@@ -541,6 +559,9 @@ const F = {
   support: async (f, ev) => { const t = String(new FormData(f).get('text') || '').trim(); if (!t) return; const r = await busy(ev.submitter, () => api('/api/support/messages', { method:'POST', body:{ text:t } })); if (r) setState(r); },
   reply: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return; const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method:'POST', body:d })); if (r) { await loadMaster(); openThread(d.userId); } },
   deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method:'POST', body:{ userId:d.userId, amount:v, note:d.note } })); if (r) { sheetClose(); toast('Depósito feito.', 'ok'); loadMaster(); } },
+  product: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.price = parseMoney(d.price); const r = await busy(ev.submitter, () => api('/api/products', { method:'POST', body:d })); if (r) { sheetClose(); toast('Produto publicado!', 'ok'); S.payments = null; loadShop(); } },
+  buy: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api(`/api/products/${encodeURIComponent(d.productId)}/purchase`, { method:'POST', body:{ method:d.method } })); if (r) { setState(r); sheetClose(); toast('Compra aprovada!', 'ok'); S.payments = null; loadShop(); } },
+  autoDebit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.enabled = f.elements.enabled.checked; d.amount = parseMoney(d.amount); const r = await busy(ev.submitter, () => api('/api/payments/auto-debit', { method:'POST', body:d })); if (r) { setState(r); sheetClose(); toast('Débito automático atualizado.', 'ok'); S.payments = null; loadShop(); } },
 };
 const CH = { keyType: (el) => { const w = $('#kvWrap'); if (w) w.classList.toggle('hidden', el.value === 'aleatória'); const k = $('#kv'); if (k) { k.required = el.value !== 'aleatória'; k.placeholder = { email:'voce@email.com', telefone:'(11) 91234-5678' }[el.value] || ''; } } };
 
