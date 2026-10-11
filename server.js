@@ -47,6 +47,7 @@ function registerRoutes(app, bank, rt) {
     } catch (e) { res.status(502).json({ ok:false, message:`Erro ao enviar imagem: ${e.message}` }); }
   }));
   app.post('/api/profile/avatar', auth, (req, res) => wrap(res, () => { bank.updateAvatar(req.user, (req.body||{}).avatarUrl); res.json({ ok:true, ...st(req.user) }); }));
+  app.post('/api/profile/name', auth, (req, res) => wrap(res, () => { bank.updateProfileName(req.user, (req.body||{}).fullName); res.json({ ok:true, ...st(req.user) }); }));
 
   app.post('/api/referral/apply', auth, (req, res) => wrap(res, () => { const r = bank.applyReferral(req.user, (req.body||{}).code); res.json({ ok: true, reward: r.reward, ...st(req.user) }); }));
 
@@ -132,4 +133,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-}
+                 }
