@@ -1,9 +1,13 @@
 'use strict';
 const path = require('path');
 const { createBank } = require('./bank');
+const multer = require('multer');
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 32 * 1024 * 1024 }, fileFilter: (_req, file, cb) => cb(null, /^image\//.test(file.mimetype)) });
+const IMGBB_API_KEY = process.env.IMGBB_API_KEY || '599411b1c02c7129d1b0da9bd4634c09';
 
 function registerRoutes(app, bank, rt) {
-  const pub = (u) => { if (!u) return null; const c = { ...u }; delete c.password; return c; };
+  const pub = (u) => { if (!u) return null; const c = { ...u }; delete c.password; delete c.token; return c; };
   const st = (u) => ({ state: bank.accountState(u) });
   const emit = (ids) => { if (rt && rt.users) rt.users(ids); };
   const wrap = (res, fn) => { try { return fn(); } catch (e) { return res.status(400).json({ ok: false, message: e.message }); } };
@@ -30,6 +34,17 @@ function registerRoutes(app, bank, rt) {
   app.get('/api/me', auth, (req, res) => res.json({ ok: true, ...st(req.user) }));
   app.post('/api/logout', auth, (req, res) => res.json({ ok: true }));
   app.post('/api/password', auth, (req, res) => wrap(res, () => { const d = req.body || {}; const token = bank.changePassword(req.user, d.current, d.next); res.json({ ok: true, token, ...st(req.user) }); }));
+  app.post('/api/upload/image', auth, (req, res) => upload.single('image')(req, res, async (err) => {
+    if (err) return res.status(400).json({ ok:false, message:err.code === 'LIMIT_FILE_SIZE' ? 'A imagem deve ter no máximo 32MB.' : 'Envie uma imagem válida.' });
+    if (!req.file) return res.status(400).json({ ok:false, message:'Selecione uma imagem primeiro.' });
+    try {
+      const form = new FormData(); form.append('image', new Blob([req.file.buffer], { type:req.file.mimetype }), req.file.originalname);
+      const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method:'POST', body:form });
+      const data = await response.json(); if (!response.ok || !data.success || !data.data || !data.data.url) throw new Error(data.error && data.error.message || 'Não foi possível enviar a imagem.');
+      res.json({ ok:true, url:data.data.url, displayUrl:data.data.display_url || data.data.url });
+    } catch (e) { res.status(502).json({ ok:false, message:`Erro ao enviar imagem: ${e.message}` }); }
+  }));
+  app.post('/api/profile/avatar', auth, (req, res) => wrap(res, () => { bank.updateAvatar(req.user, (req.body||{}).avatarUrl); res.json({ ok:true, ...st(req.user) }); }));
 
   app.post('/api/referral/apply', auth, (req, res) => wrap(res, () => { const r = bank.applyReferral(req.user, (req.body||{}).code); res.json({ ok: true, reward: r.reward, ...st(req.user) }); }));
 
@@ -65,6 +80,8 @@ function registerRoutes(app, bank, rt) {
   }));
   app.post('/api/master/support/reply', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.supportReply(d.userId, d.text); res.json({ ok: true }); emit([d.userId]); }));
   app.post('/api/master/deposit', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterDeposit(d.userId, d.amount, d.note); res.json({ ok: true }); emit([d.userId]); }));
+  app.post('/api/master/users/:userId/balance', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustBalance(req.params.userId, d.amount, d.note); res.json({ ok:true }); emit([req.params.userId]); }));
+  app.post('/api/master/users/:userId/ban', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterSetBan(req.user, req.params.userId, d.banned !== false, d.note); res.json({ ok:true }); emit([req.params.userId]); if (rt && rt.masters) rt.masters(); }));
   app.get('/api/payments', auth, (req, res) => res.json({ ok:true, ...bank.paymentCatalog(req.user) }));
   app.post('/api/payments/auto-debit', auth, (req, res) => wrap(res, () => { bank.configureAutoDebit(req.user, req.body || {}); res.json({ ok:true, ...st(req.user) }); }));
   app.get('/api/products', auth, (req, res) => res.json({ ok:true, products:bank.products() }));
@@ -90,6 +107,7 @@ if (require.main === module) {
   app.use(cors());
   app.use(express.json({ limit: '100kb' }));
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
+  app.get('/health', (_req, res) => res.json({ status:'ok', bank:'Armin Bank', timestamp:new Date().toISOString() }));
 
   const rt = {
     users(ids) {
@@ -108,4 +126,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-           }
+      }
