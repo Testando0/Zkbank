@@ -51,8 +51,8 @@ function registerRoutes(app, bank, rt) {
 
   app.post('/api/referral/apply', auth, (req, res) => wrap(res, () => { const r = bank.applyReferral(req.user, (req.body||{}).code); res.json({ ok: true, reward: r.reward, ...st(req.user) }); }));
 
-  app.post('/api/pix/lookup', auth, (req, res) => { const u = bank.lookupKey(req.user, (req.body||{}).key); if (!u) return res.status(404).json({ ok: false, message: 'Chave não encontrada.' }); res.json({ ok: true, recipient: pub(u) }); });
-  app.post('/api/pix/send', auth, (req, res) => { const d = req.body || {}; const rec = bank.lookupKey(req.user, d.key); if (!rec) return res.status(404).json({ ok:false, message:'Chave não encontrada.' }); return wrap(res, () => { bank.pixSend(req.user, d); res.json({ ok: true, ...st(req.user) }); emit([req.user.id, rec.id]); }); });
+  app.post('/api/pix/lookup', auth, (req, res) => { const d = req.body || {}; const target = bank.parsePixTarget(d.key); const u = bank.lookupKey(req.user, target.key); if (!u) return res.status(404).json({ ok: false, message: 'Chave não encontrada em nenhuma conta desta rede.' }); res.json({ ok: true, key:target.key, amount:target.amount, recipient: pub(u) }); });
+  app.post('/api/pix/send', auth, (req, res) => { const d = req.body || {}; const target = bank.parsePixTarget(d.key); const rec = bank.lookupKey(req.user, target.key); if (!rec) return res.status(404).json({ ok:false, message:'Chave não encontrada em nenhuma conta desta rede.' }); return wrap(res, () => { bank.pixSend(req.user, d); res.json({ ok: true, ...st(req.user) }); emit([req.user.id, rec.id]); }); });
   app.post('/api/pix/key', auth, (req, res) => wrap(res, () => { bank.addKey(req.user, req.body || {}); res.json({ ok: true, ...st(req.user) }); }));
   app.delete('/api/pix/key/:keyId', auth, (req, res) => wrap(res, () => { bank.removeKey(req.user, req.params.keyId); res.json({ ok: true, ...st(req.user) }); }));
   app.post('/api/pix/installment/pay', auth, (req, res) => wrap(res, () => { bank.payInstallment(req.user, (req.body||{}).loanId); res.json({ ok: true, ...st(req.user) }); }));
@@ -87,6 +87,7 @@ function registerRoutes(app, bank, rt) {
   app.post('/api/master/users/:userId/ban', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterSetBan(req.user, req.params.userId, d.banned !== false, d.note); res.json({ ok:true }); emit([req.params.userId]); if (rt && rt.masters) rt.masters(); }));
   app.post('/api/master/users/:userId/role', auth, admin, (req, res) => wrap(res, () => { bank.masterSetRole(req.user, req.params.userId, (req.body||{}).role); res.json({ ok:true }); if (rt && rt.masters) rt.masters(); }));
   app.post('/api/master/users/:userId/credit-limit', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustCredit(req.params.userId, d.limit, d.note); res.json({ ok:true }); emit([req.params.userId]); if (rt && rt.masters) rt.masters(); }));
+  app.post('/api/master/users/:userId/wallet', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustWallet(req.params.userId, d.wallet, d.amount, d.note); res.json({ ok:true }); emit([req.params.userId]); if (rt && rt.masters) rt.masters(); }));
   app.get('/api/payments', auth, (req, res) => res.json({ ok:true, ...bank.paymentCatalog(req.user) }));
   app.post('/api/payments/auto-debit', auth, (req, res) => wrap(res, () => { bank.configureAutoDebit(req.user, req.body || {}); res.json({ ok:true, ...st(req.user) }); }));
   app.get('/api/products', auth, (req, res) => res.json({ ok:true, products:bank.products() }));
@@ -133,4 +134,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-                 }
+}
