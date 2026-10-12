@@ -10,6 +10,7 @@ const id = (p) => `${p}_${Date.now()}_${crypto.randomBytes(3).toString('hex')}`;
 const randomKey = () => `${crypto.randomBytes(4).toString('hex')}-${crypto.randomBytes(2).toString('hex')}`.toUpperCase();
 const genRef = () => 'IND-' + crypto.randomBytes(3).toString('hex').toUpperCase();
 const normKey = (v) => { const s = String(v||'').trim().toLowerCase(); return /^[0-9()+\s.\-]+$/.test(s) ? s.replace(/\D/g,'') : s; };
+const parsePixTarget = (value) => { const raw = String(value||'').trim(); if (raw.toUpperCase().startsWith('ZKPIX|')) { const [, key, amount] = raw.split('|'); return { key:String(key||'').trim(), amount:Number(amount) > 0 ? Number(amount) : 0 }; } return { key:raw, amount:0 }; };
 const hashPassword = (pwd) => { const salt = crypto.randomBytes(16).toString('hex'); return `scrypt$${salt}$${crypto.scryptSync(pwd, salt, 64).toString('hex')}`; };
 const verifyPassword = (pwd, stored) => { if (!stored || !stored.startsWith('scrypt$')) return stored === pwd; const p = stored.split('$'); return crypto.scryptSync(pwd, p[1], 64).toString('hex') === p[2]; };
 
@@ -92,13 +93,16 @@ function createBank(options) {
     db.users.push(u); saveDB(); return { user: u };
   }
 
-  const lookupKey = (_u, val) => db.users.find(u => u.pixKeys.some(k => normKey(k.value) === normKey(val)));
+  const lookupKey = (_u, val) => {
+    const target = parsePixTarget(val); const n = normKey(target.key);
+    return db.users.find(u => u.pixKeys.some(k => normKey(k.value) === n) || normKey(u.username) === n || normKey(u.id) === n) || null;
+  };
 
   function pixSend(sender, { key, amount, description, installments }) {
     const v = Number(amount);
     const n = Math.min(12, Math.max(1, parseInt(installments, 10) || 1));
     if (!Number.isFinite(v) || v <= 0) throw new BankError('Digite um valor válido');
-    const rec = lookupKey(sender, key);
+    const target = parsePixTarget(key); const rec = lookupKey(sender, target.key);
     if (!rec) throw new BankError('Chave não encontrada');
     if (rec.id === sender.id) throw new BankError('Não pode enviar para você mesmo');
     if (n > 1) {
@@ -276,6 +280,15 @@ function createBank(options) {
     if (!Number.isFinite(v) || v < 0 || v < u.creditUsed) throw new BankError('O limite não pode ser menor que o crédito usado');
     u.creditLimit = money(v); db.notifications.push({ id:id('note'), userId:u.id, title:'Limite de crédito atualizado', text:reason || `Seu limite agora é ${money(v).toFixed(2)}.`, read:false, createdAt:now() }); saveDB(); return u;
   }
+  function masterAdjustWallet(userId, wallet, amount, reason) {
+    const u = byId(userId); const v = Number(amount); if (!u) throw new BankError('Usuário não encontrado');
+    if (!['storeCredit','virtualCoins','magicCoins'].includes(wallet)) throw new BankError('Moeda inválida');
+    if (!Number.isFinite(v) || v === 0) throw new BankError('Informe um valor diferente de zero');
+    const next = Number(u[wallet] || 0) + v; if (next < 0) throw new BankError('A carteira não pode ficar negativa');
+    u[wallet] = wallet === 'storeCredit' ? money(next) : Math.floor(next);
+    const labels = { storeCredit:'vale da loja', virtualCoins:'moedas virtuais', magicCoins:'moedas mágicas' };
+    db.notifications.push({ id:id('note'), userId:u.id, title:'Carteira atualizada', text:reason || `${v > 0 ? 'Você recebeu' : 'Foi removido'} ${Math.abs(v)} ${labels[wallet]}.`, read:false, createdAt:now() }); saveDB(); return u;
+  }
   const paymentMethods = [
     { id:'money', label:'Dinheiro', currency:'BRL', mode:'balance' }, { id:'debit_card', label:'Cartão de débito', currency:'BRL', mode:'balance' },
     { id:'credit_card', label:'Cartão de crédito', currency:'BRL', mode:'credit' }, { id:'pix', label:'PIX', currency:'BRL', mode:'balance' },
@@ -327,7 +340,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
