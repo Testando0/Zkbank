@@ -16,7 +16,7 @@ const verifyPassword = (pwd, stored) => { if (!stored || !stored.startsWith('scr
 
 function createBank(options) {
   const file = (options && options.file) || 'db.json';
-  let db = { version: 4, users: [], transactions: [], creditRequests: [], supportMessages: [], notifications: [], products: [] };
+  let db = { version: 5, users: [], transactions: [], creditRequests: [], loanRequests: [], loans: [], supportMessages: [], notifications: [], products: [] };
 
   if (fs.existsSync(file)) { try { db = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) {} }
   else {
@@ -30,6 +30,8 @@ function createBank(options) {
   if (!db.products) db.products = [];
   db.products.forEach(p => { if (!p.sellerId) p.sellerId = 'usr_master'; if (p.active === undefined) p.active = true; if (!p.imageUrl) p.imageUrl = ''; });
   if (!db.creditRequests) db.creditRequests = [];
+  if (!db.loanRequests) db.loanRequests = [];
+  if (!db.loans) db.loans = [];
   if (!db.supportMessages) db.supportMessages = [];
   if (!db.notifications) db.notifications = [];
   if (!db.users.some(u => u.role === 'admin')) {
@@ -151,10 +153,15 @@ function createBank(options) {
   }
 
   function addKey(user, { type, value }) {
-    if (type === 'email' && (!value || !String(value).includes('@'))) throw new BankError('e-mail inválido');
-    const nv = normKey(value);
+    let raw = String(value || '').trim();
+    if (type === 'aleatória' && !raw) raw = `ARMIN-${randomKey()}`;
+    if (type === 'email' && (!raw || !raw.includes('@'))) throw new BankError('e-mail inválido');
+    if (type === 'cpf' && raw.replace(/\D/g,'').length !== 11) throw new BankError('CPF inválido');
+    if (type === 'cnpj' && raw.replace(/\D/g,'').length !== 14) throw new BankError('CNPJ inválido');
+    if (type === 'telefone' && ![10,11].includes(raw.replace(/\D/g,'').length)) throw new BankError('Telefone inválido');
+    const nv = normKey(raw);
     if (db.users.some(u => u.pixKeys.some(k => normKey(k.value) === nv))) throw new BankError('Chave já está cadastrada');
-    user.pixKeys.push({ id:id('key'), type, value:String(value).trim(), createdAt:now() }); saveDB();
+    user.pixKeys.push({ id:id('key'), type, value:raw, createdAt:now() }); saveDB();
   }
   function removeKey(user, keyId) {
     if (user.pixKeys.length <= 1) throw new BankError('Mantenha ao menos uma chave');
@@ -183,7 +190,8 @@ function createBank(options) {
   }
   function savingsMove(user, dir, amount) {
     const v = Number(amount);
-    if (dir === 'in') { if (v > user.balance) throw new BankError('Saldo insuficiente'); user.balance = money(user.balance - v); user.savings = money(user.savings + v); }
+    if (!(v > 0)) throw new BankError('Informe um valor válido');
+    if (dir === 'in') { if (!user.unlimitedFunds && v > user.balance) throw new BankError('Saldo insuficiente'); if (!user.unlimitedFunds) user.balance = money(user.balance - v); user.savings = money(user.savings + v); }
     else { if (v > user.savings) throw new BankError('Valor maior que o guardado'); user.savings = money(user.savings - v); user.balance = money(user.balance + v); }
     saveDB();
   }
@@ -206,6 +214,8 @@ function createBank(options) {
       notifications: db.notifications.filter(n => n.userId === user.id),
       supportMessages: db.supportMessages.filter(m => m.userId === user.id),
       creditRequests: db.creditRequests.filter(r => r.userId === user.id),
+      loanRequests: db.loanRequests.filter(r => r.userId === user.id),
+      loanContracts: db.loans.filter(l => l.userId === user.id),
       unread: db.notifications.filter(n => n.userId === user.id && !n.read).length,
     };
   }
@@ -224,6 +234,34 @@ function createBank(options) {
     const profile = scoreProfile(user); if (!(profile.availablePreApproved > 0)) throw new BankError('Seu limite atual já está no máximo pré-aprovado');
     user.creditLimit = money(profile.preApprovedLimit); user.preApprovedAcceptedAt = now();
     db.notifications.push({ id:id('note'), userId:user.id, title:'Limite pré-aprovado liberado', text:`Seu limite agora é R$ ${user.creditLimit.toFixed(2)}.`, read:false, createdAt:now() }); saveDB(); return user.creditLimit;
+  }
+  function loanTerms(user, amount, installments) {
+    const score = Number(user.score || 0); const rate = score >= 850 ? 0.015 : score >= 750 ? 0.02 : score >= 650 ? 0.03 : 0.05;
+    const total = money(Number(amount) * (1 + rate * installments));
+    return { rate, total, monthly:money(total / installments) };
+  }
+  function loanRequest(user, { amount, installments, purpose }) {
+    const v = money(amount); const n = Math.max(1, Math.min(24, parseInt(installments, 10) || 1));
+    if (!(v >= 100 && v <= 50000)) throw new BankError('O empréstimo deve ficar entre R$ 100 e R$ 50.000');
+    if (db.loanRequests.some(r => r.userId === user.id && r.status === 'pending')) throw new BankError('Você já tem uma solicitação em análise');
+    if (db.loans.some(l => l.userId === user.id && l.status === 'active')) throw new BankError('Quite seu empréstimo atual antes de solicitar outro');
+    const t = loanTerms(user, v, n); const r = { id:id('loanreq'), userId:user.id, fullName:user.fullName, username:user.username, amount:v, installments:n, rate:t.rate, total:t.total, monthly:t.monthly, purpose:String(purpose||'').trim().slice(0,120), status:'pending', createdAt:now() };
+    db.loanRequests.push(r); saveDB(); return r;
+  }
+  function loanDecide(admin, requestId, decision, reason) {
+    if (!admin || admin.role !== 'admin') throw new BankError('Apenas o master pode analisar empréstimos');
+    const r = db.loanRequests.find(x => x.id === requestId); if (!r || r.status !== 'pending') throw new BankError('Solicitação de empréstimo inválida');
+    r.status = decision; r.decidedAt = now(); r.decisionNote = String(reason||'').slice(0,160); const u = byId(r.userId);
+    if (decision === 'approve') { const l = { id:id('loan'), requestId:r.id, userId:r.userId, principal:r.amount, total:r.total, paid:0, remaining:r.total, installments:r.installments, paidInstallments:0, monthly:r.monthly, rate:r.rate, purpose:r.purpose, status:'active', createdAt:now() }; db.loans.push(l); if (u && !u.unlimitedFunds) u.balance = money(u.balance + r.amount); if (u) db.notifications.push({ id:id('note'), userId:u.id, title:'Empréstimo aprovado', text:`R$ ${r.amount.toFixed(2)} liberados em ${r.installments} parcelas de R$ ${r.monthly.toFixed(2)}.`, read:false, createdAt:now() }); }
+    else if (u) db.notifications.push({ id:id('note'), userId:u.id, title:'Empréstimo não aprovado', text:reason || 'Sua solicitação não foi aprovada nesta rodada.', read:false, createdAt:now() });
+    saveDB(); return r;
+  }
+  function loanPay(user, loanId) {
+    const l = db.loans.find(x => x.id === loanId && x.userId === user.id); if (!l) throw new BankError('Empréstimo não encontrado');
+    if (l.status !== 'active') throw new BankError('Este empréstimo já foi quitado');
+    const value = Math.min(l.monthly, l.remaining); if (!user.unlimitedFunds && user.balance < value) throw new BankError('Saldo insuficiente para pagar a parcela');
+    if (!user.unlimitedFunds) user.balance = money(user.balance - value); l.paid = money(l.paid + value); l.remaining = money(Math.max(0, l.remaining - value)); l.paidInstallments += 1; if (l.remaining <= 0.01) { l.remaining = 0; l.status = 'paid'; }
+    db.transactions.push({ id:id('tx'), userId:user.id, kind:'loan_payment', amount:-value, description:`Parcela ${l.paidInstallments}/${l.installments} do empréstimo`, createdAt:now() }); saveDB(); return l;
   }
   function claimBonus(user) {
     if (Date.now() - (user.lastBonus||0) < 24*3600*1000) throw new BankError('O bônus volta em 24h');
@@ -263,8 +301,9 @@ function createBank(options) {
     const threads = players.map(u => { const msgs = db.supportMessages.filter(m => m.userId === u.id); return msgs.length ? { userId:u.id, awaiting: msgs.some(m => m.awaiting) } : null; }).filter(Boolean);
     return {
       threads,
-      metrics: { players: players.length, pendingCredits: db.creditRequests.filter(r => r.status==='pending').length, moneyInPlay: money(players.reduce((s,u)=>s+u.balance,0)), avgScore: players.length ? Math.round(players.reduce((s,u)=>s+u.score,0)/players.length) : 0 },
+      metrics: { players: players.length, pendingCredits: db.creditRequests.filter(r => r.status==='pending').length, pendingLoans: db.loanRequests.filter(r => r.status==='pending').length, moneyInPlay: money(players.reduce((s,u)=>s+u.balance,0)), avgScore: players.length ? Math.round(players.reduce((s,u)=>s+u.score,0)/players.length) : 0 },
       pending: db.creditRequests.filter(r => r.status==='pending'),
+      pendingLoans: db.loanRequests.filter(r => r.status==='pending'),
       users: players.map(u => { const c={...u}; delete c.password; delete c.token; return c; }),
       support: db.supportMessages.slice(-30),
     };
@@ -365,7 +404,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
