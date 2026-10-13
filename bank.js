@@ -195,12 +195,29 @@ function createBank(options) {
     const safe = { ...user }; delete safe.password; delete safe.token;
     return {
       user: safe,
+      score: scoreProfile(user),
       transactions: db.transactions.filter(t => t.userId === user.id).sort((a,b) => String(b.createdAt).localeCompare(String(a.createdAt))),
       notifications: db.notifications.filter(n => n.userId === user.id),
       supportMessages: db.supportMessages.filter(m => m.userId === user.id),
       creditRequests: db.creditRequests.filter(r => r.userId === user.id),
       unread: db.notifications.filter(n => n.userId === user.id && !n.read).length,
     };
+  }
+  function scoreProfile(user) {
+    const score = Math.max(0, Math.min(1000, Number(user.score || 0)));
+    const band = score >= 850 ? 'Excelente' : score >= 700 ? 'Muito bom' : score >= 550 ? 'Bom' : score >= 400 ? 'Regular' : 'Baixo';
+    const preApprovedLimit = score >= 850 ? 5000 : score >= 750 ? 3000 : score >= 650 ? 1500 : score >= 550 ? 700 : 0;
+    const usedRatio = user.creditLimit > 0 ? Math.min(1, (user.creditUsed || 0) / user.creditLimit) : 0;
+    return { value:score, min:0, max:1000, band, preApprovedLimit:money(preApprovedLimit), availablePreApproved:money(Math.max(0, preApprovedLimit - (user.creditLimit || 0))), factors:[
+      { label:'Pagamentos em dia', status:(user.score||0) >= 650 ? 'positivo' : 'em construção' },
+      { label:'Uso do limite', status:usedRatio <= .3 ? 'baixo' : usedRatio <= .7 ? 'moderado' : 'alto' },
+      { label:'Histórico no Armin Bank', status:(user.createdAt && Date.now() - new Date(user.createdAt).getTime() > 30*86400000) ? 'estável' : 'novo' },
+    ] };
+  }
+  function acceptPreApproved(user) {
+    const profile = scoreProfile(user); if (!(profile.availablePreApproved > 0)) throw new BankError('Seu limite atual já está no máximo pré-aprovado');
+    user.creditLimit = money(profile.preApprovedLimit); user.preApprovedAcceptedAt = now();
+    db.notifications.push({ id:id('note'), userId:user.id, title:'Limite pré-aprovado liberado', text:`Seu limite agora é R$ ${user.creditLimit.toFixed(2)}.`, read:false, createdAt:now() }); saveDB(); return user.creditLimit;
   }
   function claimBonus(user) {
     if (Date.now() - (user.lastBonus||0) < 24*3600*1000) throw new BankError('O bônus volta em 24h');
@@ -340,7 +357,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
