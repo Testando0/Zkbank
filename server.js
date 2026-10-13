@@ -65,6 +65,7 @@ function registerRoutes(app, bank, rt) {
 
   app.post('/api/credit/pay', auth, (req, res) => wrap(res, () => { bank.payInvoice(req.user, (req.body||{}).amount); res.json({ ok: true, ...st(req.user) }); }));
   app.post('/api/credit/draw', auth, (req, res) => wrap(res, () => { bank.creditDraw(req.user, (req.body||{}).amount); res.json({ ok: true, ...st(req.user) }); }));
+  app.post('/api/credit/pre-approved/accept', auth, (req, res) => wrap(res, () => { const limit = bank.acceptPreApproved(req.user); res.json({ ok:true, limit, ...st(req.user) }); }));
   app.post('/api/credit/request', auth, (req, res) => wrap(res, () => { const d = req.body || {}; bank.creditRequest(req.user, d); res.json({ ok: true, message: 'Análise enviada para o master.', ...st(req.user) }); }));
 
   app.get('/api/support/messages', auth, (req, res) => res.json({ ok: true, messages: bank.accountState(req.user).supportMessages }));
@@ -134,4 +135,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-}
+                                                                                             }
