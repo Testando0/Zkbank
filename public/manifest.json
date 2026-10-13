@@ -1,6 +1,6 @@
 {
-  "name": "Armin Bank",
-  "short_name": "Armin Bank",
+  "name": "GhsotBank",
+  "short_name": "GhsotBank",
   "description": "Conta digital com Pix, cartão, cofrinho, crédito e empréstimos.",
   "start_url": "/",
   "scope": "/",
