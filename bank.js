@@ -16,7 +16,7 @@ const verifyPassword = (pwd, stored) => { if (!stored || !stored.startsWith('scr
 
 function createBank(options) {
   const file = (options && options.file) || 'db.json';
-  let db = { version: 5, users: [], transactions: [], creditRequests: [], loanRequests: [], loans: [], supportMessages: [], notifications: [], products: [] };
+  let db = { version: 6, users: [], transactions: [], creditRequests: [], loanRequests: [], loans: [], vehicleListings: [], vehicleFinancings: [], lifePolicies: [], supportMessages: [], notifications: [], products: [] };
 
   if (fs.existsSync(file)) { try { db = JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) {} }
   else {
@@ -32,6 +32,9 @@ function createBank(options) {
   if (!db.creditRequests) db.creditRequests = [];
   if (!db.loanRequests) db.loanRequests = [];
   if (!db.loans) db.loans = [];
+  if (!db.vehicleListings) db.vehicleListings = [];
+  if (!db.vehicleFinancings) db.vehicleFinancings = [];
+  if (!db.lifePolicies) db.lifePolicies = [];
   if (!db.supportMessages) db.supportMessages = [];
   if (!db.notifications) db.notifications = [];
   if (!db.users.some(u => u.role === 'admin')) {
@@ -204,8 +207,14 @@ function createBank(options) {
       saveDB();
     }
   }
+  function applyAutomaticDebtDiscount(user) {
+    const a = user.autoDebit; if (!a || !a.enabled || user.unlimitedFunds || !(a.amount > 0) || !(user.balance > 0) || !(user.creditUsed > 0)) return 0;
+    const value = money(Math.min(a.amount, user.balance, user.creditUsed)); user.balance = money(user.balance - value); user.creditUsed = money(user.creditUsed - value);
+    db.transactions.push({ id:id('tx'), userId:user.id, kind:'automatic_debt_payment', amount:-value, description:'Desconto automático da dívida de crédito', createdAt:now() }); saveDB(); return value;
+  }
   function accountState(user) {
     applyYield(user);
+    applyAutomaticDebtDiscount(user);
     const safe = { ...user }; delete safe.password; delete safe.token;
     return {
       user: safe,
@@ -216,6 +225,8 @@ function createBank(options) {
       creditRequests: db.creditRequests.filter(r => r.userId === user.id),
       loanRequests: db.loanRequests.filter(r => r.userId === user.id),
       loanContracts: db.loans.filter(l => l.userId === user.id),
+      vehicleFinancings: db.vehicleFinancings.filter(f => f.userId === user.id),
+      lifePolicies: db.lifePolicies.filter(p => p.userId === user.id),
       unread: db.notifications.filter(n => n.userId === user.id && !n.read).length,
     };
   }
@@ -227,7 +238,7 @@ function createBank(options) {
     return { value:score, min:0, max:1000, band, preApprovedLimit:money(preApprovedLimit), availablePreApproved:money(Math.max(0, preApprovedLimit - (user.creditLimit || 0))), factors:[
       { label:'Pagamentos em dia', status:(user.score||0) >= 650 ? 'positivo' : 'em construção' },
       { label:'Uso do limite', status:usedRatio <= .3 ? 'baixo' : usedRatio <= .7 ? 'moderado' : 'alto' },
-      { label:'Histórico no Armin Bank', status:(user.createdAt && Date.now() - new Date(user.createdAt).getTime() > 30*86400000) ? 'estável' : 'novo' },
+      { label:'Histórico no GhsotBank', status:(user.createdAt && Date.now() - new Date(user.createdAt).getTime() > 30*86400000) ? 'estável' : 'novo' },
     ] };
   }
   function acceptPreApproved(user) {
@@ -301,9 +312,10 @@ function createBank(options) {
     const threads = players.map(u => { const msgs = db.supportMessages.filter(m => m.userId === u.id); return msgs.length ? { userId:u.id, awaiting: msgs.some(m => m.awaiting) } : null; }).filter(Boolean);
     return {
       threads,
-      metrics: { players: players.length, pendingCredits: db.creditRequests.filter(r => r.status==='pending').length, pendingLoans: db.loanRequests.filter(r => r.status==='pending').length, moneyInPlay: money(players.reduce((s,u)=>s+u.balance,0)), avgScore: players.length ? Math.round(players.reduce((s,u)=>s+u.score,0)/players.length) : 0 },
+      metrics: { players: players.length, pendingCredits: db.creditRequests.filter(r => r.status==='pending').length, pendingLoans: db.loanRequests.filter(r => r.status==='pending').length, pendingFinancing: db.vehicleFinancings.filter(f => f.status==='pending').length, moneyInPlay: money(players.reduce((s,u)=>s+u.balance,0)), avgScore: players.length ? Math.round(players.reduce((s,u)=>s+u.score,0)/players.length) : 0 },
       pending: db.creditRequests.filter(r => r.status==='pending'),
       pendingLoans: db.loanRequests.filter(r => r.status==='pending'),
+      pendingFinancing: db.vehicleFinancings.filter(f => f.status==='pending'),
       users: players.map(u => { const c={...u}; delete c.password; delete c.token; return c; }),
       support: db.supportMessages.slice(-30),
     };
@@ -394,6 +406,27 @@ function createBank(options) {
     if (p.stock > 0) p.stock -= 1;
     db.transactions.push({ id:id('tx'), userId:user.id, kind:'product_purchase', amount:m.currency === 'BRL' ? -v : 0, description:`${p.name} — ${m.label}`, createdAt:now(), productId:p.id, paymentMethod:method }); saveDB(); return p;
   }
+  function createVehicle(admin, data) {
+    if (!admin || admin.role !== 'admin') throw new BankError('Apenas o master pode cadastrar veículos');
+    if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe modelo e preço válido');
+    const v = { id:id('vehicle'), name:String(data.name).trim().slice(0,100), description:String(data.description||'').trim().slice(0,240), imageUrl:String(data.imageUrl||'').trim().slice(0,500), price:money(data.price), year:String(data.year||'').slice(0,9), active:true, createdAt:now() }; db.vehicleListings.push(v); saveDB(); return v;
+  }
+  function vehicles() { return db.vehicleListings.filter(v => v.active).map(v => ({...v})); }
+  function requestVehicleFinance(user, vehicleId, data) {
+    const v = db.vehicleListings.find(x => x.id === vehicleId && x.active); if (!v) throw new BankError('Veículo não encontrado');
+    if (db.vehicleFinancings.some(f => f.userId === user.id && ['pending','active'].includes(f.status))) throw new BankError('Você já possui um financiamento em análise ou ativo');
+    const down = money(data.downPayment || 0); const n = Math.max(6, Math.min(72, parseInt(data.installments,10)||48)); if (down < 0 || down >= v.price) throw new BankError('Entrada inválida');
+    const financed = money(v.price - down); const rate = Number(user.score||0) >= 750 ? .012 : .018; const total = money(financed * (1 + rate*n)); const f = { id:id('fin'), vehicleId:v.id, userId:user.id, vehicleName:v.name, imageUrl:v.imageUrl, vehiclePrice:v.price, downPayment:down, financed, installments:n, rate, total, monthly:money(total/n), paid:0, remaining:total, paidInstallments:0, status:'pending', createdAt:now() }; db.vehicleFinancings.push(f); saveDB(); return f;
+  }
+  function decideVehicleFinance(admin, financingId, decision, reason) {
+    if (!admin || admin.role !== 'admin') throw new BankError('Apenas o master pode analisar financiamentos'); const f = db.vehicleFinancings.find(x => x.id === financingId); if (!f || f.status !== 'pending') throw new BankError('Financiamento inválido'); f.status = decision === 'approve' ? 'active' : 'rejected'; f.decisionNote = String(reason||'').slice(0,160); f.decidedAt = now(); const u = byId(f.userId); if (u) db.notifications.push({ id:id('note'), userId:u.id, title:decision === 'approve' ? 'Financiamento aprovado' : 'Financiamento reprovado', text:decision === 'approve' ? `${f.vehicleName} aprovado em ${f.installments} parcelas de R$ ${f.monthly.toFixed(2)}.` : (reason || 'Financiamento não aprovado.'), read:false, createdAt:now() }); saveDB(); return f;
+  }
+  function payVehicleFinance(user, financingId) {
+    const f = db.vehicleFinancings.find(x => x.id === financingId && x.userId === user.id); if (!f) throw new BankError('Financiamento não encontrado'); if (f.status !== 'active') throw new BankError('Financiamento não está ativo'); const value = Math.min(f.monthly, f.remaining); if (!user.unlimitedFunds && user.balance < value) throw new BankError('Saldo insuficiente para a parcela'); if (!user.unlimitedFunds) user.balance = money(user.balance-value); f.paid = money(f.paid+value); f.remaining = money(Math.max(0,f.remaining-value)); f.paidInstallments += 1; if (f.remaining <= .01) { f.remaining=0; f.status='paid'; } db.transactions.push({ id:id('tx'), userId:user.id, kind:'vehicle_finance_payment', amount:-value, description:`Parcela ${f.paidInstallments}/${f.installments} — ${f.vehicleName}`, createdAt:now() }); saveDB(); return f;
+  }
+  function contractLifeInsurance(user, data) {
+    if (db.lifePolicies.some(p => p.userId === user.id && p.status === 'active')) throw new BankError('Você já possui um seguro de vida ativo'); const plan = ['essencial','familia','premium'].includes(data.plan) ? data.plan : 'essencial'; const plans = { essencial:{premium:29.90,coverage:50000}, familia:{premium:59.90,coverage:150000}, premium:{premium:99.90,coverage:300000} }; const p = { id:id('life'), userId:user.id, plan, premium:plans[plan].premium, coverage:plans[plan].coverage, status:'active', createdAt:now() }; db.lifePolicies.push(p); saveDB(); return p;
+  }
   function configureAutoDebit(user, data) {
     const amount = money(data.amount); if (data.enabled && amount <= 0) throw new BankError('Informe um valor válido');
     user.autoDebit = { enabled:!!data.enabled, description:String(data.description||'').slice(0,100), amount, nextRun:data.enabled ? (data.nextRun || now()) : null }; saveDB(); return user.autoDebit;
@@ -404,7 +437,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, createVehicle, vehicles, requestVehicleFinance, decideVehicleFinance, payVehicleFinance, contractLifeInsurance, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
