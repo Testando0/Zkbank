@@ -63,13 +63,14 @@ function createBank(options) {
     if (u.banned === undefined) u.banned = false;
     if (u.bannedAt === undefined) u.bannedAt = null;
     if (u.unlimitedFunds === undefined) u.unlimitedFunds = u.role === 'admin';
+    if (!Array.isArray(u.tokens)) u.tokens = u.token ? [u.token] : [];
   });
 
   const saveDB = () => fs.writeFileSync(file, JSON.stringify(db, null, 2));
   saveDB();
 
   const byId = (uid) => db.users.find(u => u.id === uid);
-  const userFromToken = (t) => t ? (db.users.find(u => u.token === t) || null) : null;
+  const userFromToken = (t) => t ? (db.users.find(u => u.token === t || (Array.isArray(u.tokens) && u.tokens.includes(t))) || null) : null;
 
   function login(nameOrKey, password) {
     const n = String(nameOrKey||'').trim().toLowerCase();
@@ -82,7 +83,7 @@ function createBank(options) {
       if (u.loginAttempts >= 5) u.locked = true;
       saveDB(); throw new BankError('Credenciais inválidos');
     }
-    u.loginAttempts = 0; u.token = crypto.randomBytes(32).toString('hex'); saveDB();
+    u.loginAttempts = 0; u.token = crypto.randomBytes(32).toString('hex'); u.tokens = [...new Set([...(u.tokens||[]), u.token])].slice(-8); saveDB();
     return { token: u.token, user: u };
   }
 
@@ -180,6 +181,7 @@ function createBank(options) {
   }
   const toggleCard = (user) => { user.cardBlocked = !user.cardBlocked; saveDB(); };
   function payInvoice(user, amount) {
+    if (user.unlimitedFunds) { user.creditUsed = 0; saveDB(); return; }
     if (user.creditUsed === 0) throw new BankError('Fatura já zerada');
     if (Number(amount) > user.creditUsed) throw new BankError('valor informado maior que a fatura');
     if (Number(amount) > user.balance) throw new BankError('Saldo insuficiente para pagamento');
@@ -215,7 +217,7 @@ function createBank(options) {
   function accountState(user) {
     applyYield(user);
     applyAutomaticDebtDiscount(user);
-    const safe = { ...user }; delete safe.password; delete safe.token;
+    const safe = { ...user }; delete safe.password; delete safe.token; delete safe.tokens;
     return {
       user: safe,
       score: scoreProfile(user),
@@ -434,7 +436,7 @@ function createBank(options) {
   function changePassword(user, oldPassword, newPassword) {
     if (!verifyPassword(oldPassword, user.password)) throw new BankError('Senha atual incorreta');
     if (!newPassword || String(newPassword).length < 4) throw new BankError('Senha muito curta');
-    user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); saveDB(); return user.token;
+    user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); user.tokens = [user.token]; saveDB(); return user.token;
   }
 
   return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, createVehicle, vehicles, requestVehicleFinance, decideVehicleFinance, payVehicleFinance, contractLifeInsurance, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
