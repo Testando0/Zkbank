@@ -106,8 +106,10 @@ function createBank(options) {
     if (!rec) throw new BankError('Chave não encontrada');
     if (rec.id === sender.id) throw new BankError('Não pode enviar para você mesmo');
     if (n > 1) {
-      if (sender.creditUsed + v > sender.creditLimit) throw new BankError('Limite insuficiente para parcelar este Pix');
-      sender.creditUsed = money(sender.creditUsed + v);
+      if (!sender.unlimitedFunds) {
+        if (sender.creditUsed + v > sender.creditLimit) throw new BankError('Limite insuficiente para parcelar este Pix');
+        sender.creditUsed = money(sender.creditUsed + v);
+      }
       sender.loans.push({ id:id('loan'), total:money(v), n, paid:0, monthly:money(v/n), description:description||'Pix parcelado', recipient:rec.fullName, createdAt:now() });
       db.transactions.push({ id:id('tx'), userId:sender.id, kind:'pix_parcelado', amount:-money(v), description:`Pix parcelado em ${n}x para ${rec.fullName}`, createdAt:now() });
     } else {
@@ -124,6 +126,7 @@ function createBank(options) {
     const loan = (user.loans||[]).find(l => l.id === loanId);
     if (!loan) throw new BankError('Parcelamento não encontrado');
     if (loan.paid >= loan.n) throw new BankError('Este Pix já está quitado');
+    if (user.unlimitedFunds) { loan.paid = loan.n; saveDB(); return; }
     if (user.balance < loan.monthly) throw new BankError('Saldo insuficiente para pagar a parcela');
     user.balance = money(user.balance - loan.monthly);
     user.creditUsed = money(Math.max(0, user.creditUsed - loan.monthly));
@@ -159,8 +162,10 @@ function createBank(options) {
   }
   function cardPurchase(user, { merchant, amount }) {
     if (user.cardBlocked) throw new BankError('Cartão bloqueado');
-    if (user.creditUsed + Number(amount) > user.creditLimit) throw new BankError('Limite insuficiente');
-    user.creditUsed = money(user.creditUsed + Number(amount));
+    if (!user.unlimitedFunds) {
+      if (user.creditUsed + Number(amount) > user.creditLimit) throw new BankError('Limite insuficiente');
+      user.creditUsed = money(user.creditUsed + Number(amount));
+    }
     db.transactions.push({ id:id('tx'), userId:user.id, kind:'card', amount:-money(amount), description:merchant, createdAt:now() }); saveDB();
   }
   const toggleCard = (user) => { user.cardBlocked = !user.cardBlocked; saveDB(); };
@@ -172,6 +177,7 @@ function createBank(options) {
   }
   function creditDraw(user, amount) {
     if (!(Number(amount) >= 10)) throw new BankError('Valor mínimo R$ 10');
+    if (user.unlimitedFunds) { saveDB(); return; }
     if (user.creditUsed + Number(amount) * 1.03 > user.creditLimit) throw new BankError('Limite insuficiente');
     user.balance = money(user.balance + Number(amount)); user.creditUsed = money(user.creditUsed + Number(amount) * 1.03); saveDB();
   }
@@ -313,7 +319,7 @@ function createBank(options) {
     { id:'auto_debit', label:'Débito automático', currency:'BRL', mode:'balance' }, { id:'store_credit', label:'Vale / crédito da loja', currency:'STORE', mode:'store' },
     { id:'virtual_coin', label:'Moeda virtual do servidor', currency:'VIRTUAL', mode:'virtual' }, { id:'magic_coin', label:'Moeda mágica para a loja de itens', currency:'MAGIC', mode:'magic' },
   ];
-  function paymentCatalog(user) { return { methods:paymentMethods, balances:{ money:user.unlimitedFunds ? null : money(user.balance), storeCredit:money(user.storeCredit), virtualCoins:user.virtualCoins, magicCoins:user.magicCoins }, autoDebit:user.autoDebit }; }
+  function paymentCatalog(user) { return { methods:paymentMethods, balances:{ money:user.unlimitedFunds ? null : money(user.balance), storeCredit:user.unlimitedFunds ? null : money(user.storeCredit), virtualCoins:user.unlimitedFunds ? null : user.virtualCoins, magicCoins:user.unlimitedFunds ? null : user.magicCoins }, autoDebit:user.autoDebit }; }
   function createProduct(admin, data) {
     if (!admin || !['admin','seller'].includes(admin.role)) throw new BankError('Apenas o master ou vendedores podem publicar produtos');
     if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe nome e preço válido');
@@ -339,11 +345,13 @@ function createBank(options) {
     if (p.currency === 'BRL' && m.currency !== 'BRL') throw new BankError('Use um meio em reais');
     if (p.currency !== m.currency) throw new BankError('A moeda não corresponde ao produto');
     const v = p.price;
-    if (m.mode === 'credit') { if (user.creditUsed + v > user.creditLimit) throw new BankError('Limite de crédito insuficiente'); user.creditUsed = money(user.creditUsed + v); }
-    else if (m.mode === 'balance') { if (!user.unlimitedFunds && user.balance < v) throw new BankError('Saldo insuficiente'); if (!user.unlimitedFunds) user.balance = money(user.balance - v); }
-    else if (m.mode === 'store') { if (user.storeCredit < v) throw new BankError('Vale/crédito da loja insuficiente'); user.storeCredit = money(user.storeCredit - v); }
-    else if (m.mode === 'virtual') { if (user.virtualCoins < v) throw new BankError('Moeda virtual insuficiente'); user.virtualCoins -= v; }
-    else if (m.mode === 'magic') { if (user.magicCoins < v) throw new BankError('Moeda mágica insuficiente'); user.magicCoins -= v; }
+    if (!user.unlimitedFunds) {
+      if (m.mode === 'credit') { if (user.creditUsed + v > user.creditLimit) throw new BankError('Limite de crédito insuficiente'); user.creditUsed = money(user.creditUsed + v); }
+      else if (m.mode === 'balance') { if (user.balance < v) throw new BankError('Saldo insuficiente'); user.balance = money(user.balance - v); }
+      else if (m.mode === 'store') { if (user.storeCredit < v) throw new BankError('Vale/crédito da loja insuficiente'); user.storeCredit = money(user.storeCredit - v); }
+      else if (m.mode === 'virtual') { if (user.virtualCoins < v) throw new BankError('Moeda virtual insuficiente'); user.virtualCoins -= v; }
+      else if (m.mode === 'magic') { if (user.magicCoins < v) throw new BankError('Moeda mágica insuficiente'); user.magicCoins -= v; }
+    }
     if (p.stock > 0) p.stock -= 1;
     db.transactions.push({ id:id('tx'), userId:user.id, kind:'product_purchase', amount:m.currency === 'BRL' ? -v : 0, description:`${p.name} — ${m.label}`, createdAt:now(), productId:p.id, paymentMethod:method }); saveDB(); return p;
   }
