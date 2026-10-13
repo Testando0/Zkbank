@@ -70,6 +70,10 @@ function registerRoutes(app, bank, rt) {
   app.get('/api/loans', auth, (req, res) => res.json({ ok:true, ...st(req.user) }));
   app.post('/api/loans/request', auth, (req, res) => wrap(res, () => { bank.loanRequest(req.user, req.body || {}); res.json({ ok:true, message:'Solicitação de empréstimo enviada para análise.', ...st(req.user) }); }));
   app.post('/api/loans/:loanId/pay', auth, (req, res) => wrap(res, () => { bank.loanPay(req.user, req.params.loanId); res.json({ ok:true, ...st(req.user) }); }));
+  app.get('/api/vehicles', auth, (req, res) => res.json({ ok:true, vehicles:bank.vehicles(), financings:bank.accountState(req.user).vehicleFinancings }));
+  app.post('/api/vehicles/:vehicleId/finance', auth, (req, res) => wrap(res, () => { bank.requestVehicleFinance(req.user, req.params.vehicleId, req.body || {}); res.json({ ok:true, message:'Financiamento enviado para análise.', ...st(req.user) }); }));
+  app.post('/api/vehicle-financing/:financingId/pay', auth, (req, res) => wrap(res, () => { bank.payVehicleFinance(req.user, req.params.financingId); res.json({ ok:true, ...st(req.user) }); }));
+  app.post('/api/insurance/life', auth, (req, res) => wrap(res, () => { bank.contractLifeInsurance(req.user, req.body || {}); res.json({ ok:true, message:'Seguro de vida contratado.', ...st(req.user) }); }));
 
   app.get('/api/support/messages', auth, (req, res) => res.json({ ok: true, messages: bank.accountState(req.user).supportMessages }));
   app.post('/api/support/messages', auth, (req, res) => wrap(res, () => { bank.supportSend(req.user, (req.body||{}).text); res.json({ ok: true, ...st(req.user) }); }));
@@ -86,6 +90,8 @@ function registerRoutes(app, bank, rt) {
     if (rt && rt.masters) rt.masters();
   }));
   app.post('/api/master/loans/:requestId/:action', auth, admin, (req, res) => wrap(res, () => { const action = req.params.action; if (!['approve','reject'].includes(action)) return res.status(400).json({ ok:false, message:'Decisão inválida.' }); const r = bank.loanDecide(req.user, req.params.requestId, action, (req.body||{}).note); res.json({ ok:true, request:r }); emit([r.userId]); if (rt && rt.masters) rt.masters(); }));
+  app.post('/api/master/vehicles', auth, admin, (req, res) => wrap(res, () => res.json({ ok:true, vehicle:bank.createVehicle(req.user, req.body || {}) })));
+  app.post('/api/master/vehicle-financing/:financingId/:action', auth, admin, (req, res) => wrap(res, () => { const action=req.params.action; if (!['approve','reject'].includes(action)) return res.status(400).json({ok:false,message:'Decisão inválida.'}); const f=bank.decideVehicleFinance(req.user,req.params.financingId,action,(req.body||{}).note); res.json({ok:true,financing:f}); emit([f.userId]); if (rt && rt.masters) rt.masters(); }));
   app.post('/api/master/support/reply', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.supportReply(d.userId, d.text); res.json({ ok: true }); emit([d.userId]); }));
   app.post('/api/master/deposit', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterDeposit(d.userId, d.amount, d.note); res.json({ ok: true }); emit([d.userId]); }));
   app.post('/api/master/users/:userId/balance', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustBalance(req.params.userId, d.amount, d.note); res.json({ ok:true }); emit([req.params.userId]); }));
@@ -120,7 +126,7 @@ if (require.main === module) {
   app.use(cors());
   app.use(express.json({ limit: '100kb' }));
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
-  app.get('/health', (_req, res) => res.json({ status:'ok', bank:'Armin Bank', timestamp:new Date().toISOString() }));
+  app.get('/health', (_req, res) => res.json({ status:'ok', bank:'GhsotBank', timestamp:new Date().toISOString() }));
 
   const rt = {
     users(ids) {
@@ -138,5 +144,5 @@ if (require.main === module) {
   app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
   const PORT = Number(process.env.PORT) || 3000;
-  server.listen(PORT, '0.0.0.0', () => console.log(`Armin Bank online na porta ${PORT}`));
-                                        }
+  server.listen(PORT, '0.0.0.0', () => console.log(`GhsotBank online na porta ${PORT}`));
+                                                                                                                           }
