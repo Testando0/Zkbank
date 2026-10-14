@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ghsotbank-shell-v3';
+const CACHE_NAME = 'ghsotbank-shell-v4-fitting-room';
 const APP_SHELL = ['/', '/index.html', '/manifest.json', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png'];
 
 self.addEventListener('install', (event) => {
