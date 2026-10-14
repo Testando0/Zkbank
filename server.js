@@ -60,6 +60,7 @@ function registerRoutes(app, bank, rt) {
   app.post('/api/savings/:dir', auth, (req, res) => wrap(res, () => { const d = req.params.dir; if (d !== 'in' && d !== 'out') return res.status(400).json({ ok: false, message: 'Direção inválida.' }); bank.savingsMove(req.user, d, (req.body||{}).amount); res.json({ ok: true, ...st(req.user) }); emit([req.user.id]); }));
 
   app.get('/api/card/secret', auth, (req, res) => res.json({ ok: true, card: { number: req.user.cardNumber, cvv: req.user.cvv, expiry: req.user.expiry || '12/29', holder: req.user.fullName } }));
+  app.post('/api/card/black/request', auth, (req, res) => wrap(res, () => { bank.requestBlackCard(req.user); res.json({ ok:true, message:'Solicitação de Cartão Black enviada para análise.', ...st(req.user) }); }));
   app.post('/api/card/toggle', auth, (req, res) => wrap(res, () => { bank.toggleCard(req.user); res.json({ ok: true, ...st(req.user) }); }));
   app.post('/api/card/purchase', auth, (req, res) => wrap(res, () => { const d = req.body || {}; bank.cardPurchase(req.user, d); res.json({ ok: true, ...st(req.user) }); }));
 
@@ -92,6 +93,7 @@ function registerRoutes(app, bank, rt) {
   app.post('/api/master/loans/:requestId/:action', auth, admin, (req, res) => wrap(res, () => { const action = req.params.action; if (!['approve','reject'].includes(action)) return res.status(400).json({ ok:false, message:'Decisão inválida.' }); const r = bank.loanDecide(req.user, req.params.requestId, action, (req.body||{}).note); res.json({ ok:true, request:r }); emit([r.userId]); if (rt && rt.masters) rt.masters(); }));
   app.post('/api/master/vehicles', auth, admin, (req, res) => wrap(res, () => res.json({ ok:true, vehicle:bank.createVehicle(req.user, req.body || {}) })));
   app.post('/api/master/vehicle-financing/:financingId/:action', auth, admin, (req, res) => wrap(res, () => { const action=req.params.action; if (!['approve','reject'].includes(action)) return res.status(400).json({ok:false,message:'Decisão inválida.'}); const f=bank.decideVehicleFinance(req.user,req.params.financingId,action,(req.body||{}).note); res.json({ok:true,financing:f}); emit([f.userId]); if (rt && rt.masters) rt.masters(); }));
+  app.post('/api/master/black-cards/:userId/:action', auth, admin, (req, res) => wrap(res, () => { const action=req.params.action; if (!['approve','reject'].includes(action)) return res.status(400).json({ok:false,message:'Decisão inválida.'}); const u=bank.decideBlackCard(req.user,req.params.userId,action,(req.body||{}).note); res.json({ok:true,user:{id:u.id,blackCardStatus:u.blackCardStatus}}); emit([u.id]); if (rt && rt.masters) rt.masters(); }));
   app.post('/api/master/support/reply', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.supportReply(d.userId, d.text); res.json({ ok: true }); emit([d.userId]); }));
   app.post('/api/master/deposit', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterDeposit(d.userId, d.amount, d.note); res.json({ ok: true }); emit([d.userId]); }));
   app.post('/api/master/users/:userId/balance', auth, admin, (req, res) => wrap(res, () => { const d = req.body || {}; bank.masterAdjustBalance(req.params.userId, d.amount, d.note); res.json({ ok:true }); emit([req.params.userId]); }));
@@ -145,4 +147,4 @@ if (require.main === module) {
 
   const PORT = Number(process.env.PORT) || 3000;
   server.listen(PORT, '0.0.0.0', () => console.log(`GhsotBank online na porta ${PORT}`));
-      }
+    }
