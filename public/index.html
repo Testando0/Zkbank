@@ -273,10 +273,6 @@ function renderAuth() {
         <div class="fld"><label>Senha</label><input name="password" type="password" required minlength="4" placeholder="mínimo 4 caracteres"></div>
         <button class="btn" type="submit">${ico('check')} Criar conta grátis</button>
       </form>`}
-    <div class="demo"><p>Contas de demonstração:</p>
-      <button data-act="demoLogin" data-u="aventureiro" data-p="1234">Lia (user)</button>
-      <button data-act="demoLogin" data-u="master" data-p="master">Armin (admin)</button>
-    </div>
   </div>`;
 }
 function txRow(tx) {
@@ -287,7 +283,7 @@ function txRow(tx) {
 function renderHome() {
   const u = U(); const txs = (S.st.transactions || []).slice(0, 4); const unread = S.st.unread || 0;
   const shortcut = (act, ic, label, sub, extra='') => `<button class="shortcut" data-act="${act}" ${extra}><span class="shortcut-icon">${ico(ic)}</span><b>${label}</b><span>${sub}</span></button>`;
-  const quick = `${shortcut('openPixHub','pix','Área Pix','Enviar e cobrar')}${shortcut('goPage','pig','Cofrinho','Guardar dinheiro','data-page="savings"')}${shortcut('openCard','card','Cartão Black','Ver cartão')}${shortcut('openContracts','credit','Contratar','Seguro e veículos')}${shortcut('openShop','gift','Loja','Itens e moedas')}`;
+  const quick = `${shortcut('openPixHub','pix','Área Pix','Enviar e cobrar')}${shortcut('goPage','pig','Cofrinho','Guardar dinheiro','data-page="savings"')}${shortcut('openCard','card','Meus cartões','Ver cartão')}${shortcut('openContracts','credit','Contratar','Seguro e veículos')}${shortcut('openShop','gift','Loja','Itens e moedas')}`;
   const more = `${shortcut('openScore','check','Meu score','Ver pontuação')}${shortcut('openCredit','credit','Crédito','Fatura e limite')}${shortcut('openLoans','credit','Empréstimos','Solicitar e pagar')}${shortcut('openReferral','gift','Indique','Ganhe bônus')}${shortcut('openKeys','lock','Chaves Pix','Gerenciar')}${shortcut('openCharge','plus','Cobrar','Criar cobrança')}${shortcut('openNotifs','bell','Avisos',unread ? `${unread} não lidos` : 'Tudo em dia')}${shortcut('openSupport','help','Suporte','Fale com a gente')}${shortcut('openPassword','lock','Segurança','Trocar senha')}${u.role==='admin' ? shortcut('goPage','check','Painel master','Gerenciar','data-page="master"') : shortcut('goPage','list','Extrato','Ver movimentos','data-page="pix"')}`;
   $('#view').innerHTML = `
   <div class="hdr" style="padding-bottom:10px"><div class="bar"><button class="profile-button" data-act="openProfile" aria-label="Abrir meu perfil">${avatarHtml(u)}</button><div class="tools"><button class="ib" data-act="openNotifs">${ico('bell')}${unread ? `<span class="dot">${unread}</span>` : ''}</button><button class="ib" data-act="openSupport">${ico('help')}</button><button class="ib" data-act="logout">${ico('logout')}</button></div></div></div>
@@ -372,10 +368,12 @@ function renderExtract() {
   </div>`;
 }
 function renderCardPage() {
-  const u = U(); const c = S.card; const loans = u.loans || [];
+  const u = U(); const c = S.card; const loans = u.loans || []; const black = u.blackCardStatus || 'none';
   $('#view').innerHTML = `
-  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="cardReveal" aria-label="Mostrar dados do cartão">${ico('eye')}</button></div></div><h1>Cartão Black</h1><p>${u.cardBlocked ? 'Bloqueado' : 'Ativo'} • toque no olho para ver os dados</p></div>
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="cardReveal" aria-label="Mostrar dados do cartão">${ico('eye')}</button></div></div><h1>Meus cartões</h1><p>${u.cardBlocked ? 'Bloqueado' : 'Ativo'} • toque no olho para ver os dados</p></div>
   <div class="wrap">
+    ${black !== 'approved' ? `<div class="card"><div class="ttl"><h3>Cartão Black</h3><span class="pill ${black==='pending'?'p':black==='rejected'?'r':'a'}">${black==='pending'?'em análise':black==='rejected'?'não aprovado':'disponível mediante aprovação'}</span></div><p class="mu sm-t">O Cartão Black é liberado somente após análise e aprovação do master.</p>${black==='pending' ? '<p class="mu sm-t">Sua solicitação está em análise.</p>' : `<button class="btn" data-act="requestBlackCard">Solicitar Cartão Black</button>`}</div>` : ''}
+    ${black === 'approved' ? '<div class="card" style="border:1px solid rgba(199,125,255,.45);background:linear-gradient(145deg,#111,#351047)"><div class="ttl"><h3>Cartão Black aprovado</h3><span class="pill g">ativo</span></div><p class="mu sm-t">Seus dados estão protegidos. Toque no olho para visualizar por 20 segundos.</p></div>' : ''}
     <div class="plastic ${u.cardBlocked?'blocked':''}"><div class="chipic"></div><div class="tp">${ico('card')}</div>
       <div class="num">${c ? esc(c.number) : '•••• •••• •••• ••••'}</div>
       <div class="foot"><span>${esc(u.fullName||'')}</span><span>${c ? esc(c.expiry) : '••/••'}</span></div></div>
@@ -428,6 +426,7 @@ function renderMaster() {
       <div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="decide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="decide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
     ${m.pendingLoans && m.pendingLoans.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Solicitações de empréstimo</h3><span class="pill p">${m.pendingLoans.length}</span></div>${m.pendingLoans.map(r => `<div class="row"><div class="ic a">${ico('credit')}</div><div class="mid"><b>${esc(r.fullName||r.username)}</b><span>${fmtBRL(r.amount)} • ${r.installments}x de ${fmtBRL(r.monthly)} • juros ${(r.rate*100).toFixed(2)}% a.m.</span></div><div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="loanDecide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="loanDecide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
     ${m.pendingFinancing && m.pendingFinancing.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Financiamentos de veículos</h3><span class="pill p">${m.pendingFinancing.length}</span></div>${m.pendingFinancing.map(f => `<div class="row"><div class="ic a">${ico('card')}</div><div class="mid"><b>${esc(f.vehicleName)}</b><span>${fmtBRL(f.financed)} • ${f.installments}x de ${fmtBRL(f.monthly)} • entrada ${fmtBRL(f.downPayment)}</span></div><div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="financeDecide" data-id="${esc(f.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="financeDecide" data-id="${esc(f.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
+    ${m.pendingBlackCards && m.pendingBlackCards.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Solicitações de Cartão Black</h3><span class="pill p">${m.pendingBlackCards.length}</span></div>${m.pendingBlackCards.map(u => `<div class="row"><div class="ic a">${ico('card')}</div><div class="mid"><b>${esc(u.fullName)}</b><span>@${esc(u.username)} • score ${u.score}</span></div><div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="blackDecide" data-id="${esc(u.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="blackDecide" data-id="${esc(u.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
     <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Usuários</h3><span class="pill p">${m.users.length}</span></div>${m.users.map(u => `
       <button class="row" data-act="manageUser" data-id="${esc(u.id)}"><span class="av">${u.avatarUrl ? `<img src="${esc(u.avatarUrl)}" alt="">` : esc((u.fullName||'?')[0].toUpperCase())}</span><div class="mid"><b>${esc(u.fullName)} ${u.role==='seller' ? '<span class="pill p">vendedor</span>' : ''} ${u.banned ? '<span class="pill r">banido</span>' : ''}</b><span>@${esc(u.username)} • score ${u.score}</span></div>
       <div class="end">${fmtBRL(u.balance)}<small>gerenciar ${ico('chev')}</small></div></button><div style="padding:0 16px 10px;text-align:right"><button class="lnk" data-act="openWalletAdmin" data-id="${esc(u.id)}">Ajustar moedas</button></div>`).join('')}</div>
@@ -527,7 +526,6 @@ function openAutoDebit() { const a = (S.payments && S.payments.autoDebit) || {};
 const A = {
   switchAuth: (el) => { S.authTab = el.dataset.tab; render(); },
   goPage: (el) => { S.page = el.dataset.page; render(); },
-  demoLogin: async (el) => { const r = await busy(el, () => api('/api/login', { method:'POST', body:{ username: el.dataset.u, password: el.dataset.p } })); if (r) enter(r); },
   logout: () => doLocalLogout(),
   closeSheet: () => sheetClose(),
   openPixHub: () => { S.page = 'pixhub'; render(); },
@@ -535,6 +533,7 @@ const A = {
   openSavings: () => openSavings(),
   openReferral: () => openReferral(),
   openCard: () => { S.page = 'card'; render(); },
+  requestBlackCard: async (el) => { const r = await busy(el, () => api('/api/card/black/request', { method:'POST' })); if (r) { setState(r); toast(r.message, 'ok'); } },
   openCredit: () => openCreditReq(),
   openLoans: () => openLoans(),
   openContracts: () => openContracts(),
@@ -575,6 +574,7 @@ const A = {
   decide: async (el) => { const r = await busy(el, () => api(`/api/master/credit/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Crédito aprovado.' : 'Análise reprovada.', 'ok'); loadMaster(); } },
   loanDecide: async (el) => { const r = await busy(el, () => api(`/api/master/loans/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Empréstimo aprovado.' : 'Empréstimo reprovado.', 'ok'); loadMaster(); } },
   financeDecide: async (el) => { const r = await busy(el, () => api(`/api/master/vehicle-financing/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Financiamento aprovado.' : 'Financiamento reprovado.', 'ok'); loadMaster(); } },
+  blackDecide: async (el) => { const r = await busy(el, () => api(`/api/master/black-cards/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Cartão Black aprovado.' : 'Solicitação reprovada.', 'ok'); loadMaster(); } },
   thread: (el) => openThread(el.dataset.id),
   deposit: (el) => openDeposit(el.dataset.id),
   manageUser: (el) => openUserManager(el.dataset.id),
