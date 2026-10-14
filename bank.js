@@ -22,8 +22,8 @@ function createBank(options) {
   else {
     const created = now();
     db.users.push(
-      { id:'usr_aventureiro', username:'aventureiro', password:hashPassword('1234'), fullName:'Lia Aventureira', role:'user', balance:5000, savings:0, creditLimit:500, creditUsed:0, score:650, cardNumber:'5298 4012 2410 7723', cvv:'123', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'lia@aventura.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 },
-      { id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 }
+      { id:'usr_aventureiro', username:'aventureiro', password:hashPassword('1234'), fullName:'Lia Aventureira', role:'user', balance:5000, savings:0, creditLimit:500, creditUsed:0, score:650, cardNumber:'5298 4012 2410 7723', cvv:'123', expiry:'12/29', cardBlocked:false, blackCardStatus:'none', pixKeys:[{id:id('key'),type:'email',value:'lia@aventura.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 },
+      { id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, blackCardStatus:'approved', pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 }
     );
   }
 
@@ -48,6 +48,7 @@ function createBank(options) {
     if (u.cvv === undefined) u.cvv = '123';
     if (u.expiry === undefined) u.expiry = '12/29';
     if (u.cardBlocked === undefined) u.cardBlocked = false;
+    if (u.blackCardStatus === undefined) u.blackCardStatus = u.role === 'admin' ? 'approved' : 'none';
     if (u.savings === undefined) u.savings = 0;
     if (u.savingsAt === undefined) u.savingsAt = Date.now();
     else if (typeof u.savingsAt === 'string') u.savingsAt = Date.parse(u.savingsAt) || Date.now();
@@ -95,7 +96,7 @@ function createBank(options) {
     const u = { id:id('usr'), username, password:hashPassword(password), fullName, role:'user', unlimitedFunds:false, balance:0, savings:0, creditLimit:500, creditUsed:0, score:650,
       cardNumber:`5298 ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)} ${String(Math.floor(Math.random()*9000)+1000)}`,
       cvv:String(Math.floor(Math.random()*900)+100), expiry:'12/29', cardBlocked:false,
-      pixKeys:[{ id:id('key'), type:'aleatória', value:`ARMIN-${randomKey()}`, createdAt:now() }], avatarUrl:'', banned:false, bannedAt:null, createdAt:now(), savingsAt:now(), lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 };
+      pixKeys:[{ id:id('key'), type:'aleatória', value:`ARMIN-${randomKey()}`, createdAt:now() }], avatarUrl:'', banned:false, bannedAt:null, blackCardStatus:'none', createdAt:now(), savingsAt:now(), lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 };
     db.users.push(u); saveDB(); return { user: u };
   }
 
@@ -178,6 +179,15 @@ function createBank(options) {
       user.creditUsed = money(user.creditUsed + Number(amount));
     }
     db.transactions.push({ id:id('tx'), userId:user.id, kind:'card', amount:-money(amount), description:merchant, createdAt:now() }); saveDB();
+  }
+  function requestBlackCard(user) {
+    if (user.role === 'admin') { user.blackCardStatus = 'approved'; saveDB(); return user.blackCardStatus; }
+    if (user.blackCardStatus === 'approved') throw new BankError('Seu Cartão Black já está aprovado');
+    if (user.blackCardStatus === 'pending') throw new BankError('Sua solicitação já está em análise');
+    user.blackCardStatus = 'pending'; db.notifications.push({ id:id('note'), userId:user.id, title:'Solicitação de Cartão Black', text:'Sua solicitação foi enviada para análise do master.', read:false, createdAt:now() }); saveDB(); return user.blackCardStatus;
+  }
+  function decideBlackCard(admin, userId, decision, reason) {
+    if (!admin || admin.role !== 'admin') throw new BankError('Apenas o master pode aprovar Cartão Black'); const u = byId(userId); if (!u) throw new BankError('Usuário não encontrado'); if (!['approve','reject'].includes(decision)) throw new BankError('Decisão inválida'); u.blackCardStatus = decision === 'approve' ? 'approved' : 'rejected'; db.notifications.push({ id:id('note'), userId:u.id, title:decision === 'approve' ? 'Cartão Black aprovado' : 'Cartão Black não aprovado', text:decision === 'approve' ? 'Seu Cartão Black está disponível na área Meus cartões.' : (reason || 'Sua solicitação não foi aprovada.'), read:false, createdAt:now() }); saveDB(); return u;
   }
   const toggleCard = (user) => { user.cardBlocked = !user.cardBlocked; saveDB(); };
   function payInvoice(user, amount) {
@@ -318,7 +328,8 @@ function createBank(options) {
       pending: db.creditRequests.filter(r => r.status==='pending'),
       pendingLoans: db.loanRequests.filter(r => r.status==='pending'),
       pendingFinancing: db.vehicleFinancings.filter(f => f.status==='pending'),
-      users: players.map(u => { const c={...u}; delete c.password; delete c.token; return c; }),
+      pendingBlackCards: players.filter(u => u.blackCardStatus === 'pending').map(u => ({ id:u.id, fullName:u.fullName, username:u.username, score:u.score })),
+      users: players.map(u => { const c={...u}; delete c.password; delete c.token; delete c.tokens; return c; }),
       support: db.supportMessages.slice(-30),
     };
   }
@@ -439,7 +450,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); user.tokens = [user.token]; saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, createVehicle, vehicles, requestVehicleFinance, decideVehicleFinance, payVehicleFinance, contractLifeInsurance, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, requestBlackCard, decideBlackCard, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, createVehicle, vehicles, requestVehicleFinance, decideVehicleFinance, payVehicleFinance, contractLifeInsurance, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
