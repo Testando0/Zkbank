@@ -406,7 +406,23 @@ function renderShop() {
   const cur = { BRL:'R$', STORE:'Vale', VIRTUAL:'Moedas', MAGIC:'Mágicas' };
   const balance = (label, value, note) => `<div class="shop-balance"><strong>${value}</strong><span>${label}</span><span>${note}</span></div>`;
   const canEdit = (p) => U().role === 'admin' || (U().role === 'seller' && p.sellerId === U().id);
-  const productCard = (p) => `<article class="product-card" data-act="openProductDetails" data-id="${esc(p.id)}" tabindex="0"><div class="product-art">${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy">` : '✦'}</div><h3>${esc(p.name)}</h3><p>${esc(p.description || 'Um item especial para sua jornada.')}</p><div class="product-meta"><div class="product-price">${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${cur[p.currency]}`}<small>${p.stock > 0 ? `${p.stock} disponíveis` : 'estoque ilimitado'} • ver detalhes</small></div><button class="product-buy" data-act="buyProduct" data-id="${esc(p.id)}">Comprar</button></div><button class="product-tryon" type="button" data-act="openFittingRoom" data-id="${esc(p.id)}">✦ Experimentar no boneco 3D</button>${canEdit(p) ? `<div class="product-admin"><button class="lnk" data-act="editProduct" data-id="${esc(p.id)}">Editar</button><button class="lnk danger-link" data-act="deleteProduct" data-id="${esc(p.id)}">Excluir</button></div>` : ''}</article>`;
+  const productCard = (p) => {
+    const pPrice = p.currency === 'BRL' ? fmtBRL(p.price) : `${p.price} ${cur[p.currency]}`;
+    const pStock = p.stock > 0 ? `${p.stock} disponíveis` : 'estoque ilimitado';
+    return `<article class="product-card" data-id="${esc(p.id)}" tabindex="0">
+      <div class="product-art" data-act="openProductDetails" data-id="${esc(p.id)}">
+        ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy">` : '✦'}
+      </div>
+      <h3 data-act="openProductDetails" data-id="${esc(p.id)}">${esc(p.name)}</h3>
+      <p data-act="openProductDetails" data-id="${esc(p.id)}">${esc(p.description || 'Um item especial.')}</p>
+      <div class="product-meta">
+        <div class="product-price">${pPrice}<small>${pStock}</small></div>
+        <button class="product-buy" data-act="buyProduct" data-id="${esc(p.id)}">Comprar</button>
+      </div>
+      <button class="product-tryon" style="display:block!important;visibility:visible!important;opacity:1!important" type="button" data-act="openFittingRoom" data-id="${esc(p.id)}">✦ Experimentar no boneco 3D</button>
+      ${canEdit(p) ? `<div class="product-admin"><button class="lnk" data-act="editProduct" data-id="${esc(p.id)}">Editar</button><button class="lnk danger-link" data-act="deleteProduct" data-id="${esc(p.id)}">Excluir</button></div>` : ''}
+    </article>`;
+  };
   $('#view').innerHTML = `<div class="hdr" style="padding-bottom:10px"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button><div class="tools"><button class="ib" data-act="openAutoDebit">${ico('refresh')}</button></div></div></div><div class="wrap" style="padding-top:6px">
     <div class="shop-hero"><span class="eyebrow">Ghsot market</span><h2>Itens para deixar sua conta mais interessante.</h2><p>Compre com saldo, cartão, vale ou suas moedas especiais.</p></div>
     <div class="shop-balances">${balance('Saldo',U().unlimitedFunds?'Ilimitado':fmtBRL(S.payments.balances.money),'BRL')}${balance('Vale',U().unlimitedFunds?'Ilimitado':fmtBRL(S.payments.balances.storeCredit),'Loja')}${balance('Virtual',U().unlimitedFunds?'Ilimitado':S.payments.balances.virtualCoins,'servidor')}${balance('Mágica',U().unlimitedFunds?'Ilimitado':S.payments.balances.magicCoins,'itens')}</div><button class="card magic-wallet" data-act="openMagic"><b>✨ Abrir carteira de moedas mágicas</b><span>Ver saldos e usar moedas especiais na vitrine</span></button>
