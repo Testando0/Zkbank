@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#000000" />
+<meta name="description" content="GhsotBank — conta digital com Pix, cartão, cofrinho e crédito." />
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/icon-192.png" type="image/png" />
+<link rel="apple-touch-icon" href="/icon-192.png" />
+<title>GhsotBank</title>
+<style>
+:root{--bg:#000;--card:#141416;--card2:#1e1e22;--tx:#fff;--mu:#8e8e96;--ln:#26262b;--p:#820ad1;--p2:#9b1be8;--p3:#2a1240;--gr:#00c853;--gr2:#0e3b22;--rd:#ff5a76;--rd2:#3b1220;--am:#ffb020;--am2:#3b2a0e;--r:16px;--top:env(safe-area-inset-top,0px);--bot:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;overscroll-behavior-y:none;touch-action:manipulation}
+body{font-size:15px;line-height:1.4}
+button,input,select,textarea{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;padding:0;touch-action:manipulation}
+button:disabled{opacity:.55;cursor:default}
+svg.i{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hidden{display:none!important}
+#root{height:100vh;height:100dvh;max-width:480px;margin:0 auto;position:relative;background:var(--bg)}
+@media(min-width:520px){body{background:#000}#root{height:min(100dvh,900px);margin-top:max(0px,calc((100dvh - 900px)/2));border-radius:24px;box-shadow:0 0 0 1px #1e1e22;overflow:hidden}}
+.auth{height:100%;overflow-y:auto;background:var(--bg);color:#fff;padding:calc(36px + var(--top)) 24px calc(28px + var(--bot));display:flex;flex-direction:column}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.14em;font-size:15px}
+.logo b{width:38px;height:38px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;font-size:19px;letter-spacing:0}
+.auth h1{font-size:30px;line-height:1.1;letter-spacing:-.03em;margin:44px 0 8px;color:#fff}
+.auth>p{margin:0 0 24px;color:var(--mu)}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card2);border-radius:12px;padding:4px;margin-bottom:18px}
+.seg button{padding:10px;border-radius:9px;font-weight:700;color:var(--mu)}
+.seg button.on{background:var(--p);color:#fff}
+.fld{margin:0 0 14px;min-width:0}
+.fld label{display:block;font-size:12.5px;font-weight:700;color:var(--mu);margin-bottom:6px}
+.fld input,.fld select,.fld textarea{width:100%;border:1.5px solid var(--ln);border-radius:12px;padding:14px;background:var(--card2);color:#fff;outline:0;font-size:16px;transition:border-color .15s,box-shadow .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(130,10,209,.35)}
+.fld small{display:block;color:var(--mu);margin-top:5px;font-size:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;border-radius:999px;background:var(--p);color:#fff;font-weight:700;font-size:15.5px;padding:0 22px}
+.btn:active:not(:disabled){filter:brightness(.9)}
+.btn.sec{background:var(--card2);color:#c77dff}
+.btn.out{background:transparent;color:#c77dff;border:1.5px solid var(--p)}
+.btn.dng{background:var(--rd2);color:var(--rd)}
+.btn.sm{min-height:38px;font-size:13.5px;padding:0 16px;width:auto}
+.btns{display:grid;gap:10px;margin-top:6px}
+.btns.two{grid-template-columns:1fr 1fr}
+.lnk{color:#c77dff;font-weight:700;font-size:13.5px}
+.demo{margin-top:auto;padding-top:26px;font-size:12px;color:var(--mu);text-align:center}
+.demo button{display:inline-block;margin:6px 4px 0;padding:8px 12px;border-radius:999px;background:var(--card2);color:#fff;font-weight:700;font-size:12px}
+.app{height:100%;display:flex;flex-direction:column}
+.view{flex:1;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(92px + var(--bot))}
+.hdr{background:var(--bg);color:#fff;padding:calc(14px + var(--top)) 18px 22px}
+.hdr .bar{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px}
+.hdr .tools{display:flex;gap:4px;align-items:center}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:inherit;position:relative}
+.ib:active{background:var(--card2)}
+.hdr h1{margin:10px 0 0;font-size:26px;letter-spacing:-.03em;line-height:1.15;color:#fff}
+.hdr p{margin:4px 0 0;color:var(--mu);font-size:13.5px}
+.hdr .balance{font-size:34px;font-weight:800;letter-spacing:-.03em;margin:10px 0 0;color:#fff}
+.av{width:42px;height:42px;border-radius:50%;background:var(--p);display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px;flex:none;overflow:hidden}.av img{width:100%;height:100%;object-fit:cover}.profile-button{width:42px;height:42px;border-radius:50%;padding:0;display:grid;place-items:center}
+.dot{position:absolute;top:5px;right:5px;min-width:17px;height:17px;border-radius:9px;background:var(--rd);color:#fff;font-size:10.5px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid var(--bg)}
+.wrap{padding:14px 14px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.wrap>*{min-width:0}
+.home-hero{position:relative;overflow:hidden;border-radius:24px;padding:20px;background:linear-gradient(135deg,#26083d 0%,#6812a0 52%,#a832d8 100%);box-shadow:0 14px 32px rgba(130,10,209,.22)}
+.home-hero::after{content:"";position:absolute;width:180px;height:180px;right:-55px;top:-70px;border-radius:50%;border:1px solid rgba(255,255,255,.18);box-shadow:0 0 0 20px rgba(255,255,255,.04),0 0 0 42px rgba(255,255,255,.03)}
+.home-hero>*{position:relative;z-index:1}.home-hero .eyebrow{color:#e9c8ff;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.home-hero .balance{font-size:35px;margin:10px 0 3px}.home-hero p{color:#e5c9f2;margin:0;font-size:13px}
+.home-hero .hero-actions{display:flex;gap:8px;margin-top:18px}.hero-actions button{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;min-height:42px;border-radius:12px;background:rgba(255,255,255,.14);color:#fff;font-size:12px;font-weight:750;padding:0 10px}.hero-actions button:first-child{background:#fff;color:#6812a0}.hero-actions .i{width:17px;height:17px}
+.section-head{display:flex;align-items:end;justify-content:space-between;gap:10px;margin:6px 2px 0}.section-head h2,.quick-title h2{font-size:18px;letter-spacing:-.02em;margin:0}.section-head p{font-size:12px;color:var(--mu);margin:3px 0 0}
+.shortcut-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.shortcut{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0;text-align:center;background:var(--card);border:1px solid rgba(255,255,255,.04);border-radius:16px;padding:12px 6px;color:#fff;min-height:92px;transition:transform .15s,border-color .15s}.shortcut:active{transform:scale(.97)}.shortcut .shortcut-icon{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--p3);color:#d89bff;margin-bottom:8px}.shortcut .shortcut-icon .i{width:19px;height:19px}.shortcut b{display:block;width:100%;font-size:11.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shortcut span:last-child{display:block;width:100%;color:var(--mu);font-size:10px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-title{display:flex;align-items:center;justify-content:space-between;gap:12px}.more-toggle{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--p);color:#fff;box-shadow:0 6px 14px rgba(130,10,209,.35);transition:transform .2s}.more-toggle.open{transform:rotate(45deg);background:var(--card2);color:#d89bff}.home-menu{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .25s ease,opacity .2s ease}.home-menu.open{grid-template-rows:1fr;opacity:1}.home-menu-inner{overflow:hidden;padding-top:0}.home-menu.open .home-menu-inner{padding-top:8px}
+.shop-hero{position:relative;overflow:hidden;border-radius:24px;padding:22px;background:linear-gradient(145deg,#120b1d,#35104f 55%,#8b16c5);min-height:178px}.shop-hero::before{content:"✦";position:absolute;right:24px;top:10px;color:rgba(255,255,255,.35);font-size:88px;line-height:1}.shop-hero h2{position:relative;font-size:28px;line-height:1.05;max-width:230px;margin:5px 0 8px;letter-spacing:-.04em}.shop-hero p{position:relative;color:#e3c8ee;font-size:13px;max-width:255px;margin:0}.shop-hero .eyebrow{position:relative;color:#f1caff;text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:800}.shop-balances{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:-28px;position:relative;z-index:2}.shop-balance{background:rgba(30,30,34,.96);border:1px solid var(--ln);border-radius:14px;padding:11px 8px;min-width:0}.shop-balance strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shop-balance span{display:block;color:var(--mu);font-size:10px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.shop-toolbar{display:flex;gap:8px;overflow:auto;scrollbar-width:none}.shop-toolbar::-webkit-scrollbar{display:none}.shop-chip{flex:0 0 auto;border:1px solid var(--ln);background:var(--card);color:var(--mu);border-radius:999px;padding:9px 12px;font-size:11.5px;font-weight:750}.shop-chip.on{background:var(--p3);border-color:var(--p);color:#e1b6ff}.product-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.product-card{background:var(--card);border:1px solid rgba(255,255,255,.05);border-radius:18px;padding:12px;display:flex;flex-direction:column;min-height:214px;position:relative}.product-art{height:82px;border-radius:14px;background:radial-gradient(circle at 70% 28%,#d273ff 0,#8c18c5 22%,#32104b 70%);display:grid;place-items:center;color:#fff;font-size:33px;margin-bottom:11px}.product-card:nth-child(3n+2) .product-art{background:radial-gradient(circle at 30% 30%,#ffcf70 0,#bd6222 24%,#422014 75%)}.product-card:nth-child(3n) .product-art{background:radial-gradient(circle at 60% 25%,#79e6c0 0,#168b79 25%,#103c40 75%)}.product-card h3{font-size:14px;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.product-card p{color:var(--mu);font-size:11px;line-height:1.35;margin:5px 0 9px;min-height:30px}.product-meta{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:auto}.product-price{font-weight:800;font-size:14px}.product-price small{display:block;color:var(--mu);font-size:9px;font-weight:600;margin-top:2px}.product-buy{background:var(--p);color:#fff;border-radius:10px;padding:9px 10px;font-size:11px;font-weight:800}.payment-strip{display:flex;gap:7px;flex-wrap:wrap}.payment-tag{background:var(--card2);color:#d8a5f2;border-radius:999px;padding:7px 9px;font-size:10.5px;font-weight:700}
+.product-art{overflow:hidden}.product-art img{width:100%;height:100%;object-fit:cover}
+.product-card{cursor:pointer}.product-tryon{display:flex!important;align-items:center;justify-content:center;width:100%;min-height:42px;margin-top:9px;padding:10px 8px;border:1px solid rgba(199,125,255,.55);border-radius:11px;background:linear-gradient(135deg,#351047,#6912a0);color:#fff!important;font-size:12px;font-weight:800;text-align:center}.product-tryon:active{transform:scale(.98);filter:brightness(1.15)}.product-admin{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;border-top:1px solid var(--ln);font-size:11px}.danger-link{color:var(--rd)}
+.tryon-stage{height:390px;border-radius:20px;background:radial-gradient(circle at 50% 22%,#52206e 0,#1c1028 38%,#09090b 78%);overflow:hidden;position:relative;border:1px solid rgba(199,125,255,.25);touch-action:none}.tryon-canvas{height:100%;display:flex;align-items:center;justify-content:center;perspective:700px;touch-action:none;user-select:none}.tryon-avatar{position:relative;width:164px;height:330px;transform-style:preserve-3d;transform:rotateY(0deg);transition:transform .25s ease}.tryon-head{position:absolute;left:56px;top:8px;width:52px;height:58px;border-radius:48% 48% 42% 42%;background:linear-gradient(135deg,#f2b18b,#a85e51);box-shadow:inset -8px -5px 0 rgba(80,30,30,.18)}.tryon-neck{position:absolute;left:72px;top:57px;width:20px;height:28px;background:#c77b63}.tryon-torso{position:absolute;left:30px;top:72px;width:104px;height:126px;border-radius:38px 38px 24px 24px;background:linear-gradient(105deg,#5d177f,#b44fe0 45%,#391044);box-shadow:inset -14px 0 0 rgba(0,0,0,.18)}.tryon-arm{position:absolute;top:79px;width:24px;height:116px;border-radius:18px;background:#c77b63}.tryon-arm.left{left:8px;transform:rotate(7deg)}.tryon-arm.right{right:8px;transform:rotate(-7deg)}.tryon-legs{position:absolute;top:187px;left:43px;width:78px;height:112px;background:linear-gradient(90deg,#262432 0 47%,#13121a 47% 53%,#262432 53%);border-radius:10px 10px 20px 20px}.tryon-shoes{position:absolute;top:292px;left:29px;width:106px;height:25px;border-radius:18px 18px 8px 8px;background:#f4f4f6;box-shadow:inset 0 -6px 0 #c7c7cf}.tryon-item-texture{position:absolute;inset:0;border-radius:inherit;background-size:cover;background-position:center;opacity:.62;mix-blend-mode:screen}.tryon-loading{height:100%;display:grid;place-items:center;color:#e7cfff;font-size:12px}.tryon-badge{position:absolute;top:12px;left:12px;z-index:2;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:7px 10px;color:#e7cfff;font-size:10px;font-weight:800;letter-spacing:.04em}.tryon-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}.tryon-controls button{background:var(--card2);border:1px solid var(--ln);border-radius:10px;padding:11px 9px;color:var(--mu);font-size:11px;font-weight:800;min-height:42px}.tryon-controls button.on{background:var(--p3);border-color:var(--p);color:#fff}.tryon-note{font-size:11px;color:var(--mu);margin:8px 0 0}.tryon-product{display:flex;align-items:center;gap:10px;padding:9px;border-radius:12px;background:var(--card2);margin-top:10px}.tryon-product img{width:42px;height:42px;border-radius:9px;object-fit:cover}.tryon-product b{font-size:12px}.tryon-product span{display:block;color:var(--mu);font-size:10px;margin-top:2px}
+.magic-wallet{text-align:left;border:1px solid rgba(199,125,255,.3);background:linear-gradient(110deg,#21102f,#351047);color:#fff}.magic-wallet b{display:block;font-size:14px}.magic-wallet span{display:block;color:#d4acdF;font-size:11px;margin-top:4px}
+.vehicle-card{margin-bottom:10px}.vehicle-image{height:150px;border-radius:14px;overflow:hidden;background:linear-gradient(135deg,#24102f,#7b1fc1);display:grid;place-items:center;font-size:52px;margin-bottom:12px}.vehicle-image img{width:100%;height:100%;object-fit:cover}
+.score-card{background:linear-gradient(135deg,#18121f,#2d1241);border:1px solid rgba(199,125,255,.25)}.score-ring{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;margin:4px auto 14px;background:conic-gradient(var(--p2) var(--score),#302c35 0);position:relative}.score-ring:after{content:"";position:absolute;inset:9px;border-radius:50%;background:#18121f}.score-ring b,.score-ring span{position:relative;z-index:1}.score-ring b{font-size:27px}.score-ring span{font-size:10px;color:var(--mu);margin-top:31px;position:absolute}
+.product-detail-image{width:100%;min-height:180px;max-height:55vh;border-radius:18px;background:#0b0b0d;display:flex;align-items:center;justify-content:center;overflow:hidden;color:#fff;font-size:70px;margin-bottom:14px;padding:8px}.product-detail-image img{display:block;width:auto;height:auto;max-width:100%;max-height:55vh;object-fit:contain;object-position:center}
+.card{background:var(--card);border-radius:var(--r);padding:16px;min-width:0}
+.card.flush{padding:0;overflow:hidden}
+.ttl{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px;gap:8px}
+.ttl h3{margin:0;font-size:15px;color:#fff}
+.mu{color:var(--mu)}.sm-t{font-size:12.5px}
+.big{font-size:30px;font-weight:800;letter-spacing:-.03em;margin:2px 0;color:#fff}
+.row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--ln);background:var(--card);min-width:0}
+.row:last-child{border-bottom:0}
+button.row:active{background:var(--card2)}
+.row .ic{width:40px;height:40px;border-radius:50%;background:var(--p3);color:#c77dff;display:grid;place-items:center;flex:none}
+.row .ic.g{background:var(--gr2);color:var(--gr)}.row .ic.r{background:var(--rd2);color:var(--rd)}.row .ic.a{background:var(--am2);color:var(--am)}
+.row .mid{flex:1;min-width:0}
+.row .mid b{display:block;font-size:14.5px;font-weight:650;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .mid span{display:block;font-size:12.5px;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .end{text-align:right;font-weight:700;font-size:14.5px;flex:none;max-width:44%;color:#fff}
+.row .end small{display:block;font-weight:500;font-size:11.5px;color:var(--mu)}
+.in{color:var(--gr)}.out{color:var(--tx)}
+.chev{color:#55555c;width:20px;height:20px;flex:none}
+.pill{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:800;background:var(--card2);color:var(--mu)}
+.pill.g{background:var(--gr2);color:var(--gr)}.pill.r{background:var(--rd2);color:var(--rd)}.pill.p{background:var(--p3);color:#c77dff}
+.empty{text-align:center;color:var(--mu);padding:30px 18px;font-size:13.5px}
+.empty b{display:block;color:#fff;margin-bottom:4px;font-size:15px}
+.day{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em;padding:14px 16px 6px;background:var(--card)}
+.acts{display:flex;gap:10px;overflow-x:auto;max-width:100%;padding:2px 0 4px;scrollbar-width:none}
+.acts::-webkit-scrollbar{display:none}
+.act{flex:0 0 72px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;font-weight:650;text-align:center;color:var(--mu)}
+.act i{width:56px;height:56px;border-radius:50%;background:var(--card2);color:#c77dff;display:grid;place-items:center}
+.act:active i{background:var(--p3)}
+.pixgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pixgrid .btn{flex-direction:column;min-height:70px;border-radius:14px;font-size:12.5px;gap:6px;padding:10px}
+.chart{display:flex;gap:8px;align-items:flex-end;height:120px;padding-top:8px}
+.chart .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chart .bar{width:100%;max-width:26px;border-radius:8px 8px 4px 4px;background:linear-gradient(180deg,var(--p2),var(--p));min-height:4px}
+.chart .col span{font-size:10px;color:var(--mu);font-weight:700}
+.bar2{height:8px;border-radius:99px;background:var(--ln);overflow:hidden;margin:10px 0 6px}.bar2 span{display:block;height:100%;background:var(--p);border-radius:99px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ln);font-size:14px}
+.kv:last-child{border-bottom:0}.kv span:first-child{color:var(--mu)}.kv span:last-child{font-weight:650;text-align:right;color:#fff;overflow-wrap:anywhere}
+.plastic{border-radius:20px;padding:20px;color:#fff;position:relative;overflow:hidden;aspect-ratio:1.6/1;max-height:230px;background:linear-gradient(135deg,#820ad1 0%,#4a0476 100%)}
+.plastic::before{content:"";position:absolute;inset:-20%;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.16) 0,transparent 40%);pointer-events:none}
+.plastic .chipic{position:absolute;top:20px;left:20px;width:38px;height:28px;border-radius:6px;background:linear-gradient(135deg,#d4af37,#f4d03f)}
+.plastic .tp{position:absolute;top:22px;right:20px}
+.plastic .num{position:absolute;left:20px;right:20px;bottom:44px;font-family:'Courier New',monospace;font-size:clamp(14px,4.6vw,19px);letter-spacing:.1em;font-weight:700;white-space:nowrap}
+.plastic .foot{position:absolute;left:20px;right:20px;bottom:18px;display:flex;justify-content:space-between;font-size:12px;gap:8px}
+.blocked{filter:grayscale(.85) brightness(.75)}
+.chatscroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px 14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none}
+.chatscroll::-webkit-scrollbar{display:none}
+.msgrow{display:flex;gap:8px;align-items:flex-end}
+.msgrow.me{justify-content:flex-end}
+.mavatar{width:28px;height:28px;border-radius:50%;background:var(--p3);color:#c77dff;display:grid;place-items:center;font-size:12px;font-weight:800;flex:none}
+.bubble{max-width:78%;padding:10px 14px;border-radius:18px;border-bottom-left-radius:6px;font-size:14px;line-height:1.45;background:var(--card2);color:#fff;word-wrap:break-word}
+.msgrow.me .bubble{background:var(--p);border-bottom-left-radius:18px;border-bottom-right-radius:6px}
+.mtime{font-size:10px;color:rgba(255,255,255,.55);margin-top:4px;text-align:right}
+.composer{flex:none;display:flex;gap:8px;align-items:center;padding:10px 12px calc(10px + var(--bot));border-top:1px solid var(--ln);background:var(--bg)}
+.composer input{flex:1;min-width:0;border:1.5px solid var(--ln);border-radius:999px;padding:12px 16px;background:var(--card2);color:#fff;outline:0;font-size:15px}
+.composer input:focus{border-color:var(--p)}
+.composer .send{width:46px;height:46px;border-radius:50%;background:var(--p);color:#fff;display:grid;place-items:center;flex:none}
+.composer .send:active{filter:brightness(.9)}
+.tabs{position:absolute;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg);border-top:1px solid var(--ln);padding:8px 0 calc(8px + var(--bot));z-index:20}
+.tab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;font-size:10.5px;font-weight:700;color:var(--mu)}
+.tab.on{color:#c77dff}
+.tab i{width:24px;height:24px}
+.sheet{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:20px 20px 0 0;padding:0 18px calc(18px + var(--bot));box-shadow:0 -8px 24px rgba(0,0,0,.6);transform:translateY(100%);transition:transform .25s ease-out;z-index:30;max-height:85%;overflow-y:auto;overscroll-behavior:contain}
+.sheet.open{transform:translateY(0)}
+.sheet .grip{width:38px;height:4px;border-radius:2px;background:var(--ln);margin:10px auto 14px}
+.sheet h2{margin:0 0 14px;font-size:20px;letter-spacing:-.02em;color:#fff}
+.sheet h3{color:#fff}
+.sheet .close{position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:50%;background:var(--card2);display:grid;place-items:center;color:var(--mu)}
+.code{background:#000;border:1.5px dashed var(--ln);border-radius:12px;padding:14px;font-family:'Courier New',monospace;font-size:12px;word-break:break-all;margin:14px 0;color:#fff}
+.stat{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:14px 0}
+.stat .b{background:var(--card);border-radius:12px;padding:14px;text-align:center}
+.stat .b b{display:block;font-size:20px;font-weight:800;color:#c77dff;margin-bottom:4px}
+.stat .b span{font-size:11px;color:var(--mu);font-weight:700}
+.toast{position:fixed;top:calc(20px + var(--top));left:50%;transform:translateX(-50%) translateY(-120px);background:var(--card2);color:#fff;padding:12px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 4px 12px rgba(0,0,0,.6);z-index:100;transition:transform .3s;max-width:calc(100% - 40px);border:1.5px solid var(--ln)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:var(--gr);color:var(--gr)}
+.toast.err{border-color:var(--rd);color:var(--rd)}
+.busy{position:fixed;inset:0;background:rgba(0,0,0,.75);display:grid;place-items:center;z-index:200}
+.busy i{width:40px;height:40px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--p);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+'use strict';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const fmtBRL = (v) => Number(v || 0).toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+const fmtDate = (d) => new Date(d).toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+const parseMoney = (s) => { const n = Number(String(s).replace(/\./g,'').replace(',','.')); return Number.isFinite(n) ? n : 0; };
+const U = () => (S.st && S.st.user) || {};
+const ini = () => ((U().fullName || U().username || '?')[0] || '?').toUpperCase();
+const avatarHtml = (u, cls='av') => `<span class="${cls}">${u && u.avatarUrl ? `<img src="${esc(u.avatarUrl)}" alt="Foto de ${esc(u.fullName||u.username||'usuário')}" loading="lazy">` : esc(((u && (u.fullName||u.username)) || '?')[0].toUpperCase())}</span>`;
+const fmtBalance = (u) => u && u.unlimitedFunds ? 'Ilimitado' : fmtBRL((u && u.balance) || 0);
+
+const ICO = { home:'<path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10"/>', pix:'<path d="M9 5l-4 7 4 7M15 5l4 7-4 7"/>', list:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>', card:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/>', pig:'<path d="M19 8c-2-2-5-3-8-3s-6 1-8 3c-1 1-1 3 0 4 2 2 5 3 8 3s6-1 8-3c1-1 1-3 0-4z"/><circle cx="8" cy="11" r="1" fill="currentColor"/>', credit:'<path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>', bell:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/>', help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 2-2.5 3-2.5 3M12 17h.01"/>', chev:'<path d="M9 6l6 6-6 6"/>', back:'<path d="M19 12H5M12 19l-7-7 7-7"/>', arrow:'<path d="M5 12h14M12 5l7 7-7 7"/>', plus:'<path d="M12 5v14M5 12h14"/>', check:'<path d="M20 6L9 17l-5-5"/>', close:'<path d="M18 6L6 18M6 6l12 12"/>', copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>', trash:'<path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>', gift:'<path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>', logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>', refresh:'<path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>' };
+const ico = (k) => `<svg class="i" viewBox="0 0 24 24">${ICO[k] || ''}</svg>`;
+
+const S = { token: localStorage.getItem('armin_token') || '', st: null, master: null, products: [], vehicles: [], payments: null, page: 'home', homeMore: false, authTab: 'login', socket: null, card: null, cardTimer: null, pix: { key:'', rec:null, amount:'', value:0, note:'', n:1 }, toastTimer: null, sheetEl: null, tryOnCleanup: null };
+
+async function api(p, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.token) headers.authorization = `Bearer ${S.token}`;
+  const r = await fetch(p, { ...opts, headers, body: opts.body ? JSON.stringify(opts.body) : null });
+  const j = await r.json().catch(() => null);
+  if (!r.ok) { if (r.status === 401 && S.token) { localStorage.removeItem('armin_token'); S.token=''; S.st=null; S.master=null; render(); toast('Sua sessão foi invalidada. Entre novamente para continuar.', 'err'); } throw new Error((j && j.message) || 'Erro na requisição'); }
+  return j;
+}
+async function uploadFile(file) {
+  if (!file) throw new Error('Selecione uma imagem primeiro.');
+  if (!file.type.startsWith('image/')) throw new Error('Selecione um arquivo de imagem válido.');
+  if (file.size > 32 * 1024 * 1024) throw new Error('A imagem deve ter no máximo 32MB.');
+  const form = new FormData(); form.append('image', file);
+  const headers = {}; if (S.token) headers.authorization = `Bearer ${S.token}`;
+  const r = await fetch('/api/upload/image', { method:'POST', headers, body:form });
+  const j = await r.json().catch(() => null); if (!r.ok) throw new Error((j && j.message) || 'Erro ao enviar imagem.'); return j;
+}
+async function busy(el, fn) {
+  if (el) el.disabled = true;
+  const b = document.createElement('div'); b.className = 'busy'; b.innerHTML = '<i></i>'; document.body.appendChild(b);
+  try { return await fn(); } catch (e) { toast(e.message, 'err'); return null; } finally { document.body.removeChild(b); if (el) el.disabled = false; }
+}
+function toast(msg, type = '') {
+  clearTimeout(S.toastTimer);
+  let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; document.body.appendChild(t); }
+  t.className = `toast show ${type}`; t.textContent = msg;
+  S.toastTimer = setTimeout(() => { t.className = 'toast'; }, 3000);
+}
+function sheetOpen(html) {
+  sheetClose();
+  const s = document.createElement('div'); s.className = 'sheet open';
+  s.innerHTML = `<div class="grip"></div><button class="close" data-act="closeSheet">${ico('close')}</button>${html}`;
+  $('#root').appendChild(s); S.sheetEl = s; return s;
+}
+function sheetClose() { if (S.tryOnCleanup) { S.tryOnCleanup(); S.tryOnCleanup = null; } if (S.sheetEl) { S.sheetEl.remove(); S.sheetEl = null; } }
+function setState(r) { if (r && r.state) S.st = r.state; render(); }
+async function loadMaster() { try { const m = await api('/api/master/overview'); S.master = m; render(); } catch (e) { toast(e.message, 'err'); } }
+async function loadShop() { try { const [p, pay] = await Promise.all([api('/api/products'), api('/api/payments')]); S.products = p.products || []; S.payments = pay; render(); } catch (e) { toast(e.message, 'err'); } }
+
+function chartHtml(title, txs, kinds) {
+  const pos = kinds.includes('savings_yield') || kinds.includes('referral');
+  const buckets = [];
+  for (let i = 6; i >= 0; i--) { const d = new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()-i); buckets.push({ label:'DSTQQSS'[d.getDay()], key:d.toDateString(), total:0 }); }
+  (txs||[]).forEach(t => {
+    if (!kinds.includes(t.kind||'')) return;
+    if (pos ? (t.amount||0) <= 0 : (t.amount||0) >= 0) return;
+    const k = new Date(t.createdAt); k.setHours(0,0,0,0);
+    const b = buckets.find(x => x.key === k.toDateString()); if (b) b.total += Math.abs(t.amount||0);
+  });
+  const max = Math.max(...buckets.map(b => b.total), 1);
+  const total = buckets.reduce((s,b) => s+b.total, 0);
+  return `<div class="ttl"><h3>${title}</h3><span class="pill p">${fmtBRL(total)}</span></div>
+  <div class="chart">${buckets.map(b => `<div class="col"><div class="bar" style="height:${Math.max(4, Math.round((b.total/max)*100))}%"></div><span>${b.label}</span></div>`).join('')}</div>`;
+}
+
+function shell() { return `<div class="app"><div id="view" class="view"></div><nav class="tabs" id="tabs"></nav></div>`; }
+function render() {
+  sheetClose();
+  if (!S.token || !S.st) { renderAuth(); return; }
+  $('#root').innerHTML = shell();
+  $('#tabs').innerHTML = tabsHtml();
+  const v = $('#view');
+  v.style.cssText = (S.page === 'support') ? 'display:flex;flex-direction:column;overflow:hidden;padding-bottom:calc(66px + var(--bot))' : '';
+  if (S.page === 'master' && U().role === 'admin') renderMaster();
+  else if (S.page === 'support') renderSupport();
+  else if (S.page === 'pixhub') renderPixHub();
+  else if (S.page === 'savings') renderSavings();
+  else if (S.page === 'pix') renderExtract();
+  else if (S.page === 'card') renderCardPage();
+  else if (S.page === 'shop') renderShop();
+  else if (S.page === 'more') renderMore();
+  else renderHome();
+}
+function tabsHtml() {
+  return [ {id:'home',l:'Início',i:'home'}, {id:'pix',l:'Extrato',i:'list'}, {id:'card',l:'Cartão',i:'card'}, {id:'more',l:'Mais',i:'plus'} ]
+    .map(t => `<button class="tab ${S.page===t.id?'on':''}" data-act="goPage" data-page="${t.id}">${ico(t.i)}${t.l}</button>`).join('');
+}
+function renderAuth() {
+  const tab = S.authTab;
+  $('#root').innerHTML = `
+  <div class="auth">
+    <div class="logo"><b>G</b> GHSOTBANK</div>
+    <h1>Seu banco digital<br>sem complicação</h1>
+    <p>Pix, cartão, cofrinho e crédito em um só lugar.</p>
+    <div class="seg">
+      <button class="${tab==='login'?'on':''}" data-act="switchAuth" data-tab="login">Entrar</button>
+      <button class="${tab==='register'?'on':''}" data-act="switchAuth" data-tab="register">Criar conta</button>
+    </div>
+    ${tab === 'login' ? `
+      <form data-form="login">
+        <div class="fld"><label>Usuário ou e-mail</label><input name="username" required autocomplete="username"></div>
+        <div class="fld"><label>Senha</label><input name="password" type="password" required autocomplete="current-password"></div>
+        <button class="btn" type="submit">${ico('arrow')} Entrar</button>
+      </form>` : `
+      <form data-form="register">
+        <div class="fld"><label>Nome completo</label><input name="fullName" required placeholder="Nome e sobrenome"></div>
+        <div class="fld"><label>Usuário</label><input name="username" required pattern="[a-zA-Z0-9_]+" placeholder="só letras, números e _"><small>Sem espaços nem acentos</small></div>
+        <div class="fld"><label>Senha</label><input name="password" type="password" required minlength="4" placeholder="mínimo 4 caracteres"></div>
+        <button class="btn" type="submit">${ico('check')} Criar conta grátis</button>
+      </form>`}
+  </div>`;
+}
+function txRow(tx) {
+  const isIn = (tx.amount || 0) >= 0;
+  const icon = (tx.kind||'').includes('pix') ? 'pix' : tx.kind === 'card' ? 'card' : (tx.kind === 'savings_yield' || tx.kind === 'savings') ? 'pig' : tx.kind === 'installment' ? 'credit' : tx.kind === 'referral' ? 'gift' : tx.kind === 'deposit' ? 'bonus' : 'arrow';
+  return `<div class="row"><div class="ic ${isIn?'g':'r'}">${ico(icon)}</div><div class="mid"><b>${esc(tx.description || tx.title || 'Movimentação')}</b><span>${fmtDate(tx.createdAt)}</span></div><div class="end ${isIn?'in':'out'}">${isIn?'+':'-'}${fmtBRL(Math.abs(tx.amount))}</div></div>`;
+}
+function renderHome() {
+  const u = U(); const txs = (S.st.transactions || []).slice(0, 4); const unread = S.st.unread || 0;
+  const shortcut = (act, ic, label, sub, extra='') => `<button class="shortcut" data-act="${act}" ${extra}><span class="shortcut-icon">${ico(ic)}</span><b>${label}</b><span>${sub}</span></button>`;
+  const quick = `${shortcut('openPixHub','pix','Área Pix','Enviar e cobrar')}${shortcut('goPage','pig','Cofrinho','Guardar dinheiro','data-page="savings"')}${shortcut('openCard','card','Meus cartões','Ver cartão')}${shortcut('openContracts','credit','Contratar','Seguro e veículos')}${shortcut('openShop','gift','Loja','Itens e moedas')}`;
+  const more = `${shortcut('openScore','check','Meu score','Ver pontuação')}${shortcut('openCredit','credit','Crédito','Fatura e limite')}${shortcut('openLoans','credit','Empréstimos','Solicitar e pagar')}${shortcut('openReferral','gift','Indique','Ganhe bônus')}${shortcut('openKeys','lock','Chaves Pix','Gerenciar')}${shortcut('openCharge','plus','Cobrar','Criar cobrança')}${shortcut('openNotifs','bell','Avisos',unread ? `${unread} não lidos` : 'Tudo em dia')}${shortcut('openSupport','help','Suporte','Fale com a gente')}${shortcut('openPassword','lock','Segurança','Trocar senha')}${u.role==='admin' ? shortcut('goPage','check','Painel master','Gerenciar','data-page="master"') : shortcut('goPage','list','Extrato','Ver movimentos','data-page="pix"')}`;
+  $('#view').innerHTML = `
+  <div class="hdr" style="padding-bottom:10px"><div class="bar"><button class="profile-button" data-act="openProfile" aria-label="Abrir meu perfil">${avatarHtml(u)}</button><div class="tools"><button class="ib" data-act="openNotifs">${ico('bell')}${unread ? `<span class="dot">${unread}</span>` : ''}</button><button class="ib" data-act="openSupport">${ico('help')}</button><button class="ib" data-act="logout">${ico('logout')}</button></div></div></div>
+  <div class="wrap" style="padding-top:6px">
+  <div class="home-hero"><span class="eyebrow">Sua conta Ghsot</span><h1 style="margin:8px 0 0;font-size:23px">Olá, ${esc((u.fullName||u.username||'').split(' ')[0])}</h1><p>Saldo disponível</p><div class="balance">${fmtBalance(u)}</div><div class="hero-actions"><button data-act="openPix">${ico('arrow')} Enviar Pix</button><button data-act="openShop">${ico('gift')} Explorar loja</button></div></div>
+    <div class="quick-title"><div><h2>Atalhos rápidos</h2><p style="margin:3px 0 0;color:var(--mu);font-size:12px">Suas principais funções</p></div><button class="more-toggle ${S.homeMore?'open':''}" data-act="toggleHomeMenu" aria-label="${S.homeMore?'Fechar':'Abrir'} menu completo">${ico('plus')}</button></div>
+    <div class="shortcut-grid">${quick}</div>
+    <div class="home-menu ${S.homeMore?'open':''}"><div class="home-menu-inner"><div class="shortcut-grid">${more}</div></div></div>
+    <div class="card"><div class="section-head" style="margin:0 0 10px"><div><h2>Para você</h2><p>Seu dinheiro trabalhando melhor</p></div></div><div class="row" style="border-radius:14px;padding:13px 0;background:transparent;border-bottom:0" data-act="openScore"><div class="ic">${ico('check')}</div><div class="mid"><b>Seu score ${S.st.score ? S.st.score.value : u.score}</b><span>${S.st.score ? S.st.score.band : 'Veja como melhorar seu crédito'}</span></div>${ico('chev')}</div><div class="row" style="border-radius:14px;padding:13px 0;background:transparent;border-bottom:0" data-act="openCard"><div class="ic">${ico('card')}</div><div class="mid"><b>Seu cartão Black</b><span>Toque para ver número, validade e limite</span></div>${ico('chev')}</div><div class="row" style="border-radius:14px;padding:13px 0;background:transparent;border-bottom:0" data-act="openContracts"><div class="ic">${ico('credit')}</div><div class="mid"><b>Seguro e veículos</b><span>Contrate proteção ou financie seu carro</span></div>${ico('chev')}</div><div class="row" style="border-radius:14px;padding:13px 0;background:transparent;border-bottom:0" data-act="openShop"><div class="ic">${ico('gift')}</div><div class="mid"><b>Descubra a loja de itens</b><span>Compre com reais, vale ou moedas mágicas</span></div>${ico('chev')}</div></div>
+    ${(u.savings||0) > 0 ? `<button class="card" style="width:100%;text-align:left" data-act="goPage" data-page="savings"><div class="ttl"><h3>Cofrinho</h3><span class="pill g">rendendo</span></div><div class="big">${fmtBRL(u.savings)}</div><p class="mu sm-t">Toque para acompanhar o rendimento</p></button>` : ''}
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Últimas movimentações</h3><button class="lnk" data-act="goPage" data-page="pix">Ver tudo</button></div>${txs.length ? txs.map(txRow).join('') : '<div class="empty"><b>Nada por aqui ainda</b>Suas movimentações aparecem aqui.</div>'}</div>
+  </div>`;
+}
+function renderSavings() {
+  const u = U(); const yields = (S.st.transactions || []).filter(t => t.kind === 'savings_yield');
+  const gained = yields.reduce((s,t) => s + Math.abs(t.amount||0), 0);
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button><div class="tools"><span class="pill g">rendendo</span></div></div>
+    <h1>Cofrinho</h1><p>Guardado e rendendo ~1% ao mês</p></div>
+  <div class="wrap">
+    <div class="card"><div class="big">${fmtBRL(u.savings||0)}</div>
+      <div class="kv"><span>Rendimento acumulado</span><span class="in">+${fmtBRL(gained)}</span></div>
+      <div class="kv"><span>Projeção p/ próximo mês</span><span>${fmtBRL((u.savings||0)*1.01)}</span></div>
+      <div class="btns two"><button class="btn" data-act="openSavings">${ico('pig')} Guardar</button><button class="btn sec" data-act="openSavings">Resgatar</button></div></div>
+    <div class="card">${chartHtml('Rendimento por dia', S.st.transactions || [], ['savings_yield'])}</div>
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Histórico de rendimento</h3></div>
+      ${yields.length ? yields.slice(0,8).map(txRow).join('') : '<div class="empty"><b>Sem rendimentos ainda</b>Guarde dinheiro para começar a render.</div>'}</div>
+  </div>`;
+}
+function msgRow(m) {
+  const me = m.role !== 'support';
+  return `<div class="msgrow ${me?'me':'them'}">
+    ${me ? '' : `<div class="mavatar">A</div>`}
+    <div class="bubble"><div class="mtext">${esc(m.text)}</div><div class="mtime">${fmtDate(m.createdAt)}</div></div>
+  </div>`;
+}
+function scrollChat(root) { const w = (root || document).querySelector('.chatscroll'); if (w) w.scrollTop = w.scrollHeight; }
+function renderSupport() {
+  const msgs = S.st.supportMessages || [];
+  $('#view').innerHTML = `
+  <div class="hdr" style="padding-bottom:14px">
+    <div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button>
+      <div class="tools"><span class="pill g">online</span></div></div>
+    <h1 style="font-size:22px;margin-top:6px">Suporte Ghsot</h1>
+    <p>A gente responde por aqui, em tempo real</p>
+  </div>
+  <div class="chatscroll">
+    ${msgs.length ? msgs.map(msgRow).join('') : '<div class="empty"><b>Nenhuma mensagem ainda</b>Mande um oi que a conversa começa.</div>'}
+  </div>
+  <form class="composer" data-form="support">
+    <input name="text" placeholder="Escreva sua mensagem" autocomplete="off">
+    <button class="send" type="submit" aria-label="Enviar">${ico('arrow')}</button>
+  </form>`;
+  scrollChat();
+}
+function renderPixHub() {
+  const u = U(); const pixTx = (S.st.transactions || []).filter(t => (t.kind||'').includes('pix')).slice(0, 6);
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="openKeys">${ico('plus')}</button></div></div>
+    <h1>Área Pix</h1><p>Envie, receba e gerencie chaves</p></div>
+  <div class="wrap">
+    <div class="card"><div class="pixgrid">
+      <button class="btn" data-act="openPix">${ico('arrow')}<span>Enviar Pix</span></button>
+      <button class="btn sec" data-act="openCharge">${ico('plus')}<span>Cobrar</span></button>
+      <button class="btn sec" data-act="pasteCode">${ico('copy')}<span>Colar código</span></button>
+      <button class="btn sec" data-act="openKeys">${ico('lock')}<span>Minhas chaves</span></button>
+    </div></div>
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Minhas chaves Pix</h3><button class="lnk" data-act="openKeys">Criar nova</button></div>
+      ${(u.pixKeys||[]).map(k => `<div class="row"><div class="ic">${ico('pix')}</div><div class="mid"><b>${esc(k.value)}</b><span>${esc(k.type)}</span></div><button class="btn sm dng" data-act="removeKey" data-id="${esc(k.id)}">${ico('trash')}</button></div>`).join('') || '<div class="empty">Nenhuma chave.</div>'}
+    </div>
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Últimos Pix</h3></div>
+      ${pixTx.length ? pixTx.map(txRow).join('') : '<div class="empty"><b>Nenhum Pix ainda</b>Envie ou receba o primeiro.</div>'}</div>
+  </div>`;
+}
+function renderExtract() {
+  const txs = S.st.transactions || []; let last = '';
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="goPage" data-page="home">${ico('close')}</button></div></div><h1>Extrato</h1><p>${txs.length} movimentações</p></div>
+  <div class="wrap">
+    <div class="card">${chartHtml('Gastos nos últimos 7 dias', txs, ['pix_out','card','installment'])}</div>
+    <div class="card flush">${txs.length ? txs.map(t => { const d = new Date(t.createdAt).toLocaleDateString('pt-BR'); const h = d !== last ? `<div class="day">${d}</div>` : ''; last = d; return h + txRow(t); }).join('') : '<div class="empty"><b>Nada por aqui ainda</b></div>'}</div>
+  </div>`;
+}
+function renderCardPage() {
+  const u = U(); const c = S.card; const loans = u.loans || []; const black = u.blackCardStatus || 'none';
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="cardReveal" aria-label="Mostrar dados do cartão">${ico('eye')}</button></div></div><h1>Meus cartões</h1><p>${u.cardBlocked ? 'Bloqueado' : 'Ativo'} • toque no olho para ver os dados</p></div>
+  <div class="wrap">
+    ${black !== 'approved' ? `<div class="card"><div class="ttl"><h3>Cartão Black</h3><span class="pill ${black==='pending'?'p':black==='rejected'?'r':'a'}">${black==='pending'?'em análise':black==='rejected'?'não aprovado':'disponível mediante aprovação'}</span></div><p class="mu sm-t">O Cartão Black é liberado somente após análise e aprovação do master.</p>${black==='pending' ? '<p class="mu sm-t">Sua solicitação está em análise.</p>' : `<button class="btn" data-act="requestBlackCard">Solicitar Cartão Black</button>`}</div>` : ''}
+    ${black === 'approved' ? '<div class="card" style="border:1px solid rgba(199,125,255,.45);background:linear-gradient(145deg,#111,#351047)"><div class="ttl"><h3>Cartão Black aprovado</h3><span class="pill g">ativo</span></div><p class="mu sm-t">Seus dados estão protegidos. Toque no olho para visualizar por 20 segundos.</p></div>' : ''}
+    <div class="plastic ${u.cardBlocked?'blocked':''}"><div class="chipic"></div><div class="tp">${ico('card')}</div>
+      <div class="num">${c ? esc(c.number) : '•••• •••• •••• ••••'}</div>
+      <div class="foot"><span>${esc(u.fullName||'')}</span><span>${c ? esc(c.expiry) : '••/••'}</span></div></div>
+    ${c ? `<div class="card"><div class="kv"><span>CVV</span><span>${esc(c.cvv)}</span></div><div class="kv"><span>Validade</span><span>${esc(c.expiry)}</span></div></div>` : '<button class="btn sec" data-act="cardReveal">' + ico('eye') + ' Mostrar número e CVV por 20 segundos</button>'}
+    <div class="card"><div class="kv"><span>Limite</span><span>${u.unlimitedFunds?'Ilimitado':fmtBRL(u.creditLimit)}</span></div><div class="kv"><span>Usado</span><span>${u.unlimitedFunds?fmtBRL(0):fmtBRL(u.creditUsed)}</span></div><div class="kv"><span>Disponível</span><span>${u.unlimitedFunds?'Ilimitado':fmtBRL((u.creditLimit||0)-(u.creditUsed||0))}</span></div>
+      <div class="bar2"><span style="width:${Math.min(100, u.creditLimit ? (u.creditUsed/u.creditLimit*100) : 0)}%"></span></div></div>
+    ${loans.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Pix parcelado</h3></div>
+      ${loans.map(l => { const due = new Date(l.createdAt); due.setMonth(due.getMonth() + l.paid + 1);
+        return `<div class="row"><div class="ic a">${ico('credit')}</div><div class="mid"><b>${esc(l.description)}</b><span>${l.paid}/${l.n} pagas • próx. ${l.paid < l.n ? due.toLocaleDateString('pt-BR') : '—'}</span></div>
+        <div class="end">${fmtBRL(l.monthly)}${l.paid < l.n ? `<small><button class="lnk" data-act="payInstallment" data-id="${esc(l.id)}">pagar parcela</button></small>` : '<small>quitado</small>'}</div></div>`; }).join('')}</div>` : ''}
+    <div class="btns">
+      <button class="btn" data-act="openPurchase">${ico('card')} Simular compra</button>
+      <button class="btn ${u.cardBlocked?'':'dng'}" data-act="cardToggle">${ico('lock')} ${u.cardBlocked ? 'Desbloquear' : 'Bloquear'} cartão</button>
+      <button class="btn sec" data-act="openCredit">${ico('credit')} Crédito e fatura</button>
+    </div></div>`;
+}
+function renderMore() {
+  const u = U();
+  const item = (act, ic, label, extra='') => `<button class="row" data-act="${act}" ${extra}><div class="ic">${ico(ic)}</div><div class="mid"><b>${label}</b></div>${ico('chev')}</button>`;
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="logout">${ico('logout')}</button></div></div><h1>Mais</h1><p>@${esc(u.username)}</p></div>
+  <div class="wrap"><div class="card flush">
+    ${item('openContracts','credit','Contratar')}${item('openShop','gift','Loja e formas de pagamento')}${item('openMagic','gift','Moedas mágicas e virtuais')}${item('openPixHub','pix','Área Pix')}${item('goPage','pig','Cofrinho','data-page="savings"')}${item('openReferral','gift','Indique e ganhe')}${item('openCredit','credit','Crédito e fatura')}${item('openLoans','credit','Meus empréstimos')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
+  </div><div class="btns"><button class="btn dng" data-act="logout">${ico('logout')} Sair da conta</button></div></div>`;
+}
+function isWearable(p) { return ['shirt','pants','shoes','accessory'].includes(p.category) || /camisa|blusa|calça|cueca|sapato|tênis|roupa|jaqueta|boné|vestido/i.test(`${p.name} ${p.description||''}`); }
+function renderShop() {
+  if (!S.payments) { $('#view').innerHTML = '<div class="empty">Carregando loja…</div>'; loadShop(); return; }
+  const cur = { BRL:'R$', STORE:'Vale', VIRTUAL:'Moedas', MAGIC:'Mágicas' };
+  const balance = (label, value, note) => `<div class="shop-balance"><strong>${value}</strong><span>${label}</span><span>${note}</span></div>`;
+  const canEdit = (p) => U().role === 'admin' || (U().role === 'seller' && p.sellerId === U().id);
+  const productCard = (p) => {
+    const pPrice = p.currency === 'BRL' ? fmtBRL(p.price) : `${p.price} ${cur[p.currency]}`;
+    const pStock = p.stock > 0 ? `${p.stock} disponíveis` : 'estoque ilimitado';
+    return `<article class="product-card" data-id="${esc(p.id)}" tabindex="0">
+      <div class="product-art" data-act="openProductDetails" data-id="${esc(p.id)}">
+        ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy">` : '✦'}
+      </div>
+      <h3 data-act="openProductDetails" data-id="${esc(p.id)}">${esc(p.name)}</h3>
+      <p data-act="openProductDetails" data-id="${esc(p.id)}">${esc(p.description || 'Um item especial.')}</p>
+      <div class="product-meta">
+        <div class="product-price">${pPrice}<small>${pStock}</small></div>
+        <button class="product-buy" data-act="buyProduct" data-id="${esc(p.id)}">Comprar</button>
+      </div>
+      <button class="product-tryon" style="display:block!important;visibility:visible!important;opacity:1!important" type="button" data-act="openFittingRoom" data-id="${esc(p.id)}">✦ Experimentar no boneco 3D</button>
+      ${canEdit(p) ? `<div class="product-admin"><button class="lnk" data-act="editProduct" data-id="${esc(p.id)}">Editar</button><button class="lnk danger-link" data-act="deleteProduct" data-id="${esc(p.id)}">Excluir</button></div>` : ''}
+    </article>`;
+  };
+  $('#view').innerHTML = `<div class="hdr" style="padding-bottom:10px"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button><div class="tools"><button class="ib" data-act="openAutoDebit">${ico('refresh')}</button></div></div></div><div class="wrap" style="padding-top:6px">
+    <div class="shop-hero"><span class="eyebrow">Ghsot market</span><h2>Itens para deixar sua conta mais interessante.</h2><p>Compre com saldo, cartão, vale ou suas moedas especiais.</p></div>
+    <div class="shop-balances">${balance('Saldo',U().unlimitedFunds?'Ilimitado':fmtBRL(S.payments.balances.money),'BRL')}${balance('Vale',U().unlimitedFunds?'Ilimitado':fmtBRL(S.payments.balances.storeCredit),'Loja')}${balance('Virtual',U().unlimitedFunds?'Ilimitado':S.payments.balances.virtualCoins,'servidor')}${balance('Mágica',U().unlimitedFunds?'Ilimitado':S.payments.balances.magicCoins,'itens')}</div><button class="card magic-wallet" data-act="openMagic"><b>✨ Abrir carteira de moedas mágicas</b><span>Ver saldos e usar moedas especiais na vitrine</span></button>
+    <div class="shop-toolbar"><button class="shop-chip on">Todos</button><button class="shop-chip">Mais vendidos</button><button class="shop-chip">Novidades</button><button class="shop-chip" data-act="openAutoDebit">Débito automático</button></div>
+    <div class="section-head"><div><h2>Vitrine</h2><p>${S.products.length ? `${S.products.length} itens disponíveis para você` : 'A próxima aventura começa aqui'}</p></div>${['admin','seller'].includes(U().role) ? '<button class="lnk" data-act="openProduct">+ publicar</button>' : ''}</div>
+    ${S.products.length ? `<div class="product-grid">${S.products.map(productCard).join('')}</div>` : '<div class="card empty"><b>A vitrine está sendo preparada</b>O master ainda não publicou nenhum item.</div>'}
+    <div class="card"><div class="ttl"><h3>Formas de pagamento</h3><span class="pill p">flexível</span></div><div class="payment-strip">${S.payments.methods.map(x => `<span class="payment-tag">${esc(x.label)}</span>`).join('')}</div></div>
+    ${['admin','seller'].includes(U().role) ? '<button class="btn" data-act="openProduct">+ Publicar produto</button>' : ''}<button class="btn sec" data-act="openAutoDebit">Configurar débito automático</button></div>`;
+}
+function renderMaster() {
+  if (!S.master) { $('#view').innerHTML = '<div class="empty">Carregando painel…</div>'; loadMaster(); return; }
+  const m = S.master;
+  $('#view').innerHTML = `
+  <div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button><div class="tools"><button class="ib" data-act="openVehicleAdmin">${ico('plus')}</button><button class="ib" data-act="refreshMaster">${ico('refresh')}</button></div></div><h1>Painel Master</h1><p>Gerencie jogadores, crédito e financiamentos</p></div>
+  <div class="wrap">
+    <div class="stat"><div class="b"><b>${m.metrics.players}</b><span>JOGADORES</span></div><div class="b"><b>${m.metrics.pendingCredits}</b><span>CRÉDITO PENDENTE</span></div><div class="b"><b>${fmtBRL(m.metrics.moneyInPlay)}</b><span>EM JOGO</span></div><div class="b"><b>${m.metrics.avgScore}</b><span>SCORE MÉDIO</span></div></div>
+    ${m.pending.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Pedidos de crédito</h3></div>${m.pending.map(r => `
+      <div class="row"><div class="ic a">${ico('credit')}</div><div class="mid"><b>${esc(r.fullName||r.username)}</b><span>${esc(r.purpose||'')} • ${fmtBRL(r.amount)}</span></div>
+      <div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="decide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="decide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
+    ${m.pendingLoans && m.pendingLoans.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Solicitações de empréstimo</h3><span class="pill p">${m.pendingLoans.length}</span></div>${m.pendingLoans.map(r => `<div class="row"><div class="ic a">${ico('credit')}</div><div class="mid"><b>${esc(r.fullName||r.username)}</b><span>${fmtBRL(r.amount)} • ${r.installments}x de ${fmtBRL(r.monthly)} • juros ${(r.rate*100).toFixed(2)}% a.m.</span></div><div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="loanDecide" data-id="${esc(r.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="loanDecide" data-id="${esc(r.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
+    ${m.pendingFinancing && m.pendingFinancing.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Financiamentos de veículos</h3><span class="pill p">${m.pendingFinancing.length}</span></div>${m.pendingFinancing.map(f => `<div class="row"><div class="ic a">${ico('card')}</div><div class="mid"><b>${esc(f.vehicleName)}</b><span>${fmtBRL(f.financed)} • ${f.installments}x de ${fmtBRL(f.monthly)} • entrada ${fmtBRL(f.downPayment)}</span></div><div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="financeDecide" data-id="${esc(f.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="financeDecide" data-id="${esc(f.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
+    ${m.pendingBlackCards && m.pendingBlackCards.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Solicitações de Cartão Black</h3><span class="pill p">${m.pendingBlackCards.length}</span></div>${m.pendingBlackCards.map(u => `<div class="row"><div class="ic a">${ico('card')}</div><div class="mid"><b>${esc(u.fullName)}</b><span>@${esc(u.username)} • score ${u.score}</span></div><div class="end"><button class="btn sm" style="background:var(--gr);color:#000;margin-bottom:4px" data-act="blackDecide" data-id="${esc(u.id)}" data-d="approve">Aprovar</button><button class="btn sm dng" data-act="blackDecide" data-id="${esc(u.id)}" data-d="reject">Reprovar</button></div></div>`).join('')}</div>` : ''}
+    <div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Usuários</h3><span class="pill p">${m.users.length}</span></div>${m.users.map(u => `
+      <button class="row" data-act="manageUser" data-id="${esc(u.id)}"><span class="av">${u.avatarUrl ? `<img src="${esc(u.avatarUrl)}" alt="">` : esc((u.fullName||'?')[0].toUpperCase())}</span><div class="mid"><b>${esc(u.fullName)} ${u.role==='seller' ? '<span class="pill p">vendedor</span>' : ''} ${u.banned ? '<span class="pill r">banido</span>' : ''}</b><span>@${esc(u.username)} • score ${u.score}</span></div>
+      <div class="end">${fmtBRL(u.balance)}<small>gerenciar ${ico('chev')}</small></div></button><div style="padding:0 16px 10px;text-align:right"><button class="lnk" data-act="openWalletAdmin" data-id="${esc(u.id)}">Ajustar moedas</button></div>`).join('')}</div>
+    ${m.support.length ? `<div class="card flush"><div class="ttl" style="padding:16px 16px 0"><h3>Suporte recente</h3></div>${m.support.slice(-6).reverse().map(msg => `
+      <button class="row" data-act="thread" data-id="${esc(msg.userId)}"><div class="ic">${ico('help')}</div><div class="mid"><b>${esc(msg.author||'Jogador')}</b><span>${esc(String(msg.text).slice(0,60))}</span></div><div class="end">${fmtDate(msg.createdAt)}</div></button>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+/* ---------- sheets ---------- */
+function pixStep1() { sheetOpen(`<h2>Enviar Pix</h2><div id="sheetBody">
+  <form data-form="pixLookup"><div class="fld"><label>Chave de quem vai receber</label><input id="pk" name="key" required placeholder="e-mail, telefone ou aleatória"></div>
+  <div class="btns"><button class="btn" type="submit">${ico('arrow')} Continuar</button><button class="btn sec" type="button" data-act="pasteInto">${ico('copy')} Colar código</button></div></form>
+  <div class="btns two" style="margin-top:10px"><button class="btn out sm" data-act="openCharge">Cobrar</button><button class="btn out sm" data-act="openKeys">Minhas chaves</button></div></div>`); }
+function pixStep2() { const p = S.pix; sheetOpen(`<h2>Enviar Pix</h2><div id="sheetBody">
+  <div class="card" style="background:var(--card2)"><div class="row" style="background:none;border:0;padding:6px 0"><div class="ic g">${ico('check')}</div><div class="mid"><b>${esc(p.rec.fullName)}</b><span>@${esc(p.rec.username)}</span></div></div></div>
+  <form data-form="pixReview">
+    <div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00" value="${esc(p.amount)}"></div>
+    <div class="fld"><label>Parcelas</label><select name="installments">${[1,2,3,4,5,6,7,8,9,10,11,12].map(n => `<option value="${n}" ${p.n===n?'selected':''}>${n}x${n>1 ? ' — no limite do cartão' : ' — à vista do saldo'}</option>`).join('')}</select></div>
+    <div class="fld"><label>Descrição (opcional)</label><input name="note" maxlength="80" placeholder="Ex: aluguel"></div>
+    <button class="btn" type="submit">${ico('arrow')} Revisar</button></form></div>`); }
+function pixStep3() { const p = S.pix; sheetOpen(`<h2>Confirmar Pix</h2><div id="sheetBody">
+  <div class="kv"><span>Para</span><span>${esc(p.rec.fullName)}</span></div>
+  <div class="kv"><span>Chave</span><span>${esc(p.key)}</span></div>
+  <div class="kv"><span>Valor</span><span>${fmtBRL(p.value)}</span></div>
+  ${p.n > 1 ? `<div class="kv"><span>Parcelamento</span><span>${p.n}x de ${fmtBRL(p.value/p.n)} no cartão</span></div>` : ''}
+  ${p.note ? `<div class="kv"><span>Descrição</span><span>${esc(p.note)}</span></div>` : ''}
+  <div class="btns"><button class="btn" data-act="pixConfirm">${ico('check')} Confirmar e enviar</button><button class="btn sec" data-act="closeSheet">Cancelar</button></div></div>`); }
+function openReferral() {
+  const u = U();
+  sheetOpen(`<h2>Indique e ganhe</h2><div id="sheetBody">
+    <p class="mu sm-t" style="margin:0 0 10px">Você e quem usar seu código ganham <b style="color:var(--gr)">R$ 25,00</b> na hora.</p>
+    <div class="code" style="text-align:center;font-size:16px;letter-spacing:.08em;font-weight:700">${esc(u.refCode||'')}</div>
+    <div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(u.refCode||'')}">${ico('copy')} Copiar meu código</button></div>
+    <div class="kv" style="margin-top:10px"><span>Já indicou</span><span>${u.refCount||0} pessoa(s)</span></div>
+    ${u.refUsed ? '<p class="mu sm-t" style="margin-top:10px">Você já usou um código de indicação.</p>' : `
+    <h3 style="margin:14px 0 8px;font-size:14px">Tem um código?</h3>
+    <form data-form="referral"><div class="fld"><input name="code" placeholder="Ex: IND-1A2B3C" required></div>
+    <button class="btn sec" type="submit">${ico('gift')} Usar código e ganhar R$ 25</button></form>`}
+  </div>`);
+}
+function openSavings() { const u = U(); sheetOpen(`<h2>Cofrinho</h2><div id="sheetBody">
+  <div class="big">${fmtBRL(u.savings||0)}</div><p class="mu sm-t">Rende ~1% ao mês, creditado por hora.</p>
+  <form data-form="savings"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div>
+  <div class="btns two"><button class="btn" type="submit" data-dir="in">${ico('pig')} Guardar</button><button class="btn sec" type="submit" data-dir="out">Resgatar</button></div></form></div>`); }
+function openScore() { const u = U(); const s = S.st.score || {value:u.score||0,band:'Em construção',preApprovedLimit:0,availablePreApproved:0,factors:[]}; const pct = `${Math.max(0,Math.min(100,s.value/10))}%`; sheetOpen(`<h2>Meu score</h2><div id="sheetBody"><div class="card score-card"><div class="score-ring" style="--score:${pct}"><b>${s.value}</b><span>de 1000</span></div><h3 style="text-align:center;margin:0">${esc(s.band)}</h3><p class="mu sm-t" style="text-align:center;margin:5px 0 0">Seu score ajuda a definir ofertas de crédito mais adequadas.</p></div><div class="card" style="margin-top:12px"><div class="ttl"><h3>O que influencia</h3></div>${s.factors.map(f => `<div class="kv"><span>${esc(f.label)}</span><b>${esc(f.status)}</b></div>`).join('')}</div><div class="card" style="margin-top:12px"><div class="ttl"><h3>Como melhorar</h3></div><p class="mu sm-t" style="margin:0;line-height:1.55">Pague sua fatura em dia, mantenha o uso do limite sob controle e continue movimentando sua conta.</p></div></div>`); }
+function openLoans() { const u = U(); const active = (S.st.loanContracts||[]).filter(l => l.status === 'active'); const pending = (S.st.loanRequests||[]).filter(r => r.status === 'pending'); sheetOpen(`<h2>Meus empréstimos</h2><div id="sheetBody"><div class="card score-card" style="margin-bottom:12px"><div class="ttl"><h3>Solicitar empréstimo</h3><span class="pill p">com análise</span></div><p class="mu sm-t">Escolha o valor e o número de parcelas. A taxa é calculada pelo seu score.</p><form data-form="loanRequest"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="Ex: 1000"></div><div class="fld"><label>Parcelas</label><select name="installments">${[1,2,3,4,5,6,8,10,12,18,24].map(n=>`<option value="${n}">${n}x</option>`).join('')}</select></div><div class="fld"><label>Finalidade</label><input name="purpose" maxlength="120" required placeholder="Ex: reforma, equipamento"></div><button class="btn" type="submit">Solicitar empréstimo</button></form></div>${pending.length ? `<div class="card"><b>Solicitação em análise</b><p class="mu sm-t">O master está analisando seu pedido.</p></div>` : ''}${active.length ? active.map(l=>`<div class="card"><div class="ttl"><h3>Empréstimo ativo</h3><span class="pill g">${l.paidInstallments}/${l.installments} pagas</span></div><div class="kv"><span>Valor contratado</span><b>${fmtBRL(l.principal)}</b></div><div class="kv"><span>Juros</span><span>${(l.rate*100).toFixed(2)}% ao mês</span></div><div class="kv"><span>Parcela</span><b>${fmtBRL(l.monthly)}</b></div><div class="kv"><span>Restante</span><b>${fmtBRL(l.remaining)}</b></div><button class="btn" data-act="payLoan" data-id="${esc(l.id)}">Pagar próxima parcela</button></div>`).join('') : '<div class="card empty"><b>Nenhum empréstimo ativo</b>Você pode solicitar um acima.</div>'}</div>`); }
+function openCreditReq() { const u = U(); const s = S.st.score || {preApprovedLimit:0,availablePreApproved:0}; sheetOpen(`<h2>Crédito</h2><div id="sheetBody">
+  <div class="card score-card" style="margin-bottom:12px"><div class="ttl"><h3>Limite pré-aprovado</h3><span class="pill g">disponível</span></div><div class="big">${s.preApprovedLimit > 0 ? fmtBRL(s.preApprovedLimit) : 'Em análise'}</div><p class="mu sm-t" style="margin:0">Oferta calculada pelo seu score. Sem nova análise.</p>${s.availablePreApproved > 0 ? `<button class="btn" style="margin-top:12px" data-act="acceptPreApproved">Contratar limite pré-aprovado</button>` : '<p class="mu sm-t" style="margin:10px 0 0">Seu limite atual já está no máximo disponível para o seu perfil.</p>'}</div><div class="kv"><span>Limite atual</span><span>${fmtBRL(u.creditLimit)}</span></div><div class="kv"><span>Usado</span><span>${fmtBRL(u.creditUsed)}</span></div><div class="kv"><span>Disponível</span><span>${fmtBRL((u.creditLimit||0)-(u.creditUsed||0))}</span></div><div class="kv"><span>Score</span><button class="lnk" data-act="openScore">${s.value || u.score} — ${s.band || 'ver detalhes'}</button></div>
+  <h3 style="margin:14px 0 8px;font-size:14px">Pedir aumento de limite</h3>
+  <form data-form="creditReq"><div class="fld"><label>Valor (mín. R$ 50)</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Para quê</label><input name="purpose" maxlength="100" placeholder="Ex: equipamento novo"></div><button class="btn" type="submit">Enviar pedido</button></form>
+  <h3 style="margin:14px 0 8px;font-size:14px">Saque do crédito (taxa 3%)</h3>
+  <form data-form="draw"><div class="fld"><label>Valor (mín. R$ 10)</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><button class="btn sec" type="submit">Sacar para a conta</button></form>
+  <h3 style="margin:14px 0 8px;font-size:14px">Pagar fatura</h3>
+  <form data-form="invoice"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><button class="btn sec" type="submit">Pagar fatura</button></form></div>`); }
+function openPurchase() { sheetOpen(`<h2>Simular compra</h2><div id="sheetBody">
+  <form data-form="purchase"><div class="fld"><label>Loja</label><input name="merchant" required placeholder="Ex: Loja do Reino"></div><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><button class="btn" type="submit">Comprar no crédito</button></form></div>`); }
+function openKeys() { const u = U(); sheetOpen(`<h2>Minhas chaves Pix</h2><div id="sheetBody">
+  ${(u.pixKeys||[]).map(k => `<div class="row" style="background:var(--card2);border-radius:12px;margin-bottom:8px;border-bottom:0"><div class="ic">${ico('pix')}</div><div class="mid"><b>${esc(k.value)}</b><span>${esc(k.type)}</span></div><button class="btn sm dng" data-act="removeKey" data-id="${esc(k.id)}">${ico('trash')}</button></div>`).join('')}
+  <form data-form="addKey" style="margin-top:12px"><div class="fld"><label>Tipo</label><select name="type" data-change="keyType"><option value="aleatória">Aleatória</option><option value="cpf">CPF</option><option value="cnpj">CNPJ</option><option value="email">E-mail</option><option value="telefone">Telefone</option></select></div>
+  <div class="fld hidden" id="kvWrap"><label>Valor</label><input id="kv" name="value"></div><button class="btn" type="submit">${ico('plus')} Criar nova chave</button></form></div>`); }
+function openCharge() { const u = U(); sheetOpen(`<h2>Cobrar via Pix</h2><div id="sheetBody">
+  <form data-form="charge"><div class="fld"><label>Receber na chave</label><select name="key">${(u.pixKeys||[]).map(k => `<option value="${esc(k.value)}">${esc(k.value)}</option>`).join('')}</select></div>
+  <div class="fld"><label>Valor (opcional)</label><input name="amount" inputmode="decimal" placeholder="0,00"></div><button class="btn" type="submit">Gerar código</button></form><div id="chargeOut"></div></div>`); }
+function openNotifs() { const ns = S.st.notifications || []; sheetOpen(`<h2>Notificações</h2><div id="sheetBody">
+  ${ns.length ? ns.slice().reverse().map(n => `<div class="row" style="background:var(--card2);border-radius:12px;margin-bottom:8px;border-bottom:0"><div class="ic">${ico('bell')}</div><div class="mid"><b>${esc(n.title)}</b><span>${esc(n.text)}</span></div></div>`).join('') : '<div class="empty">Nenhuma notificação.</div>'}
+  ${(S.st.unread||0) > 0 ? `<button class="btn sec" data-act="markRead">Marcar todas como lidas</button>` : ''}</div>`); }
+function openThread(userId) {
+  const m = S.master || {}; const msgs = (m.support||[]).filter(x => x.userId === userId); const name = (m.users||[]).find(u => u.id === userId);
+  const s = sheetOpen(`<h2>${esc(name ? name.fullName : 'Jogador')}</h2><div id="sheetBody">
+  <div class="chatscroll" style="max-height:45vh;padding:4px 0 10px">
+    ${msgs.map(msgRow).join('') || '<div class="empty">Sem mensagens.</div>'}
+  </div>
+  <form class="composer" data-form="reply" style="border-top:0;padding:4px 0 0">
+    <input type="hidden" name="userId" value="${esc(userId)}">
+    <input name="text" placeholder="Responder como master" autocomplete="off">
+    <button class="send" type="submit" aria-label="Responder">${ico('arrow')}</button>
+  </form></div>`);
+  scrollChat(s);
+}
+function openDeposit(userId) { sheetOpen(`<h2>Depósito master</h2><div id="sheetBody">
+  <form data-form="deposit"><input type="hidden" name="userId" value="${esc(userId)}"><div class="fld"><label>Valor</label><input name="amount" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Motivo</label><input name="note" maxlength="80" placeholder="Ex: prêmio do evento"></div><button class="btn" type="submit">Depositar</button></form></div>`); }
+function openUserManager(userId) { const u = (S.master && S.master.users || []).find(x => x.id === userId); if (!u) return; sheetOpen(`<h2>Usuário</h2><div id="sheetBody"><div class="row" style="padding:6px 0;background:none;border:0">${avatarHtml(u)}<div class="mid"><b>${esc(u.fullName)}</b><span>@${esc(u.username)} • ${u.banned ? 'conta banida' : 'conta ativa'}</span></div></div><div class="kv"><span>Saldo atual</span><span>${fmtBalance(u)}</span></div><form data-form="masterBalance"><input type="hidden" name="userId" value="${esc(u.id)}"><div class="fld"><label>Adicionar ou remover saldo</label><input name="amount" inputmode="decimal" required placeholder="Ex: 100 ou -50"><small>Use valor negativo para remover saldo.</small></div><div class="fld"><label>Motivo</label><input name="note" maxlength="100" placeholder="Ex: prêmio ou ajuste"></div><button class="btn" type="submit">Atualizar saldo</button></form><form data-form="masterCredit" style="margin-top:14px"><input type="hidden" name="userId" value="${esc(u.id)}"><div class="fld"><label>Limite de crédito atual: ${fmtBRL(u.creditLimit)}</label><input name="limit" inputmode="decimal" value="${esc(String(u.creditLimit||0))}" required><small>Para reduzir, o novo limite não pode ficar abaixo do crédito usado.</small></div><div class="fld"><input name="note" maxlength="100" placeholder="Motivo da decisão"></div><button class="btn sec" type="submit">Atualizar limite de crédito</button></form><div class="btns" style="margin-top:12px"><button class="btn ${u.role==='seller'?'sec':''}" data-act="${u.role==='seller'?'demoteUser':'promoteUser'}" data-id="${esc(u.id)}">${u.role==='seller'?'Remover vendedor':'Promover a vendedor'}</button><button class="btn ${u.banned?'':'dng'}" data-act="${u.banned?'unbanUser':'banUser'}" data-id="${esc(u.id)}">${u.banned?'Desbanir usuário':'Banir usuário'}</button></div></div>`); }
+function openWalletAdmin(userId) { const u = (S.master && S.master.users || []).find(x => x.id === userId); if (!u) return; sheetOpen(`<h2>Carteira de moedas</h2><div id="sheetBody"><div class="kv"><span>Vale da loja</span><b>${fmtBRL(u.storeCredit||0)}</b></div><div class="kv"><span>Moeda virtual</span><b>${u.virtualCoins||0}</b></div><div class="kv"><span>Moeda mágica</span><b>${u.magicCoins||0}</b></div><form data-form="masterWallet"><input type="hidden" name="userId" value="${esc(u.id)}"><div class="fld"><label>Carteira</label><select name="wallet"><option value="magicCoins">Moeda mágica</option><option value="virtualCoins">Moeda virtual</option><option value="storeCredit">Vale / crédito da loja</option></select></div><div class="fld"><label>Quantidade</label><input name="amount" inputmode="decimal" required placeholder="Ex: 50 ou -10"><small>Use valor negativo para remover.</small></div><div class="fld"><input name="note" maxlength="100" placeholder="Motivo"></div><button class="btn" type="submit">Atualizar carteira</button></form></div>`); }
+function openPassword() { sheetOpen(`<h2>Alterar senha</h2><div id="sheetBody">
+  <form data-form="password"><div class="fld"><label>Senha atual</label><input name="current" type="password" required></div><div class="fld"><label>Nova senha</label><input name="next" type="password" required minlength="4"></div><button class="btn" type="submit">Salvar nova senha</button></form></div>`); }
+function openProfile() { const u = U(); sheetOpen(`<h2>Meu perfil</h2><div id="sheetBody"><div style="display:grid;place-items:center;margin:4px 0 16px">${avatarHtml(u)}</div><form data-form="profileName"><div class="fld"><label>Nome exibido na conta</label><input name="fullName" value="${esc(u.fullName||'')}" required minlength="3" maxlength="80"><small>Esse nome aparecerá na saudação da home.</small></div><button class="btn" type="submit">Salvar nome</button></form><div class="kv" style="margin-top:14px"><span>Usuário</span><span>@${esc(u.username||'')}</span></div><form data-form="avatar" style="margin-top:14px"><div class="fld"><label>Foto de perfil</label><input name="image" type="file" accept="image/*" required><small>PNG, JPG ou WEBP • máximo 32MB</small></div><button class="btn sec" type="submit">Salvar foto</button></form></div>`); }
+function openProduct() { sheetOpen(`<h2>Publicar produto</h2><div id="sheetBody"><form data-form="product"><div class="fld"><label>Imagem do produto</label><input name="image" type="file" accept="image/*" required><small>A imagem será enviada para o armazenamento do sistema.</small></div><div class="fld"><label>Nome</label><input name="name" required></div><div class="fld"><label>Descrição</label><input name="description"></div><div class="fld"><label>Tipo do item</label><select name="category"><option value="item">Item comum</option><option value="shirt">Camisa / blusa</option><option value="pants">Calça</option><option value="shoes">Tênis / sapato</option><option value="accessory">Acessório</option></select><small>Itens vestíveis aparecem no provador 3D.</small></div><div class="fld"><label>Preço</label><input name="price" inputmode="decimal" required></div><div class="fld"><label>Moeda</label><select name="currency"><option value="BRL">Reais</option><option value="STORE">Vale / crédito da loja</option><option value="VIRTUAL">Moeda virtual</option><option value="MAGIC">Moeda mágica</option></select></div><div class="fld"><label>Estoque (0 = infinito)</label><input name="stock" type="number" min="0" value="0"></div><button class="btn" type="submit">Publicar produto</button></form></div>`); }
+function openMagic() { const p = S.payments && S.payments.balances || {}; const value = (v, moneyValue=false) => U().unlimitedFunds ? 'Ilimitado' : (moneyValue ? fmtBRL(v || 0) : (v || 0)); sheetOpen(`<h2>Moedas especiais</h2><div id="sheetBody"><div class="card" style="background:linear-gradient(145deg,#24103f,#6d1ca1);margin-bottom:12px"><div class="eyebrow">Ghsot magic</div><div class="big">${value(p.magicCoins)}</div><p style="margin:0;color:#e8cfff">Moedas mágicas para itens raros e experiências especiais.</p></div><div class="kv"><span>Moeda mágica</span><b>${value(p.magicCoins)}</b></div><div class="kv"><span>Moeda virtual</span><b>${value(p.virtualCoins)}</b></div><div class="kv"><span>Vale da loja</span><b>${value(p.storeCredit,true)}</b></div><p class="mu sm-t" style="margin-top:12px">Na loja, escolha um produto marcado como Mágicas, Moedas ou Vale. O saldo é conferido automaticamente antes da compra.</p><button class="btn" data-act="openShop">Ir para a loja</button></div>`); }
+async function openContracts() { try { const r = await api('/api/vehicles'); S.vehicles = r.vehicles || []; } catch (e) { return toast(e.message, 'err'); } const policies = S.st.lifePolicies || []; const fins = S.st.vehicleFinancings || []; sheetOpen(`<h2>Contratar</h2><div id="sheetBody"><div class="card score-card"><div class="ttl"><h3>Seguro de vida</h3><span class="pill g">proteção</span></div><p class="mu sm-t">Proteção financeira para sua família com contratação imediata.</p><form data-form="lifeInsurance"><div class="fld"><label>Plano</label><select name="plan"><option value="essencial">Essencial — R$ 29,90/mês • cobertura R$ 50 mil</option><option value="familia">Família — R$ 59,90/mês • cobertura R$ 150 mil</option><option value="premium">Premium — R$ 99,90/mês • cobertura R$ 300 mil</option></select></div><button class="btn" type="submit">Contratar seguro</button></form>${policies.map(p=>`<div class="kv"><span>Seguro ${p.plan}</span><b>Ativo • ${fmtBRL(p.coverage)}</b></div>`).join('')}</div><h3 style="margin:18px 2px 8px">Financiamento de veículos</h3>${S.vehicles.length ? S.vehicles.map(v=>`<div class="card vehicle-card"><div class="vehicle-image">${v.imageUrl ? `<img src="${esc(v.imageUrl)}" alt="${esc(v.name)}">` : '🚗'}</div><h3>${esc(v.name)} ${v.year ? `(${esc(v.year)})` : ''}</h3><p class="mu sm-t">${esc(v.description||'Veículo disponível para financiamento.')}</p><div class="kv"><span>Preço</span><b>${fmtBRL(v.price)}</b></div><form data-form="vehicleFinance"><input type="hidden" name="vehicleId" value="${esc(v.id)}"><div class="fld"><label>Entrada</label><input name="downPayment" inputmode="decimal" placeholder="0,00" value="0"></div><div class="fld"><label>Parcelas</label><select name="installments"><option>24</option><option>36</option><option selected>48</option><option>60</option><option>72</option></select></div><button class="btn" type="submit">Simular e solicitar</button></form></div>`).join('') : '<div class="card empty"><b>Nenhum veículo disponível</b>O master ainda não publicou veículos.</div>'}${fins.length ? `<h3 style="margin:18px 2px 8px">Meus financiamentos</h3>${fins.map(f=>`<div class="card"><div class="ttl"><h3>${esc(f.vehicleName)}</h3><span class="pill ${f.status==='active'?'g':'p'}">${esc(f.status)}</span></div><div class="kv"><span>Parcela</span><b>${fmtBRL(f.monthly)}</b></div><div class="kv"><span>Restante</span><b>${fmtBRL(f.remaining)}</b></div>${f.status==='active'?`<button class="btn" data-act="payVehicleFinance" data-id="${esc(f.id)}">Pagar parcela</button>`:''}</div>`).join('')}`:''}</div>`); }
+function openVehicleAdmin() { sheetOpen(`<h2>Cadastrar veículo</h2><div id="sheetBody"><form data-form="vehicleAdmin"><div class="fld"><label>Foto do carro</label><input name="image" type="file" accept="image/*" required><small>PNG, JPG ou WEBP • máximo 32MB</small></div><div class="fld"><label>Modelo</label><input name="name" required placeholder="Ex: Ghost Sedan 2026"></div><div class="fld"><label>Ano</label><input name="year" placeholder="2026"></div><div class="fld"><label>Preço</label><input name="price" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Descrição</label><input name="description" maxlength="240"></div><button class="btn" type="submit">Publicar veículo</button></form></div>`); }
+function openProductDetails(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const cur = {BRL:'R$',STORE:'Vale',VIRTUAL:'Moedas',MAGIC:'Mágicas'}; const canEdit = U().role === 'admin' || (U().role === 'seller' && p.sellerId === U().id); sheetOpen(`<h2>${esc(p.name)}</h2><div id="sheetBody"><div class="product-detail-image">${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}">` : '✦'}</div><p class="mu">${esc(p.description || 'Um item especial para sua jornada.')}</p><div class="kv"><span>Preço</span><b>${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${cur[p.currency]}`}</b></div><div class="kv"><span>Disponibilidade</span><span>${p.stock > 0 ? `${p.stock} unidades` : 'Estoque ilimitado'}</span></div><div class="kv"><span>Publicado por</span><span>${p.sellerId === 'usr_master' ? 'Armin Master' : 'Vendedor da loja'}</span></div><button class="btn sec" data-act="openFittingRoom" data-id="${esc(p.id)}">✦ Experimentar no boneco 3D</button><button class="btn" data-act="buyProduct" data-id="${esc(p.id)}">Comprar agora</button>${canEdit ? `<div class="btns two"><button class="btn sec" data-act="editProduct" data-id="${esc(p.id)}">Editar</button><button class="btn dng" data-act="deleteProduct" data-id="${esc(p.id)}">Excluir</button></div>` : ''}</div>`); }
+function openEditProduct(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; sheetOpen(`<h2>Editar produto</h2><div id="sheetBody"><form data-form="productEdit"><input type="hidden" name="productId" value="${esc(p.id)}"><input type="hidden" name="imageUrl" value="${esc(p.imageUrl||'')}"><div class="fld"><label>Trocar imagem (opcional)</label><input name="image" type="file" accept="image/*"><small>${p.imageUrl ? 'A imagem atual será mantida se você não selecionar outra.' : 'Adicione uma imagem para destacar o produto.'}</small></div><div class="fld"><label>Nome</label><input name="name" value="${esc(p.name)}" required></div><div class="fld"><label>Descrição</label><input name="description" value="${esc(p.description||'')}"></div><div class="fld"><label>Preço</label><input name="price" inputmode="decimal" value="${esc(String(p.price))}" required></div><div class="fld"><label>Moeda</label><select name="currency"><option value="BRL" ${p.currency==='BRL'?'selected':''}>Reais</option><option value="STORE" ${p.currency==='STORE'?'selected':''}>Vale / crédito da loja</option><option value="VIRTUAL" ${p.currency==='VIRTUAL'?'selected':''}>Moeda virtual</option><option value="MAGIC" ${p.currency==='MAGIC'?'selected':''}>Moeda mágica</option></select></div><div class="fld"><label>Estoque (0 = infinito)</label><input name="stock" type="number" min="0" value="${p.stock||0}"></div><button class="btn" type="submit">Salvar alterações</button></form></div>`); }
+function openFittingRoom(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const category = ['shirt','pants','shoes','accessory'].includes(p.category) ? p.category : 'shirt'; const labels={shirt:'camisa / blusa',pants:'calça',shoes:'tênis / sapato',accessory:'acessório'}; sheetOpen(`<h2>Provador 3D</h2><div id="sheetBody"><div class="tryon-stage"><div class="tryon-badge">ARMIN FIT • ${labels[category]}</div><div id="tryonCanvas"><div class="tryon-loading">Carregando seu boneco...</div></div></div><div class="tryon-controls"><button type="button" data-tryon-view="0" class="on">Frente</button><button type="button" data-tryon-view="1.57">Lado</button><button type="button" data-tryon-view="3.14">Costas</button></div><div class="tryon-product">${p.imageUrl?`<img src="${esc(p.imageUrl)}" alt="">`:''}<div><b>${esc(p.name)}</b><span>Arraste o boneco para girar • ${labels[category]}</span></div></div><p class="tryon-note">A foto do produto é aplicada à peça para uma prévia visual. Funciona no celular por toque.</p><button class="btn" data-act="buyProduct" data-id="${esc(p.id)}" style="margin-top:12px">Comprar este item</button></div>`); setTimeout(() => initFittingRoom({...p,category}), 0); }
+function initFittingRoom(p) {
+  const mount = $('#tryonCanvas'); if (!mount) return;
+  mount.innerHTML = '<div class="tryon-canvas"><div class="tryon-avatar"><div class="tryon-head"></div><div class="tryon-neck"></div><div class="tryon-torso"><span class="tryon-item-texture"></span></div><div class="tryon-arm left"></div><div class="tryon-arm right"></div><div class="tryon-legs"></div><div class="tryon-shoes"></div></div></div>';
+  const avatar = mount.querySelector('.tryon-avatar'); const texture = mount.querySelector('.tryon-item-texture'); let angle = 0; let dragging = false; let start = 0;
+  if (p.imageUrl) texture.style.backgroundImage = `url("${String(p.imageUrl).replace(/"/g, '%22')}")`;
+  const rotate = (value) => { angle = Number(value) || 0; avatar.style.transform = `rotateY(${angle}rad)`; };
+  const startDrag = (e) => { dragging = true; start = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0; };
+  const moveDrag = (e) => { if (!dragging) return; const x = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || start; angle += (x - start) * .012; start = x; avatar.style.transform = `rotateY(${angle}rad)`; };
+  const stopDrag = () => { dragging = false; };
+  mount.addEventListener('pointerdown', startDrag); mount.addEventListener('pointermove', moveDrag); mount.addEventListener('pointerup', stopDrag); mount.addEventListener('pointercancel', stopDrag); mount.addEventListener('touchstart', startDrag, {passive:true}); mount.addEventListener('touchmove', moveDrag, {passive:true}); mount.addEventListener('touchend', stopDrag, {passive:true});
+  document.querySelectorAll('[data-tryon-view]').forEach(b => b.addEventListener('click', () => { rotate(b.dataset.tryonView); document.querySelectorAll('[data-tryon-view]').forEach(x => x.classList.remove('on')); b.classList.add('on'); }));
+  S.tryOnCleanup = () => { mount.innerHTML = ''; };
+}
+function openBuy(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const options = S.payments.methods.filter(m => m.currency === p.currency); sheetOpen(`<h2>Comprar ${esc(p.name)}</h2><div id="sheetBody"><p class="mu">${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${p.currency}`}</p><form data-form="buy"><input type="hidden" name="productId" value="${esc(productId)}"><div class="fld"><label>Forma de pagamento</label><select name="method">${options.map(m => `<option value="${m.id}">${m.label}</option>`).join('')}</select></div><button class="btn" type="submit">Confirmar compra</button></form></div>`); }
+function openAutoDebit() { const a = (S.payments && S.payments.autoDebit) || {}; sheetOpen(`<h2>Desconto automático</h2><div id="sheetBody"><p class="mu sm-t">Quando houver dívida no cartão ou crédito antecipado, o GhsotBank desconta automaticamente o valor configurado do seu saldo disponível.</p><form data-form="autoDebit"><div class="fld"><label><input type="checkbox" name="enabled" ${a.enabled?'checked':''}> Ativar desconto automático de dívidas</label></div><div class="fld"><label>Valor por desconto</label><input name="amount" inputmode="decimal" value="${a.amount||''}" placeholder="Ex: 100,00"></div><div class="fld"><label>Descrição</label><input name="description" value="${esc(a.description||'')}" placeholder="Ex: pagar cartão e crédito antecipado"></div><button class="btn" type="submit">Salvar configuração</button></form></div>`); }
+
+/* ---------- ações ---------- */
+const A = {
+  switchAuth: (el) => { S.authTab = el.dataset.tab; render(); },
+  goPage: (el) => { S.page = el.dataset.page; render(); },
+  logout: () => doLocalLogout(),
+  closeSheet: () => sheetClose(),
+  openPixHub: () => { S.page = 'pixhub'; render(); },
+  openPix: () => pixStep1(),
+  openSavings: () => openSavings(),
+  openReferral: () => openReferral(),
+  openCard: () => { S.page = 'card'; render(); },
+  requestBlackCard: async (el) => { const r = await busy(el, () => api('/api/card/black/request', { method:'POST' })); if (r) { setState(r); toast(r.message, 'ok'); } },
+  openCredit: () => openCreditReq(),
+  openLoans: () => openLoans(),
+  openContracts: () => openContracts(),
+  payLoan: async (el) => { const r = await busy(el, () => api(`/api/loans/${encodeURIComponent(el.dataset.id)}/pay`, { method:'POST' })); if (r) { setState(r); openLoans(); toast('Parcela do empréstimo paga!', 'ok'); } },
+  payVehicleFinance: async (el) => { const r = await busy(el, () => api(`/api/vehicle-financing/${encodeURIComponent(el.dataset.id)}/pay`, { method:'POST' })); if (r) { setState(r); openContracts(); toast('Parcela do veículo paga!', 'ok'); } },
+  openVehicleAdmin: () => openVehicleAdmin(),
+  openScore: () => openScore(),
+  acceptPreApproved: async (el) => { const r = await busy(el, () => api('/api/credit/pre-approved/accept', { method:'POST' })); if (r) { setState(r); openCreditReq(); toast(`Limite de ${fmtBRL(r.limit)} contratado!`, 'ok'); } },
+  openPurchase: () => openPurchase(),
+  openKeys: () => openKeys(),
+  openCharge: () => openCharge(),
+  openNotifs: () => openNotifs(),
+  openSupport: () => { S.page = 'support'; render(); },
+  openPassword: () => openPassword(),
+  openProfile: () => openProfile(),
+  toggleHomeMenu: () => { S.homeMore = !S.homeMore; render(); },
+  openShop: () => { S.page = 'shop'; S.payments = null; render(); },
+  openMagic: () => openMagic(),
+  openProduct: () => openProduct(),
+  openProductDetails: (el) => openProductDetails(el.dataset.id),
+  openFittingRoom: (el) => openFittingRoom(el.dataset.id),
+  editProduct: (el) => openEditProduct(el.dataset.id),
+  deleteProduct: async (el) => { if (!confirm('Excluir este produto da loja?')) return; const r = await busy(el, () => api(`/api/products/${encodeURIComponent(el.dataset.id)}`, { method:'DELETE' })); if (r) { sheetClose(); toast('Produto excluído.', 'ok'); S.payments = null; loadShop(); } },
+  buyProduct: (el) => openBuy(el.dataset.id),
+  openAutoDebit: () => openAutoDebit(),
+  pasteCode: async () => { pixStep1(); setTimeout(() => A.pasteInto(), 150); },
+  payInstallment: async (el) => { const r = await busy(el, () => api('/api/pix/installment/pay', { method:'POST', body:{ loanId: el.dataset.id } })); if (r) { setState(r); toast('Parcela paga!', 'ok'); } },
+  cardToggle: async (el) => { const r = await busy(el, () => api('/api/card/toggle', { method:'POST' })); if (r) { setState(r); toast(U().cardBlocked ? 'Cartão bloqueado.' : 'Cartão desbloqueado.', 'ok'); } },
+  cardReveal: async (el) => {
+    if (S.card) { S.card = null; clearTimeout(S.cardTimer); render(); return; }
+    const r = await busy(el, () => api('/api/card/secret')); if (!r) return;
+    S.card = r.card; render(); clearTimeout(S.cardTimer); S.cardTimer = setTimeout(() => { S.card = null; render(); }, 20000);
+  },
+  pixConfirm: async (el) => { const p = S.pix; const r = await busy(el, () => api('/api/pix/send', { method:'POST', body:{ key:p.key, amount:p.value, description:p.note, installments:p.n } })); if (r) { setState(r); sheetClose(); toast(p.n > 1 ? `Pix enviado em ${p.n}x!` : 'Pix enviado!', 'ok'); } },
+  pasteInto: async () => { try { const t = await navigator.clipboard.readText(); const i = $('#pk'); if (i && t) { i.value = t.trim(); toast('Colado!', 'ok'); } else toast('Nada para colar.'); } catch { toast('Cole manualmente no campo.'); const i = $('#pk'); if (i) i.focus(); } },
+  copyCode: (el) => { if (navigator.clipboard) navigator.clipboard.writeText(el.dataset.v).then(() => toast('Código copiado!', 'ok'), () => toast('Copie manualmente.')); else toast('Copie manualmente.'); },
+  removeKey: async (el) => { const fromHub = S.page === 'pixhub'; const r = await busy(el, () => api('/api/pix/key/' + encodeURIComponent(el.dataset.id), { method:'DELETE' })); if (r) { setState(r); toast('Chave removida.', 'ok'); if (!fromHub) openKeys(); } },
+  markRead: async (el) => { const r = await busy(el, () => api('/api/notifications/read', { method:'POST' })); if (r) setState(r); },
+  decide: async (el) => { const r = await busy(el, () => api(`/api/master/credit/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Crédito aprovado.' : 'Análise reprovada.', 'ok'); loadMaster(); } },
+  loanDecide: async (el) => { const r = await busy(el, () => api(`/api/master/loans/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Empréstimo aprovado.' : 'Empréstimo reprovado.', 'ok'); loadMaster(); } },
+  financeDecide: async (el) => { const r = await busy(el, () => api(`/api/master/vehicle-financing/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Financiamento aprovado.' : 'Financiamento reprovado.', 'ok'); loadMaster(); } },
+  blackDecide: async (el) => { const r = await busy(el, () => api(`/api/master/black-cards/${encodeURIComponent(el.dataset.id)}/${el.dataset.d}`, { method:'POST', body:{} })); if (r) { toast(el.dataset.d === 'approve' ? 'Cartão Black aprovado.' : 'Solicitação reprovada.', 'ok'); loadMaster(); } },
+  thread: (el) => openThread(el.dataset.id),
+  deposit: (el) => openDeposit(el.dataset.id),
+  manageUser: (el) => openUserManager(el.dataset.id),
+  banUser: async (el) => { const r = await busy(el, () => api(`/api/master/users/${encodeURIComponent(el.dataset.id)}/ban`, { method:'POST', body:{ banned:true, note:'Banimento aplicado pelo master.' } })); if (r) { sheetClose(); toast('Usuário banido.', 'ok'); loadMaster(); } },
+  unbanUser: async (el) => { const r = await busy(el, () => api(`/api/master/users/${encodeURIComponent(el.dataset.id)}/ban`, { method:'POST', body:{ banned:false, note:'Conta reativada pelo master.' } })); if (r) { sheetClose(); toast('Usuário reativado.', 'ok'); loadMaster(); } },
+  promoteUser: async (el) => { const r = await busy(el, () => api(`/api/master/users/${encodeURIComponent(el.dataset.id)}/role`, { method:'POST', body:{ role:'seller' } })); if (r) { sheetClose(); toast('Usuário promovido a vendedor.', 'ok'); loadMaster(); } },
+  demoteUser: async (el) => { const r = await busy(el, () => api(`/api/master/users/${encodeURIComponent(el.dataset.id)}/role`, { method:'POST', body:{ role:'user' } })); if (r) { sheetClose(); toast('Permissão de vendedor removida.', 'ok'); loadMaster(); } },
+  openWalletAdmin: (el) => openWalletAdmin(el.dataset.id),
+  refreshMaster: () => loadMaster(),
+};
+
+/* ---------- formulários ---------- */
+const F = {
+  profileName: async (f, ev) => { const fullName = String(new FormData(f).get('fullName') || '').trim(); const r = await busy(ev.submitter, () => api('/api/profile/name', { method:'POST', body:{ fullName } })); if (r) { setState(r); sheetClose(); toast('Nome atualizado!', 'ok'); } },
+  login: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/login', { method:'POST', body:{ username:d.username, password:d.password } })); if (r) { enter(r); toast(`Olá, ${((r.state&&r.state.user&&r.state.user.fullName)||'').split(' ')[0] || 'bem-vindo'}!`, 'ok'); } },
+  register: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/register', { method:'POST', body:d })); if (r) { enter(r); toast('Conta criada! Bem-vindo(a).', 'ok'); } },
+  referral: async (f, ev) => { const code = new FormData(f).get('code'); const r = await busy(ev.submitter, () => api('/api/referral/apply', { method:'POST', body:{ code } })); if (r) { setState(r); openReferral(); toast(`Você ganhou ${fmtBRL(r.reward)} com o código!`, 'ok'); } },
+  pixLookup: async (f, ev) => { const key = new FormData(f).get('key'); const r = await busy(ev.submitter, () => api('/api/pix/lookup', { method:'POST', body:{ key } })); if (r) { S.pix = { ...S.pix, key:r.key || key, rec:r.recipient, amount:r.amount > 0 ? String(r.amount) : '' }; pixStep2(); } },
+  pixReview: (f) => {
+    const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const n = parseInt(d.installments, 10) || 1;
+    if (!(v > 0)) return toast('Digite um valor válido.', 'err');
+    if (!U().unlimitedFunds && n > 1) { if (v > ((U().creditLimit||0) - (U().creditUsed||0))) return toast('Limite do cartão insuficiente para parcelar.', 'err'); }
+    else if (!U().unlimitedFunds && v > U().balance) return toast('Saldo insuficiente para este Pix.', 'err');
+    S.pix.value = v; S.pix.amount = d.amount; S.pix.note = (d.note||'').trim(); S.pix.n = n; pixStep3();
+  },
+  addKey: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/pix/key', { method:'POST', body:d })); if (r) { setState(r); openKeys(); toast('Chave cadastrada!', 'ok'); } },
+  charge: (f) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); const hasV = String(d.amount||'').trim() !== ''; if (hasV && !(v > 0)) return toast('Valor inválido.', 'err'); const code = `ZKPIX|${d.key}|${hasV ? v.toFixed(2) : '0'}`; $('#chargeOut').innerHTML = `<div class="code">${esc(code)}</div><div class="btns"><button class="btn" data-act="copyCode" data-v="${esc(code)}">${ico('copy')} Copiar código</button></div><p class="mu sm-t">Quem paga cola em Pix → Colar código.</p>`; },
+  savings: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const dir = (ev.submitter && ev.submitter.dataset.dir) || 'in'; const r = await busy(ev.submitter, () => api(`/api/savings/${dir}`, { method:'POST', body:{ amount:v } })); if (r) { setState(r); openSavings(); toast(dir === 'in' ? 'Guardado com sucesso!' : 'Resgate feito — dinheiro na conta.', 'ok'); } },
+  invoice: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/pay', { method:'POST', body:{ amount:v } })); if (r) { setState(r); sheetClose(); toast('Fatura paga!', 'ok'); } },
+  draw: async (f, ev) => { const v = parseMoney(new FormData(f).get('amount')); if (!(v >= 10)) return toast('O valor mínimo é R$ 10,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/draw', { method:'POST', body:{ amount:v } })); if (r) { setState(r); sheetClose(); toast(`${fmtBRL(v)} na sua conta!`, 'ok'); } },
+  purchase: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/card/purchase', { method:'POST', body:{ merchant:d.merchant, amount:v } })); if (r) { setState(r); sheetClose(); toast('Compra aprovada!', 'ok'); } },
+  creditReq: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v >= 50)) return toast('Peça pelo menos R$ 50,00.', 'err'); const r = await busy(ev.submitter, () => api('/api/credit/request', { method:'POST', body:{ amount:v, purpose:d.purpose } })); if (r) { setState(r); openCreditReq(); toast(r.message, 'ok'); } },
+  loanRequest: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.amount = parseMoney(d.amount); const r = await busy(ev.submitter, () => api('/api/loans/request', { method:'POST', body:d })); if (r) { setState(r); openLoans(); toast(r.message, 'ok'); } },
+  lifeInsurance: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/insurance/life', { method:'POST', body:d })); if (r) { setState(r); openContracts(); toast(r.message, 'ok'); } },
+  vehicleFinance: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.downPayment = parseMoney(d.downPayment); const r = await busy(ev.submitter, () => api(`/api/vehicles/${encodeURIComponent(d.vehicleId)}/finance`, { method:'POST', body:d })); if (r) { setState(r); openContracts(); toast(r.message, 'ok'); } },
+  vehicleAdmin: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.price = parseMoney(d.price); const r = await busy(ev.submitter, async () => { const up = await uploadFile(f.elements.image.files[0]); d.imageUrl = up.url; delete d.image; return api('/api/master/vehicles', { method:'POST', body:d }); }); if (r) { sheetClose(); toast('Veículo publicado com foto.', 'ok'); } },
+  password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method:'POST', body:d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); sheetClose(); toast('Senha alterada!', 'ok'); } },
+  support: async (f, ev) => { const t = String(new FormData(f).get('text') || '').trim(); if (!t) return; const r = await busy(ev.submitter, () => api('/api/support/messages', { method:'POST', body:{ text:t } })); if (r) setState(r); },
+  reply: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return; const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method:'POST', body:d })); if (r) { await loadMaster(); openThread(d.userId); } },
+  deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method:'POST', body:{ userId:d.userId, amount:v, note:d.note } })); if (r) { sheetClose(); toast('Depósito feito.', 'ok'); loadMaster(); } },
+  masterBalance: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.amount = parseMoney(d.amount); if (!d.amount) return toast('Informe um valor diferente de zero.', 'err'); const r = await busy(ev.submitter, () => api(`/api/master/users/${encodeURIComponent(d.userId)}/balance`, { method:'POST', body:{ amount:d.amount, note:d.note } })); if (r) { sheetClose(); toast('Saldo atualizado.', 'ok'); loadMaster(); } },
+  masterCredit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.limit = parseMoney(d.limit); const r = await busy(ev.submitter, () => api(`/api/master/users/${encodeURIComponent(d.userId)}/credit-limit`, { method:'POST', body:{ limit:d.limit, note:d.note } })); if (r) { sheetClose(); toast('Limite de crédito atualizado.', 'ok'); loadMaster(); } },
+  masterWallet: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.amount = parseMoney(d.amount); if (!d.amount) return toast('Informe uma quantidade diferente de zero.', 'err'); const r = await busy(ev.submitter, () => api(`/api/master/users/${encodeURIComponent(d.userId)}/wallet`, { method:'POST', body:{ wallet:d.wallet, amount:d.amount, note:d.note } })); if (r) { sheetClose(); toast('Carteira atualizada.', 'ok'); loadMaster(); } },
+  avatar: async (f, ev) => { const r = await busy(ev.submitter, async () => { const up = await uploadFile(f.elements.image.files[0]); return api('/api/profile/avatar', { method:'POST', body:{ avatarUrl:up.url } }); }); if (r) { setState(r); sheetClose(); toast('Foto de perfil atualizada!', 'ok'); } },
+  product: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.price = parseMoney(d.price); const r = await busy(ev.submitter, async () => { const up = await uploadFile(f.elements.image.files[0]); delete d.image; d.imageUrl = up.url; return api('/api/products', { method:'POST', body:d }); }); if (r) { sheetClose(); toast('Produto publicado com imagem!', 'ok'); S.payments = null; loadShop(); } },
+  productEdit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.price = parseMoney(d.price); const r = await busy(ev.submitter, async () => { if (f.elements.image.files[0]) d.imageUrl = (await uploadFile(f.elements.image.files[0])).url; delete d.image; return api(`/api/products/${encodeURIComponent(d.productId)}`, { method:'PUT', body:d }); }); if (r) { sheetClose(); toast('Produto atualizado.', 'ok'); S.payments = null; loadShop(); } },
+  buy: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api(`/api/products/${encodeURIComponent(d.productId)}/purchase`, { method:'POST', body:{ method:d.method } })); if (r) { setState(r); sheetClose(); toast('Compra aprovada!', 'ok'); S.payments = null; loadShop(); } },
+  autoDebit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.enabled = f.elements.enabled.checked; d.amount = parseMoney(d.amount); const r = await busy(ev.submitter, () => api('/api/payments/auto-debit', { method:'POST', body:d })); if (r) { setState(r); sheetClose(); toast('Débito automático atualizado.', 'ok'); S.payments = null; loadShop(); } },
+};
+const CH = { keyType: (el) => { const w = $('#kvWrap'); if (w) w.classList.toggle('hidden', el.value === 'aleatória'); const k = $('#kv'); if (k) { k.required = el.value !== 'aleatória'; k.placeholder = { cpf:'000.000.000-00', cnpj:'00.000.000/0000-00', email:'voce@email.com', telefone:'(11) 91234-5678' }[el.value] || ''; } } };
+
+/* ---------- sessão / tempo real ---------- */
+function enter(r) { S.token = r.token; localStorage.setItem('armin_token', S.token); S.st = r.state; S.page = 'home'; S.master = null; render(); connectSocket(); }
+function doLocalLogout() { localStorage.removeItem('armin_token'); S.token = ''; S.st = null; S.master = null; S.card = null; S.page = 'home'; S.authTab = 'login'; if (S.socket) { S.socket.disconnect(); S.socket = null; } render(); }
+function connectSocket() {
+  if (S.socket) { S.socket.disconnect(); S.socket = null; }
+  if (typeof io === 'undefined' || !S.token) return;
+  S.socket = io({ auth: { token: S.token }, reconnectionDelayMax: 8000 });
+  S.socket.on('account:updated', (p) => { if (p.state) { S.st = p.state; render(); } });
+  S.socket.on('master:refresh', () => { if (S.page === 'master') loadMaster(); });
+}
+async function poll() { if (!S.token || !S.st || document.hidden) return; try { const r = await api('/api/me'); if (JSON.stringify(r.state) !== JSON.stringify(S.st)) { S.st = r.state; render(); } } catch (e) {} }
+
+document.addEventListener('click', (e) => { const el = e.target.closest('[data-act]'); if (!el || el.disabled) return; const fn = A[el.dataset.act]; if (!fn) return; e.preventDefault(); fn(el, e); });
+document.addEventListener('submit', (e) => { const f = e.target.closest('[data-form]'); if (!f) return; e.preventDefault(); const fn = F[f.dataset.form]; if (fn) fn(f, e); });
+document.addEventListener('change', (e) => { const el = e.target.closest('[data-change]'); if (el && CH[el.dataset.change]) CH[el.dataset.change](el); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') sheetClose(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+setInterval(poll, 25000);
+
+$('#root').innerHTML = shell();
+(async function boot() {
+  render();
+  if (!S.token) return;
+  try { const r = await api('/api/me'); S.st = r.state; render(); connectSocket(); }
+  catch (e) { localStorage.removeItem('armin_token'); S.token = ''; S.st = null; render(); }
+  })();
+  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js?v=5', { updateViaCache:'none' }).catch(() => {}));
+</script>
+</body>
+  </html>
