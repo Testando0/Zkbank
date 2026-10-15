@@ -375,11 +375,25 @@ body[data-theme="violeta"] .busy i { border-top-color:#e879f9!important; }
 body[data-theme="rubi"] .busy i { border-top-color:#fb7185!important; }
 body[data-theme="ciano"] .busy i { border-top-color:#67f3ff!important; }
 
+
+/* Provador 3D Three.js — referência Ghost Fit */
+.tryon-stage { height: 430px; min-height: 330px; background: radial-gradient(circle at 50% 18%, #50206f 0, #1b1029 36%, #07070b 82%); border-color: rgba(199,125,255,.35); }
+.tryon-stage::before { content:''; position:absolute; inset:0; background: linear-gradient(125deg, rgba(255,255,255,.08), transparent 28%, transparent 72%, rgba(47,211,255,.08)); pointer-events:none; z-index:1; }
+.tryon-stage canvas { display:block; width:100%; height:100%; position:relative; z-index:0; cursor:grab; touch-action:none; }
+.tryon-stage canvas:active { cursor:grabbing; }
+.tryon-hint { position:absolute; bottom:12px; left:50%; transform:translateX(-50%); z-index:3; white-space:nowrap; padding:6px 10px; border-radius:999px; color:#e7cfff; background:rgba(5,3,9,.62); border:1px solid rgba(255,255,255,.12); font-size:10px; pointer-events:none; }
+.tryon-loading { height:100%; display:grid; place-items:center; color:#e7cfff; font-size:12px; text-align:center; padding:20px; }
+.product-tryon { display:flex; align-items:center; justify-content:center; width:100%; min-height:40px; margin-top:8px; padding:0 14px; border:1px solid rgba(199,125,255,.38); border-radius:12px; color:#e7b7ff; background:rgba(33,23,45,.92); font-size:12px; font-weight:800; transition:transform .2s ease, background .2s ease, border-color .2s ease; }
+.product-tryon:hover { transform:translateY(-1px); background:rgba(64,32,89,.96); border-color:#d65cff; }
+@media (max-width:380px) { .tryon-stage { height:390px; } .tryon-hint { font-size:9px; } }
+
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script src="/socket.io/socket.io.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+<script type="module" src="/three-viewer.js"></script>
 <script>
 'use strict';
 const $ = (s) => document.querySelector(s);
@@ -673,7 +687,7 @@ function renderShop() {
         <div class="product-price">${pPrice}<small>${pStock}</small></div>
         <button class="product-buy" data-act="buyProduct" data-id="${esc(p.id)}">Comprar</button>
       </div>
-      <button class="product-tryon" style="display:block!important;visibility:visible!important;opacity:1!important" type="button" data-act="openFittingRoom" data-id="${esc(p.id)}">✦ Experimentar no boneco 3D</button>
+      <button class="product-tryon" type="button" data-act="openFittingRoom" data-id="${esc(p.id)}">◉ Visualizar no boneco 3D</button>
       ${canEdit(p) ? `<div class="product-admin"><button class="lnk" data-act="editProduct" data-id="${esc(p.id)}">Editar</button><button class="lnk danger-link" data-act="deleteProduct" data-id="${esc(p.id)}">Excluir</button></div>` : ''}
     </article>`;
   };
@@ -791,19 +805,28 @@ async function openContracts() { try { const r = await api('/api/vehicles'); S.v
 function openVehicleAdmin() { sheetOpen(`<h2>Cadastrar veículo</h2><div id="sheetBody"><form data-form="vehicleAdmin"><div class="fld"><label>Foto do carro</label><input name="image" type="file" accept="image/*" required><small>PNG, JPG ou WEBP • máximo 32MB</small></div><div class="fld"><label>Modelo</label><input name="name" required placeholder="Ex: Ghost Sedan 2026"></div><div class="fld"><label>Ano</label><input name="year" placeholder="2026"></div><div class="fld"><label>Preço</label><input name="price" inputmode="decimal" required placeholder="0,00"></div><div class="fld"><label>Descrição</label><input name="description" maxlength="240"></div><button class="btn" type="submit">Publicar veículo</button></form></div>`); }
 function openProductDetails(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const cur = {BRL:'R$',STORE:'Vale',VIRTUAL:'Moedas',MAGIC:'Mágicas'}; const canEdit = U().role === 'admin' || (U().role === 'seller' && p.sellerId === U().id); sheetOpen(`<h2>${esc(p.name)}</h2><div id="sheetBody"><div class="product-detail-image">${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}">` : '✦'}</div><p class="mu">${esc(p.description || 'Um item especial para sua jornada.')}</p><div class="kv"><span>Preço</span><b>${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${cur[p.currency]}`}</b></div><div class="kv"><span>Disponibilidade</span><span>${p.stock > 0 ? `${p.stock} unidades` : 'Estoque ilimitado'}</span></div><div class="kv"><span>Publicado por</span><span>${p.sellerId === 'usr_master' ? 'Armin Master' : 'Vendedor da loja'}</span></div><button class="btn sec" data-act="openFittingRoom" data-id="${esc(p.id)}">✦ Experimentar no boneco 3D</button><button class="btn" data-act="buyProduct" data-id="${esc(p.id)}">Comprar agora</button>${canEdit ? `<div class="btns two"><button class="btn sec" data-act="editProduct" data-id="${esc(p.id)}">Editar</button><button class="btn dng" data-act="deleteProduct" data-id="${esc(p.id)}">Excluir</button></div>` : ''}</div>`); }
 function openEditProduct(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; sheetOpen(`<h2>Editar produto</h2><div id="sheetBody"><form data-form="productEdit"><input type="hidden" name="productId" value="${esc(p.id)}"><input type="hidden" name="imageUrl" value="${esc(p.imageUrl||'')}"><div class="fld"><label>Trocar imagem (opcional)</label><input name="image" type="file" accept="image/*"><small>${p.imageUrl ? 'A imagem atual será mantida se você não selecionar outra.' : 'Adicione uma imagem para destacar o produto.'}</small></div><div class="fld"><label>Nome</label><input name="name" value="${esc(p.name)}" required></div><div class="fld"><label>Descrição</label><input name="description" value="${esc(p.description||'')}"></div><div class="fld"><label>Preço</label><input name="price" inputmode="decimal" value="${esc(String(p.price))}" required></div><div class="fld"><label>Moeda</label><select name="currency"><option value="BRL" ${p.currency==='BRL'?'selected':''}>Reais</option><option value="STORE" ${p.currency==='STORE'?'selected':''}>Vale / crédito da loja</option><option value="VIRTUAL" ${p.currency==='VIRTUAL'?'selected':''}>Moeda virtual</option><option value="MAGIC" ${p.currency==='MAGIC'?'selected':''}>Moeda mágica</option></select></div><div class="fld"><label>Estoque (0 = infinito)</label><input name="stock" type="number" min="0" value="${p.stock||0}"></div><button class="btn" type="submit">Salvar alterações</button></form></div>`); }
-function openFittingRoom(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const category = ['shirt','pants','shoes','accessory'].includes(p.category) ? p.category : 'shirt'; const labels={shirt:'camisa / blusa',pants:'calça',shoes:'tênis / sapato',accessory:'acessório'}; sheetOpen(`<h2>Provador 3D</h2><div id="sheetBody"><div class="tryon-stage"><div class="tryon-badge">ARMIN FIT • ${labels[category]}</div><div id="tryonCanvas"><div class="tryon-loading">Carregando seu boneco...</div></div></div><div class="tryon-controls"><button type="button" data-tryon-view="0" class="on">Frente</button><button type="button" data-tryon-view="1.57">Lado</button><button type="button" data-tryon-view="3.14">Costas</button></div><div class="tryon-product">${p.imageUrl?`<img src="${esc(p.imageUrl)}" alt="">`:''}<div><b>${esc(p.name)}</b><span>Arraste o boneco para girar • ${labels[category]}</span></div></div><p class="tryon-note">A foto do produto é aplicada à peça para uma prévia visual. Funciona no celular por toque.</p><button class="btn" data-act="buyProduct" data-id="${esc(p.id)}" style="margin-top:12px">Comprar este item</button></div>`); setTimeout(() => initFittingRoom({...p,category}), 0); }
-function initFittingRoom(p) {
+function openFittingRoom(productId) {
+  const p = S.products.find(x => x.id === productId); if (!p) return;
+  const category = ['shirt','pants','shoes','accessory'].includes(p.category) ? p.category : 'shirt';
+  const labels = { shirt:'camisa / blusa', pants:'calça', shoes:'tênis / sapato', accessory:'acessório' };
+  sheetOpen(`<h2>Visualizar no boneco 3D</h2><div id="sheetBody"><div class="tryon-stage"><div class="tryon-badge">GHOST FIT • ${labels[category]}</div><div id="tryonCanvas"><div class="tryon-loading">Preparando seu provador 3D...</div></div><div class="tryon-hint">Arraste para girar • pinça ou scroll para aproximar</div></div><div class="tryon-controls"><button type="button" data-tryon-view="0" class="on">Frente</button><button type="button" data-tryon-view="1.57">Lado</button><button type="button" data-tryon-view="3.14">Costas</button></div><div class="tryon-product">${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="">` : ''}<div><b>${esc(p.name)}</b><span>Prévia 3D • ${labels[category]}</span></div></div><p class="tryon-note">Visualização aproximada para você conferir o caimento e a cor antes de comprar.</p><button class="btn" data-act="buyProduct" data-id="${esc(p.id)}" style="margin-top:12px">Comprar este item</button></div>`);
+  setTimeout(() => initFittingRoom({...p, category}), 0);
+}
+async function initFittingRoom(p) {
   const mount = $('#tryonCanvas'); if (!mount) return;
-  mount.innerHTML = '<div class="tryon-canvas"><div class="tryon-avatar"><div class="tryon-head"></div><div class="tryon-neck"></div><div class="tryon-torso"><span class="tryon-item-texture"></span></div><div class="tryon-arm left"></div><div class="tryon-arm right"></div><div class="tryon-legs"></div><div class="tryon-shoes"></div></div></div>';
-  const avatar = mount.querySelector('.tryon-avatar'); const texture = mount.querySelector('.tryon-item-texture'); let angle = 0; let dragging = false; let start = 0;
-  if (p.imageUrl) texture.style.backgroundImage = `url("${String(p.imageUrl).replace(/"/g, '%22')}")`;
-  const rotate = (value) => { angle = Number(value) || 0; avatar.style.transform = `rotateY(${angle}rad)`; };
-  const startDrag = (e) => { dragging = true; start = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || 0; };
-  const moveDrag = (e) => { if (!dragging) return; const x = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX) || start; angle += (x - start) * .012; start = x; avatar.style.transform = `rotateY(${angle}rad)`; };
-  const stopDrag = () => { dragging = false; };
-  mount.addEventListener('pointerdown', startDrag); mount.addEventListener('pointermove', moveDrag); mount.addEventListener('pointerup', stopDrag); mount.addEventListener('pointercancel', stopDrag); mount.addEventListener('touchstart', startDrag, {passive:true}); mount.addEventListener('touchmove', moveDrag, {passive:true}); mount.addEventListener('touchend', stopDrag, {passive:true});
-  document.querySelectorAll('[data-tryon-view]').forEach(b => b.addEventListener('click', () => { rotate(b.dataset.tryonView); document.querySelectorAll('[data-tryon-view]').forEach(x => x.classList.remove('on')); b.classList.add('on'); }));
-  S.tryOnCleanup = () => { mount.innerHTML = ''; };
+  try {
+    await window.ghostThreeReady;
+    const cleanup = await window.mountGhostFittingRoom(mount, p);
+    if (!document.body.contains(mount)) { if (cleanup) cleanup(); return; }
+    S.tryOnCleanup = cleanup;
+    document.querySelectorAll('[data-tryon-view]').forEach(b => b.addEventListener('click', () => {
+      if (window.ghostThreeSetView) window.ghostThreeSetView(b.dataset.tryonView);
+      document.querySelectorAll('[data-tryon-view]').forEach(x => x.classList.remove('on')); b.classList.add('on');
+    }));
+  } catch (error) {
+    mount.innerHTML = '<div class="tryon-loading">Não foi possível carregar o provador 3D. Tente novamente.</div>';
+    console.warn('Provador Three.js indisponível:', error);
+  }
 }
 function openBuy(productId) { const p = S.products.find(x => x.id === productId); if (!p) return; const options = S.payments.methods.filter(m => m.currency === p.currency); sheetOpen(`<h2>Comprar ${esc(p.name)}</h2><div id="sheetBody"><p class="mu">${p.currency==='BRL'?fmtBRL(p.price):`${p.price} ${p.currency}`}</p><form data-form="buy"><input type="hidden" name="productId" value="${esc(productId)}"><div class="fld"><label>Forma de pagamento</label><select name="method">${options.map(m => `<option value="${m.id}">${m.label}</option>`).join('')}</select></div><button class="btn" type="submit">Confirmar compra</button></form></div>`); }
 function openAutoDebit() { const a = (S.payments && S.payments.autoDebit) || {}; sheetOpen(`<h2>Desconto automático</h2><div id="sheetBody"><p class="mu sm-t">Quando houver dívida no cartão ou crédito antecipado, o GhsotBank desconta automaticamente o valor configurado do seu saldo disponível.</p><form data-form="autoDebit"><div class="fld"><label><input type="checkbox" name="enabled" ${a.enabled?'checked':''}> Ativar desconto automático de dívidas</label></div><div class="fld"><label>Valor por desconto</label><input name="amount" inputmode="decimal" value="${a.amount||''}" placeholder="Ex: 100,00"></div><div class="fld"><label>Descrição</label><input name="description" value="${esc(a.description||'')}" placeholder="Ex: pagar cartão e crédito antecipado"></div><button class="btn" type="submit">Salvar configuração</button></form></div>`); }
