@@ -2,6 +2,13 @@
 const path = require('path');
 const { createBank } = require('./bank');
 const multer = require('multer');
+const {
+  requestMistralAssistant,
+  requiresHumanSupport,
+  redactSensitive,
+  SUPPORT_HANDOFF_REPLY,
+  SUPPORT_UNAVAILABLE_REPLY,
+} = require('./support-ai');
 
 const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 32 * 1024 * 1024 }, fileFilter: (_req, file, cb) => cb(null, /^image\//.test(file.mimetype)) });
 const IMGBB_API_KEY = process.env.IMGBB_API_KEY || '599411b1c02c7129d1b0da9bd4634c09';
@@ -77,7 +84,39 @@ function registerRoutes(app, bank, rt) {
   app.post('/api/insurance/life', auth, (req, res) => wrap(res, () => { bank.contractLifeInsurance(req.user, req.body || {}); res.json({ ok:true, message:'Seguro de vida contratado.', ...st(req.user) }); }));
 
   app.get('/api/support/messages', auth, (req, res) => res.json({ ok: true, messages: bank.accountState(req.user).supportMessages }));
-  app.post('/api/support/messages', auth, (req, res) => wrap(res, () => { bank.supportSend(req.user, (req.body||{}).text); res.json({ ok: true, ...st(req.user) }); }));
+  app.post('/api/support/messages', auth, async (req, res) => {
+    const data = req.body || {};
+    const rawText = String(data.text || '');
+    let userMessage;
+    try { userMessage = bank.supportSend(req.user, redactSensitive(rawText)); }
+    catch (e) { return res.status(400).json({ ok:false, message:e.message }); }
+
+    let handoff = requiresHumanSupport(rawText, data.forceHuman === true);
+    let reply = handoff ? SUPPORT_HANDOFF_REPLY : '';
+    if (!handoff) {
+      try {
+        const result = await requestMistralAssistant(bank.supportHistory(req.user.id));
+        if (!result) {
+          handoff = true;
+          reply = SUPPORT_UNAVAILABLE_REPLY;
+        } else if (result.escalate || /encaminh|suporte humano|fale com (?:um|uma) atendente|atendimento humano/i.test(result.reply)) {
+          handoff = true;
+          reply = SUPPORT_HANDOFF_REPLY;
+        } else {
+          reply = result.reply;
+        }
+      } catch (e) {
+        handoff = true;
+        reply = SUPPORT_UNAVAILABLE_REPLY;
+        console.warn(`Assistente Mistral indisponível: ${e.message}`);
+      }
+    }
+
+    bank.supportAiReply(req.user.id, reply, { userMessageId:userMessage.id, awaitingHuman:handoff });
+    emit([req.user.id]);
+    if (rt && rt.masters) rt.masters();
+    return res.json({ ok:true, ...st(req.user), handoff });
+  });
   app.post('/api/notifications/read', auth, (req, res) => wrap(res, () => { bank.markNotifsRead(req.user); res.json({ ok: true, ...st(req.user) }); }));
 
   app.get('/api/master/overview', auth, admin, (req, res) => res.json({ ok: true, ...bank.masterOverview() }));
@@ -128,7 +167,7 @@ if (require.main === module) {
   app.use(cors());
   app.use(express.json({ limit: '100kb' }));
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0 }));
-  app.get('/health', (_req, res) => res.json({ status:'ok', bank:'GhsotBank', timestamp:new Date().toISOString() }));
+  app.get('/health', (_req, res) => res.json({ status:'ok', bank:'GhostBank', timestamp:new Date().toISOString() }));
 
   const rt = {
     users(ids) {
@@ -146,5 +185,5 @@ if (require.main === module) {
   app.get('*', (_req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
   const PORT = Number(process.env.PORT) || 3000;
-  server.listen(PORT, '0.0.0.0', () => console.log(`GhsotBank online na porta ${PORT}`));
+  server.listen(PORT, '0.0.0.0', () => console.log(`GhostBank online na porta ${PORT}`));
 }

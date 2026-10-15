@@ -6,7 +6,7 @@
   "engines": { "node": ">=18" },
   "scripts": {
     "start": "node server.js",
-    "test": "node test/bank.test.js && node test/frontend-check.js"
+    "test": "node test/bank.test.js && node test/frontend-check.js && node test/support-ai.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

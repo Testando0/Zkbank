@@ -8,6 +8,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: MISTRAL_MODEL
+        value: ministral-3b-2512
       - key: DATA_DIR          # onde o db.json é salvo (precisa ficar no disco persistente)
         value: /data
       - key: MASTER_PASSWORD   # senha inicial do usuário "master" (defina no painel da Render)
