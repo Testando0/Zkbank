@@ -79,22 +79,42 @@ function createBaseBody(THREE, product) {
 }
 
 function createShirtGarment(THREE, texture) {
-  const shape = new THREE.Shape();
-  shape.moveTo(-.52, -.72); shape.lineTo(.52, -.72); shape.lineTo(.56, .08);
-  shape.lineTo(.75, .43); shape.lineTo(.94, .57); shape.lineTo(.72, .79);
-  shape.lineTo(.48, .56); shape.lineTo(.25, .72); shape.lineTo(.17, .91);
-  shape.lineTo(-.17, .91); shape.lineTo(-.25, .72); shape.lineTo(-.48, .56);
-  shape.lineTo(-.72, .79); shape.lineTo(-.94, .57); shape.lineTo(-.75, .43); shape.lineTo(-.56, .08); shape.closePath();
-  const neck = new THREE.Path(); neck.absellipse(0, .77, .19, .13, 0, Math.PI * 2, true, 0); shape.holes.push(neck);
-  const geometry = new THREE.ExtrudeGeometry(shape, { depth: .18, steps: 2, bevelEnabled: true, bevelSegments: 3, bevelSize: .025, bevelThickness: .025 });
-  const position = geometry.attributes.position; const uv = geometry.attributes.uv;
-  for (let i = 0; i < position.count; i++) uv.setXY(i, (position.getX(i) + .98) / 1.96, (position.getY(i) + .78) / 1.72);
-  uv.needsUpdate = true; geometry.computeVertexNormals();
-  const mat = new THREE.MeshStandardMaterial({ map: texture, color: 0xffffff, transparent: true, alphaTest: .025, roughness: .88, metalness: .01, side: THREE.DoubleSide });
-  const garment = new THREE.Group(); garment.position.set(0, 2.28, .38);
-  const mesh = new THREE.Mesh(geometry, mat); mesh.castShadow = true; mesh.receiveShadow = true; garment.add(mesh);
-  const collarMat = new THREE.MeshStandardMaterial({ color: 0x111217, roughness: .78 });
-  const collar = new THREE.Mesh(new THREE.TorusGeometry(.19, .025, 8, 28), collarMat); collar.position.set(0, .77, .205); collar.castShadow = true; garment.add(collar);
+  const garment = new THREE.Group();
+  garment.position.set(0, 2.28, 0);
+  const cloth = new THREE.MeshStandardMaterial({ color: 0x121318, roughness: .9, metalness: .01, side: THREE.DoubleSide });
+  const sleeveCloth = new THREE.MeshStandardMaterial({ color: 0x111217, roughness: .92, side: THREE.DoubleSide });
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(.60, .69, 1.42, 48, 12, false), cloth);
+  shell.position.y = .02; shell.scale.z = .74; shell.castShadow = true; shell.receiveShadow = true; garment.add(shell);
+  const sleeve = (x) => {
+    const mesh = new THREE.Mesh(new THREE.CapsuleGeometry(.18, .38, 10, 24), sleeveCloth);
+    mesh.position.set(x, .40, 0); mesh.rotation.z = x > 0 ? -.10 : .10; mesh.scale.set(1, 1, .82); mesh.castShadow = true; mesh.receiveShadow = true; garment.add(mesh);
+  };
+  sleeve(-.58); sleeve(.58);
+  const collarMat = new THREE.MeshStandardMaterial({ color: 0x0b0c10, roughness: .8 });
+  const collar = new THREE.Mesh(new THREE.TorusGeometry(.19, .026, 10, 32), collarMat);
+  collar.position.set(0, .69, .455); collar.scale.set(1, .72, 1); collar.castShadow = true; garment.add(collar);
+  if (texture) {
+    const cols = 32, rows = 30, positions = [], uvs = [], indices = [];
+    const width = .55, height = 1.22, radius = .605;
+    for (let row = 0; row <= rows; row++) {
+      const v = row / rows; const y = .62 - v * height;
+      for (let col = 0; col <= cols; col++) {
+        const u = col / cols; const x = -width + u * width * 2;
+        const normalized = Math.min(1, Math.abs(x) / radius);
+        const z = Math.sqrt(Math.max(0, radius * radius * (1 - normalized * normalized))) + .012;
+        positions.push(x, y, z); uvs.push(u, 1 - v);
+      }
+    }
+    for (let row = 0; row < rows; row++) for (let col = 0; col < cols; col++) {
+      const a = row * (cols + 1) + col, b = a + 1, c = a + cols + 1, d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); geometry.setIndex(indices); geometry.computeVertexNormals();
+    const printMat = new THREE.MeshStandardMaterial({ map: texture, transparent: true, alphaTest: .035, roughness: .88, metalness: .01, side: THREE.DoubleSide });
+    const print = new THREE.Mesh(geometry, printMat); print.castShadow = true; print.receiveShadow = true; garment.add(print);
+  }
   return garment;
 }
 
