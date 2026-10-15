@@ -18,7 +18,7 @@ const {
 function setup() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ghostbank-support-ai-'));
   const bank = createBank({ file: path.join(dir, 'db.json') });
-  const { token, user } = bank.login('aventureiro', '1234');
+  const { token, user } = bank.login('redzin', 'redzin012');
   const routes = {};
   const app = {
     get: (route, ...handlers) => { routes[`GET ${route}`] = handlers; },

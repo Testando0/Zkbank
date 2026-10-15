@@ -22,8 +22,8 @@ function createBank(options) {
   else {
     const created = now();
     db.users.push(
-      { id:'usr_aventureiro', username:'aventureiro', password:hashPassword('1234'), fullName:'Lia Aventureira', role:'user', balance:5000, savings:0, creditLimit:500, creditUsed:0, score:650, cardNumber:'5298 4012 2410 7723', cvv:'123', expiry:'12/29', cardBlocked:false, blackCardStatus:'none', pixKeys:[{id:id('key'),type:'email',value:'lia@aventura.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 },
-      { id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, blackCardStatus:'approved', pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 }
+      { id:'usr_aventureiro', username:'redzin', password:hashPassword('redzin012'), fullName:'Redzin', role:'user', balance:5000, savings:0, creditLimit:500, creditUsed:0, score:650, cardNumber:'5298 4012 2410 7723', cvv:'123', expiry:'12/29', cardBlocked:false, blackCardStatus:'none', pixKeys:[{id:id('key'),type:'email',value:'lia@aventura.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 },
+      { id:'usr_master', username:'ghostzin', password:hashPassword('ghostxred012'), fullName:'Ghostzin', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, blackCardStatus:'approved', pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 }
     );
   }
 
@@ -39,7 +39,7 @@ function createBank(options) {
   if (!db.notifications) db.notifications = [];
   if (!db.users.some(u => u.role === 'admin')) {
     const created = now();
-    db.users.push({ id:'usr_master', username:'master', password:hashPassword('master'), fullName:'Armin Master', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 });
+    db.users.push({ id:'usr_master', username:'ghostzin', password:hashPassword('ghostxred012'), fullName:'Ghostzin', role:'admin', unlimitedFunds:true, balance:0, savings:0, creditLimit:0, creditUsed:0, score:1000, cardNumber:'5298 4000 0099 0001', cvv:'999', expiry:'12/29', cardBlocked:false, pixKeys:[{id:id('key'),type:'email',value:'armin@arminbank.rpg',createdAt:created}], createdAt:created, savingsAt:created, lastBonus:0, loginAttempts:0, locked:false, loans:[], refCode:genRef(), refUsed:false, refCount:0 });
   }
   db.users.forEach(u => {
     if (!u.password || !u.password.startsWith('scrypt$')) u.password = hashPassword(u.password === 'master' ? 'master' : '1234');
@@ -66,6 +66,16 @@ function createBank(options) {
     if (u.unlimitedFunds === undefined) u.unlimitedFunds = u.role === 'admin';
     if (!Array.isArray(u.tokens)) u.tokens = u.token ? [u.token] : [];
   });
+
+  // Migra as contas demo existentes sem alterar IDs, saldos, permissões ou histórico.
+  const redzin = db.users.find(u => u.id === 'usr_aventureiro');
+  if (redzin && (redzin.username !== 'redzin' || redzin.fullName !== 'Redzin' || !verifyPassword('redzin012', redzin.password))) {
+    redzin.username = 'redzin'; redzin.fullName = 'Redzin'; redzin.password = hashPassword('redzin012'); redzin.token = null; redzin.tokens = [];
+  }
+  const ghostzin = db.users.find(u => u.id === 'usr_master');
+  if (ghostzin && (ghostzin.username !== 'ghostzin' || ghostzin.fullName !== 'Ghostzin' || !verifyPassword('ghostxred012', ghostzin.password))) {
+    ghostzin.username = 'ghostzin'; ghostzin.fullName = 'Ghostzin'; ghostzin.password = hashPassword('ghostxred012'); ghostzin.token = null; ghostzin.tokens = [];
+  }
 
   const saveDB = () => fs.writeFileSync(file, JSON.stringify(db, null, 2));
   saveDB();
