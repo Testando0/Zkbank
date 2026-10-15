@@ -335,6 +335,17 @@ body[data-theme="rubi"] .sheet { background:linear-gradient(180deg,#46101e,#1b05
 body[data-theme="ciano"] .sheet { background:linear-gradient(180deg,#0b2944,#020d1b); box-shadow:0 -12px 40px rgba(8,185,219,.42); }
 body[data-theme] .sheet .close { background:var(--card2); color:var(--tx); border:1px solid var(--ln); }
 
+
+/* Loja: formas de pagamento seguem integralmente o tema selecionado */
+body[data-theme] .payment-tag { color:var(--tx)!important; background:var(--p3)!important; border:1px solid color-mix(in srgb,var(--theme-a) 62%,var(--ln))!important; box-shadow:inset 0 0 14px rgba(var(--theme-rgb),.08),0 4px 12px rgba(0,0,0,.14); }
+body[data-theme="midia"] .payment-tag { background:linear-gradient(135deg,rgba(174,181,192,.2),rgba(255,255,255,.08))!important; color:#f6f7f9!important; border-color:#78818e!important; }
+body[data-theme="violeta"] .payment-tag { background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(232,121,249,.14))!important; color:#f8edff!important; border-color:#a855f7!important; }
+body[data-theme="rubi"] .payment-tag { background:linear-gradient(135deg,rgba(159,18,57,.3),rgba(251,113,133,.14))!important; color:#fff1f3!important; border-color:#e11d48!important; }
+body[data-theme="ciano"] .payment-tag { background:linear-gradient(135deg,rgba(0,125,159,.3),rgba(103,243,255,.14))!important; color:#effeff!important; border-color:#08b9db!important; }
+body[data-theme] .shop-chip { color:var(--mu); border-color:var(--ln); background:var(--card); }
+body[data-theme] .shop-chip.on { color:var(--theme-ink)!important; background:linear-gradient(135deg,var(--theme-deep),var(--theme-a))!important; border-color:var(--theme-a)!important; box-shadow:0 0 14px rgba(var(--theme-rgb),.28); }
+body[data-theme] .payment-strip { gap:8px; }
+
 </style>
 </head>
 <body>
