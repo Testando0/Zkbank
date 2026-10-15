@@ -78,6 +78,26 @@ function createBaseBody(THREE, product) {
   return { root, shirt };
 }
 
+function createShirtGarment(THREE, texture) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-.52, -.72); shape.lineTo(.52, -.72); shape.lineTo(.56, .08);
+  shape.lineTo(.75, .43); shape.lineTo(.94, .57); shape.lineTo(.72, .79);
+  shape.lineTo(.48, .56); shape.lineTo(.25, .72); shape.lineTo(.17, .91);
+  shape.lineTo(-.17, .91); shape.lineTo(-.25, .72); shape.lineTo(-.48, .56);
+  shape.lineTo(-.72, .79); shape.lineTo(-.94, .57); shape.lineTo(-.75, .43); shape.lineTo(-.56, .08); shape.closePath();
+  const neck = new THREE.Path(); neck.absellipse(0, .77, .19, .13, 0, Math.PI * 2, true, 0); shape.holes.push(neck);
+  const geometry = new THREE.ExtrudeGeometry(shape, { depth: .18, steps: 2, bevelEnabled: true, bevelSegments: 3, bevelSize: .025, bevelThickness: .025 });
+  const position = geometry.attributes.position; const uv = geometry.attributes.uv;
+  for (let i = 0; i < position.count; i++) uv.setXY(i, (position.getX(i) + .98) / 1.96, (position.getY(i) + .78) / 1.72);
+  uv.needsUpdate = true; geometry.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ map: texture, color: 0xffffff, transparent: true, alphaTest: .025, roughness: .88, metalness: .01, side: THREE.DoubleSide });
+  const garment = new THREE.Group(); garment.position.set(0, 2.28, .38);
+  const mesh = new THREE.Mesh(geometry, mat); mesh.castShadow = true; mesh.receiveShadow = true; garment.add(mesh);
+  const collarMat = new THREE.MeshStandardMaterial({ color: 0x111217, roughness: .78 });
+  const collar = new THREE.Mesh(new THREE.TorusGeometry(.19, .025, 8, 28), collarMat); collar.position.set(0, .77, .205); collar.castShadow = true; garment.add(collar);
+  return garment;
+}
+
 function loadImageTexture(THREE, url) {
   return new Promise((resolve) => {
     if (!url) return resolve(null);
@@ -106,7 +126,15 @@ function removePhotoBackground(THREE, source) {
       if (likelyPurpleBackground) d[i + 3] = Math.max(0, Math.min(255, (dist - 45) * 4));
     }
     ctx.putImageData(pixels, 0, 0);
-    const texture = new THREE.CanvasTexture(canvas); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8; resolve(texture);
+    let minX = size, minY = size, maxX = 0, maxY = 0;
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      if (d[(y * size + x) * 4 + 3] > 24) { minX = Math.min(minX, x); minY = Math.min(minY, y); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y); }
+    }
+    if (maxX <= minX || maxY <= minY) return resolve(null);
+    const crop = document.createElement('canvas'); const pad = 12;
+    crop.width = maxX - minX + 1 + pad * 2; crop.height = maxY - minY + 1 + pad * 2;
+    crop.getContext('2d').drawImage(canvas, minX, minY, maxX - minX + 1, maxY - minY + 1, pad, pad, maxX - minX + 1, maxY - minY + 1);
+    const texture = new THREE.CanvasTexture(crop); texture.colorSpace = THREE.SRGBColorSpace; texture.anisotropy = 8; resolve(texture);
   });
 }
 
@@ -127,13 +155,10 @@ async function mountGhostFittingRoom(mount, product) {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(1.56, .018, 8, 96), new THREE.MeshBasicMaterial({ color: 0xc048ff, transparent: true, opacity: .75 })); ring.rotation.x = -Math.PI / 2; ring.position.y = .07; scene.add(ring);
 
   const source = await loadImageTexture(THREE, product.imageUrl);
-  const { root, shirt } = createBaseBody(THREE, product); scene.add(root);
+  const { root } = createBaseBody(THREE, product); scene.add(root);
   if (source && (product.category || 'shirt') === 'shirt') {
     const cutout = await removePhotoBackground(THREE, source);
-    if (cutout) {
-      const graphic = new THREE.Mesh(new THREE.PlaneGeometry(1.02, 1.35), new THREE.MeshBasicMaterial({ map: cutout, transparent: true, alphaTest: .035, depthWrite: false, side: THREE.DoubleSide }));
-      graphic.position.set(0, 2.32, .515); graphic.castShadow = false; root.add(graphic);
-    }
+    if (cutout) root.add(createShirtGarment(THREE, cutout));
     source.dispose();
   }
 
