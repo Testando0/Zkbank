@@ -539,10 +539,11 @@ function renderSavings() {
   </div>`;
 }
 function msgRow(m) {
-  const me = m.role !== 'support';
+  const me = !['support','assistant'].includes(m.role);
+  const label = m.role === 'assistant' ? 'GhostBank IA · ' : m.role === 'support' ? 'Suporte humano · ' : '';
   return `<div class="msgrow ${me?'me':'them'}">
     ${me ? '' : `<div class="mavatar">A</div>`}
-    <div class="bubble"><div class="mtext">${esc(m.text)}</div><div class="mtime">${fmtDate(m.createdAt)}</div></div>
+    <div class="bubble"><div class="mtext">${esc(m.text)}</div><div class="mtime">${label}${fmtDate(m.createdAt)}</div></div>
   </div>`;
 }
 function scrollChat(root) { const w = (root || document).querySelector('.chatscroll'); if (w) w.scrollTop = w.scrollHeight; }
@@ -551,15 +552,15 @@ function renderSupport() {
   $('#view').innerHTML = `
   <div class="hdr" style="padding-bottom:14px">
     <div class="bar"><button class="ib" data-act="goPage" data-page="home">${ico('back')}</button>
-      <div class="tools"><span class="pill g">online</span></div></div>
-    <h1 style="font-size:22px;margin-top:6px">Suporte Ghsot</h1>
-    <p>A gente responde por aqui, em tempo real</p>
+      <div class="tools"><span class="pill g">suporte</span></div></div>
+    <h1 style="font-size:22px;margin-top:6px">Suporte GhostBank</h1>
+    <p>Assistente IA e equipe humana. Escreva “atendente” para falar com uma pessoa. Não envie senha, PIN, CVV ou códigos; mensagens podem ser processadas pela Mistral.</p>
   </div>
   <div class="chatscroll">
     ${msgs.length ? msgs.map(msgRow).join('') : '<div class="empty"><b>Nenhuma mensagem ainda</b>Mande um oi que a conversa começa.</div>'}
   </div>
   <form class="composer" data-form="support">
-    <input name="text" placeholder="Escreva sua mensagem" autocomplete="off">
+    <input name="text" maxlength="500" placeholder="Digite sua dúvida ou escreva atendente" autocomplete="off">
     <button class="send" type="submit" aria-label="Enviar">${ico('arrow')}</button>
   </form>`;
   scrollChat();
@@ -900,7 +901,7 @@ const F = {
   vehicleFinance: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.downPayment = parseMoney(d.downPayment); const r = await busy(ev.submitter, () => api(`/api/vehicles/${encodeURIComponent(d.vehicleId)}/finance`, { method:'POST', body:d })); if (r) { setState(r); openContracts(); toast(r.message, 'ok'); } },
   vehicleAdmin: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.price = parseMoney(d.price); const r = await busy(ev.submitter, async () => { const up = await uploadFile(f.elements.image.files[0]); d.imageUrl = up.url; delete d.image; return api('/api/master/vehicles', { method:'POST', body:d }); }); if (r) { sheetClose(); toast('Veículo publicado com foto.', 'ok'); } },
   password: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const r = await busy(ev.submitter, () => api('/api/password', { method:'POST', body:d })); if (r) { S.token = r.token; localStorage.setItem('armin_token', r.token); connectSocket(); setState(r); sheetClose(); toast('Senha alterada!', 'ok'); } },
-  support: async (f, ev) => { const t = String(new FormData(f).get('text') || '').trim(); if (!t) return; const r = await busy(ev.submitter, () => api('/api/support/messages', { method:'POST', body:{ text:t } })); if (r) setState(r); },
+  support: async (f, ev) => { const t = String(new FormData(f).get('text') || '').trim(); if (!t) return; const r = await busy(ev.submitter, () => api('/api/support/messages', { method:'POST', body:{ text:t } })); if (r) { setState(r); if (r.handoff) toast('Sua mensagem foi encaminhada ao suporte humano.', 'ok'); } },
   reply: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); if (!String(d.text).trim()) return; const r = await busy(ev.submitter, () => api('/api/master/support/reply', { method:'POST', body:d })); if (r) { await loadMaster(); openThread(d.userId); } },
   deposit: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); const v = parseMoney(d.amount); if (!(v > 0)) return toast('Digite um valor válido.', 'err'); const r = await busy(ev.submitter, () => api('/api/master/deposit', { method:'POST', body:{ userId:d.userId, amount:v, note:d.note } })); if (r) { sheetClose(); toast('Depósito feito.', 'ok'); loadMaster(); } },
   masterBalance: async (f, ev) => { const d = Object.fromEntries(new FormData(f)); d.amount = parseMoney(d.amount); if (!d.amount) return toast('Informe um valor diferente de zero.', 'err'); const r = await busy(ev.submitter, () => api(`/api/master/users/${encodeURIComponent(d.userId)}/balance`, { method:'POST', body:{ amount:d.amount, note:d.note } })); if (r) { sheetClose(); toast('Saldo atualizado.', 'ok'); loadMaster(); } },

@@ -310,12 +310,25 @@ function createBank(options) {
   }
   function supportSend(user, message) {
     if (!message || !String(message).trim()) throw new BankError('Escreva uma mensagem');
-    db.supportMessages.push({ id:id('msg'), userId:user.id, author:user.fullName, role:user.role, text:String(message).trim().slice(0,500), awaiting:true, createdAt:now() }); saveDB();
+    const entry = { id:id('msg'), userId:user.id, author:user.fullName, role:user.role, text:String(message).trim().slice(0,500), awaiting:true, createdAt:now() };
+    db.supportMessages.push(entry); saveDB(); return entry;
+  }
+  function supportAiReply(userId, message, options = {}) {
+    const text = String(message || '').trim().slice(0,500);
+    if (!text) throw new BankError('Escreva uma resposta');
+    const userMessage = db.supportMessages.find(m => m.id === options.userMessageId && m.userId === userId);
+    if (!userMessage) throw new BankError('Mensagem de suporte não encontrada');
+    if (!options.awaitingHuman) userMessage.awaiting = false;
+    const entry = { id:id('msg'), userId, author:'Assistente GhostBank', role:'assistant', text, awaiting:false, createdAt:now() };
+    db.supportMessages.push(entry); saveDB(); return entry;
+  }
+  function supportHistory(userId) {
+    return db.supportMessages.filter(m => m.userId === userId);
   }
   function supportReply(userId, message) {
     db.supportMessages.push({ id:id('msg'), userId, author:'Armin Master', role:'support', text:String(message).trim().slice(0,500), awaiting:false, createdAt:now() });
-    const th = db.supportMessages.filter(m => m.userId === userId);
-    for (let i = th.length-1; i >= 0; i--) if (th[i].awaiting) { th[i].awaiting = false; break; }
+    const th = supportHistory(userId);
+    for (const pending of th) if (pending.awaiting) pending.awaiting = false;
     saveDB();
   }
   const markNotifsRead = (user) => { db.notifications.forEach(n => { if (n.userId === user.id) n.read = true; }); saveDB(); };
@@ -450,7 +463,7 @@ function createBank(options) {
     user.password = hashPassword(newPassword); user.token = crypto.randomBytes(32).toString('hex'); user.tokens = [user.token]; saveDB(); return user.token;
   }
 
-  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, requestBlackCard, decideBlackCard, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, createVehicle, vehicles, requestVehicleFinance, decideVehicleFinance, payVehicleFinance, contractLifeInsurance, claimBonus, creditRequest, creditDecide, supportSend, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
+  return { byId, userFromToken, login, register, updateAvatar, updateProfileName, lookupKey, parsePixTarget, pixSend, payInstallment, applyReferral, addKey, removeKey, cardPurchase, requestBlackCard, decideBlackCard, toggleCard, payInvoice, creditDraw, savingsMove, accountState, scoreProfile, acceptPreApproved, loanRequest, loanDecide, loanPay, createVehicle, vehicles, requestVehicleFinance, decideVehicleFinance, payVehicleFinance, contractLifeInsurance, claimBonus, creditRequest, creditDecide, supportSend, supportAiReply, supportHistory, supportReply, markNotifsRead, masterOverview, masterDeposit, masterAdjustBalance, masterSetBan, masterSetRole, masterAdjustCredit, masterAdjustWallet, paymentCatalog, createProduct, updateProduct, deleteProduct, products, purchaseProduct, configureAutoDebit, changePassword, db: () => db };
 }
 
 module.exports = { createBank, BankError };
