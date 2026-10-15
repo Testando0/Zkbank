@@ -94,6 +94,13 @@ t('crédito: pedido, duplicado, aprovação sobe limite, reprovação notifica',
   const r2 = bank.creditRequest(u, { amount: 9000, purpose: 'Castelo' }); bank.creditDecide(r2.id, 'reject', 'Não por agora');
   assert.ok(bank.accountState(u).notifications.some((n) => n.title === 'Análise encerrada'));
 });
+t('loja aceita categorias vestíveis com imagem', () => {
+  const admin = bank.byId('usr_master');
+  for (const category of ['shirt', 'jacket', 'pants', 'underwear', 'shoes', 'glasses']) {
+    const product = bank.createProduct(admin, { name: `Teste ${category}`, description: category, imageUrl: 'data:image/png;base64,teste', category, price: 10, currency: 'BRL', stock: 0 });
+    assert.strictEqual(product.category, category); assert.strictEqual(product.imageUrl, 'data:image/png;base64,teste');
+  }
+});
 t('suporte e master', () => {
   const u = lia(); bank.supportSend(u, 'Olá!'); throwsMsg(() => bank.supportSend(u, '   '), /mensagem/);
   const ov = bank.masterOverview(); assert.ok(ov.threads.find((x) => x.userId === u.id && x.awaiting));

@@ -78,44 +78,75 @@ function createBaseBody(THREE, product) {
   return { root, shirt };
 }
 
-function createShirtGarment(THREE, texture) {
-  const garment = new THREE.Group();
-  garment.position.set(0, 2.28, 0);
-  const cloth = new THREE.MeshStandardMaterial({ color: 0x121318, roughness: .9, metalness: .01, side: THREE.DoubleSide });
-  const sleeveCloth = new THREE.MeshStandardMaterial({ color: 0x111217, roughness: .92, side: THREE.DoubleSide });
-  const shell = new THREE.Mesh(new THREE.CylinderGeometry(.60, .69, 1.42, 48, 12, false), cloth);
-  shell.position.y = .02; shell.scale.z = .74; shell.castShadow = true; shell.receiveShadow = true; garment.add(shell);
-  const sleeve = (x) => {
-    const mesh = new THREE.Mesh(new THREE.CapsuleGeometry(.18, .38, 10, 24), sleeveCloth);
-    mesh.position.set(x, .40, 0); mesh.rotation.z = x > 0 ? -.10 : .10; mesh.scale.set(1, 1, .82); mesh.castShadow = true; mesh.receiveShadow = true; garment.add(mesh);
-  };
-  sleeve(-.58); sleeve(.58);
-  const collarMat = new THREE.MeshStandardMaterial({ color: 0x0b0c10, roughness: .8 });
-  const collar = new THREE.Mesh(new THREE.TorusGeometry(.19, .026, 10, 32), collarMat);
-  collar.position.set(0, .69, .455); collar.scale.set(1, .72, 1); collar.castShadow = true; garment.add(collar);
-  if (texture) {
-    const cols = 32, rows = 30, positions = [], uvs = [], indices = [];
-    const width = .55, height = 1.22, radius = .605;
-    for (let row = 0; row <= rows; row++) {
-      const v = row / rows; const y = .62 - v * height;
-      for (let col = 0; col <= cols; col++) {
-        const u = col / cols; const x = -width + u * width * 2;
-        const normalized = Math.min(1, Math.abs(x) / radius);
-        const z = Math.sqrt(Math.max(0, radius * radius * (1 - normalized * normalized))) + .012;
-        positions.push(x, y, z); uvs.push(u, 1 - v);
-      }
+function curvedPatch(THREE, texture, { centerX = 0, centerY = 0, width, height, radius, rows = 24, cols = 28 }) {
+  const positions = [], uvs = [], indices = [];
+  for (let row = 0; row <= rows; row++) {
+    const v = row / rows; const y = centerY + height / 2 - v * height;
+    for (let col = 0; col <= cols; col++) {
+      const u = col / cols; const x = centerX - width + u * width * 2;
+      const normalized = Math.min(1, Math.abs(x - centerX) / radius);
+      const z = Math.sqrt(Math.max(0, radius * radius * (1 - normalized * normalized))) + .014;
+      positions.push(x, y, z); uvs.push(u, 1 - v);
     }
-    for (let row = 0; row < rows; row++) for (let col = 0; col < cols; col++) {
-      const a = row * (cols + 1) + col, b = a + 1, c = a + cols + 1, d = c + 1;
-      indices.push(a, c, b, b, c, d);
-    }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); geometry.setIndex(indices); geometry.computeVertexNormals();
-    const printMat = new THREE.MeshStandardMaterial({ map: texture, transparent: true, alphaTest: .035, roughness: .88, metalness: .01, side: THREE.DoubleSide });
-    const print = new THREE.Mesh(geometry, printMat); print.castShadow = true; print.receiveShadow = true; garment.add(print);
   }
+  for (let row = 0; row < rows; row++) for (let col = 0; col < cols; col++) {
+    const a = row * (cols + 1) + col, b = a + 1, c = a + cols + 1, d = c + 1;
+    indices.push(a, c, b, b, c, d);
+  }
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2)); geometry.setIndex(indices); geometry.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ map: texture, transparent: true, alphaTest: .035, roughness: .88, metalness: .01, side: THREE.DoubleSide });
+  const mesh = new THREE.Mesh(geometry, mat); mesh.castShadow = true; mesh.receiveShadow = true; return mesh;
+}
+
+function createTopGarment(THREE, texture, jacket = false) {
+  const garment = new THREE.Group(); garment.position.set(0, 2.28, 0);
+  const cloth = material(THREE, jacket ? 0x1a1b22 : 0x121318, { roughness: .9, side: THREE.DoubleSide });
+  const shell = new THREE.Mesh(new THREE.CylinderGeometry(jacket ? .65 : .60, jacket ? .73 : .69, jacket ? 1.54 : 1.42, 48, 12, false), cloth);
+  shell.position.y = .02; shell.scale.z = .74; shell.castShadow = true; shell.receiveShadow = true; garment.add(shell);
+  const sleeve = (x) => { const mesh = new THREE.Mesh(new THREE.CapsuleGeometry(jacket ? .20 : .18, jacket ? .48 : .38, 10, 24), cloth); mesh.position.set(x, .38, 0); mesh.rotation.z = x > 0 ? -.10 : .10; mesh.scale.set(1, 1, .82); mesh.castShadow = true; mesh.receiveShadow = true; garment.add(mesh); };
+  sleeve(-jacket ? .63 : .58); sleeve(jacket ? .63 : .58);
+  const collar = new THREE.Mesh(new THREE.TorusGeometry(.19, .026, 10, 32), material(THREE, 0x0b0c10, { roughness: .8 })); collar.position.set(0, .69, .455); collar.scale.set(1, .72, 1); collar.castShadow = true; garment.add(collar);
+  if (jacket) { const zip = new THREE.Mesh(new THREE.BoxGeometry(.025, 1.12, .025), material(THREE, 0x9ea2ad, { metalness: .35, roughness: .42 })); zip.position.set(0, .08, .46); garment.add(zip); }
+  if (texture) garment.add(curvedPatch(THREE, texture, { centerY: jacket ? .02 : 0, width: jacket ? .60 : .55, height: jacket ? 1.34 : 1.22, radius: jacket ? .655 : .605 }));
   return garment;
+}
+function createShirtGarment(THREE, texture) { return createTopGarment(THREE, texture, false); }
+function createJacketGarment(THREE, texture) { return createTopGarment(THREE, texture, true); }
+
+function createPantsGarment(THREE, texture) {
+  const garment = new THREE.Group(); const cloth = material(THREE, 0x20212b, { roughness: .9 });
+  [-.29, .29].forEach((x) => { const leg = new THREE.Mesh(new THREE.CylinderGeometry(.30, .34, 1.45, 32, 10, false), cloth); leg.position.set(x, 1.05, 0); leg.scale.z = .82; leg.castShadow = true; leg.receiveShadow = true; garment.add(leg); if (texture) garment.add(curvedPatch(THREE, texture, { centerX: x, centerY: 1.07, width: .265, height: 1.22, radius: .315, rows: 22, cols: 18 })); });
+  const waist = new THREE.Mesh(new THREE.TorusGeometry(.53, .035, 8, 40), material(THREE, 0x11121a, { roughness: .8 })); waist.rotation.x = Math.PI / 2; waist.position.set(0, 1.72, 0); waist.scale.z = .82; garment.add(waist); return garment;
+}
+function createUnderwearGarment(THREE, texture) {
+  const garment = new THREE.Group(); const cloth = material(THREE, 0x5d2d70, { roughness: .86 });
+  const brief = new THREE.Mesh(new THREE.SphereGeometry(.55, 40, 24), cloth); brief.position.set(0, 1.66, 0); brief.scale.set(1, .48, .78); brief.castShadow = true; brief.receiveShadow = true; garment.add(brief);
+  if (texture) garment.add(curvedPatch(THREE, texture, { centerY: 1.68, width: .43, height: .42, radius: .53, rows: 14, cols: 20 }));
+  const waistband = new THREE.Mesh(new THREE.TorusGeometry(.48, .028, 8, 40), material(THREE, 0x21132a, { roughness: .8 })); waistband.rotation.x = Math.PI / 2; waistband.position.set(0, 1.86, 0); waistband.scale.z = .78; garment.add(waistband); return garment;
+}
+function createShoesGarment(THREE, texture) {
+  const garment = new THREE.Group(); const shoe = material(THREE, 0xe9eaf0, { roughness: .42, metalness: .08, map: texture || null, transparent: !!texture, alphaTest: texture ? .03 : 0 });
+  [-.31, .31].forEach((x) => { const upper = new THREE.Mesh(new THREE.BoxGeometry(.58, .25, .86), shoe); upper.position.set(x, .2, .15); upper.castShadow = true; upper.receiveShadow = true; garment.add(upper); const sole = new THREE.Mesh(new THREE.BoxGeometry(.63, .075, .9), material(THREE, 0xb9bcc6, { roughness: .5 })); sole.position.set(x, .095, .15); sole.castShadow = true; garment.add(sole); }); return garment;
+}
+function createGlassesGarment(THREE, texture) {
+  const garment = new THREE.Group(); const frame = material(THREE, 0x17131d, { roughness: .34, metalness: .28, map: texture || null }); const lens = material(THREE, 0x5e9bbb, { transparent: true, opacity: .28, roughness: .16, metalness: .18 });
+  [-.16, .16].forEach((x) => { const ring = new THREE.Mesh(new THREE.TorusGeometry(.145, .026, 10, 32), frame); ring.position.set(x, 3.53, .39); ring.castShadow = true; garment.add(ring); const glass = new THREE.Mesh(new THREE.CircleGeometry(.12, 32), lens); glass.position.set(x, 3.53, .385); garment.add(glass); });
+  const bridge = new THREE.Mesh(new THREE.BoxGeometry(.12, .025, .025), frame); bridge.position.set(0, 3.53, .39); garment.add(bridge); const arm = (x) => { const side = new THREE.Mesh(new THREE.BoxGeometry(.34, .025, .025), frame); side.position.set(x * .31, 3.53, .28); side.rotation.y = x > 0 ? -.05 : .05; garment.add(side); }; arm(-1); arm(1); return garment;
+}
+function createAccessoryGarment(THREE, texture) {
+  const garment = new THREE.Group(); const mat = material(THREE, 0x32203c, { roughness: .78, map: texture || null, transparent: !!texture, alphaTest: texture ? .03 : 0 }); const hat = new THREE.Mesh(new THREE.CylinderGeometry(.44, .50, .18, 32), mat); hat.position.set(0, 3.9, 0); hat.castShadow = true; garment.add(hat); const brim = new THREE.Mesh(new THREE.CylinderGeometry(.70, .70, .05, 32), mat); brim.position.set(0, 3.79, .02); brim.castShadow = true; garment.add(brim); return garment;
+}
+function createGarmentForCategory(THREE, category, texture) {
+  if (category === 'shirt') return createShirtGarment(THREE, texture);
+  if (category === 'jacket') return createJacketGarment(THREE, texture);
+  if (category === 'pants') return createPantsGarment(THREE, texture);
+  if (category === 'underwear') return createUnderwearGarment(THREE, texture);
+  if (category === 'shoes') return createShoesGarment(THREE, texture);
+  if (category === 'glasses') return createGlassesGarment(THREE, texture);
+  if (category === 'accessory') return createAccessoryGarment(THREE, texture);
+  return new THREE.Group();
 }
 
 function loadImageTexture(THREE, url) {
@@ -176,11 +207,9 @@ async function mountGhostFittingRoom(mount, product) {
 
   const source = await loadImageTexture(THREE, product.imageUrl);
   const { root } = createBaseBody(THREE, product); scene.add(root);
-  if (source && (product.category || 'shirt') === 'shirt') {
-    const cutout = await removePhotoBackground(THREE, source);
-    if (cutout) root.add(createShirtGarment(THREE, cutout));
-    source.dispose();
-  }
+  let cutout = null;
+  if (source) { cutout = await removePhotoBackground(THREE, source); source.dispose(); }
+  root.add(createGarmentForCategory(THREE, product.category || 'shirt', cutout));
 
   const resize = () => { const width = Math.max(1, mount.clientWidth), height = Math.max(260, mount.clientHeight); camera.aspect = width / height; camera.updateProjectionMatrix(); renderer.setSize(width, height, false); };
   const observer = new ResizeObserver(resize); observer.observe(mount); resize();

@@ -400,7 +400,7 @@ function createBank(options) {
   function createProduct(admin, data) {
     if (!admin || !['admin','seller'].includes(admin.role)) throw new BankError('Apenas o master ou vendedores podem publicar produtos');
     if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe nome e preço válido');
-    const p = { id:id('product'), name:String(data.name).trim().slice(0,80), description:String(data.description||'').trim().slice(0,240), imageUrl:String(data.imageUrl||'').trim().slice(0,500), category:['shirt','pants','shoes','accessory','item'].includes(data.category) ? data.category : 'item', price:money(data.price), currency:['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : 'BRL', stock:Math.max(0, parseInt(data.stock,10) || 0), active:data.active !== false, sellerId:admin.id, createdAt:now() };
+    const p = { id:id('product'), name:String(data.name).trim().slice(0,80), description:String(data.description||'').trim().slice(0,240), imageUrl:String(data.imageUrl||'').trim().slice(0,500), category:['shirt','pants','shoes','jacket','underwear','glasses','accessory','item'].includes(data.category) ? data.category : 'item', price:money(data.price), currency:['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : 'BRL', stock:Math.max(0, parseInt(data.stock,10) || 0), active:data.active !== false, sellerId:admin.id, createdAt:now() };
     db.products.push(p); saveDB(); return p;
   }
   function canManageProduct(actor, product) { return actor && (actor.role === 'admin' || (actor.role === 'seller' && product.sellerId === actor.id)); }
@@ -408,7 +408,7 @@ function createBank(options) {
     const p = db.products.find(x => x.id === productId); if (!p) throw new BankError('Produto não encontrado');
     if (!canManageProduct(actor, p)) throw new BankError('Você não pode editar este produto');
     if (!data.name || !(Number(data.price) > 0)) throw new BankError('Informe nome e preço válido');
-    p.name = String(data.name).trim().slice(0,80); p.description = String(data.description||'').trim().slice(0,240); p.imageUrl = String(data.imageUrl||'').trim().slice(0,500); p.category = ['shirt','pants','shoes','accessory','item'].includes(data.category) ? data.category : (p.category || 'item'); p.price = money(data.price); p.currency = ['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : p.currency; p.stock = Math.max(0, parseInt(data.stock,10) || 0); saveDB(); return p;
+    p.name = String(data.name).trim().slice(0,80); p.description = String(data.description||'').trim().slice(0,240); p.imageUrl = String(data.imageUrl||'').trim().slice(0,500); p.category = ['shirt','pants','shoes','jacket','underwear','glasses','accessory','item'].includes(data.category) ? data.category : (p.category || 'item'); p.price = money(data.price); p.currency = ['BRL','STORE','VIRTUAL','MAGIC'].includes(data.currency) ? data.currency : p.currency; p.stock = Math.max(0, parseInt(data.stock,10) || 0); saveDB(); return p;
   }
   function deleteProduct(actor, productId) {
     const p = db.products.find(x => x.id === productId); if (!p) throw new BankError('Produto não encontrado');
