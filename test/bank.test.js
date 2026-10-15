@@ -13,12 +13,18 @@ const throwsMsg = (fn, re) => assert.throws(fn, (e) => e instanceof BankError &&
 
 const lia = () => bank.byId('usr_aventureiro');
 t('login com senha errada falha / correta funciona', () => {
-  throwsMsg(() => bank.login('aventureiro', 'x'), /inválidos/);
-  const { token } = bank.login('aventureiro', '1234'); assert.ok(token);
+  throwsMsg(() => bank.login('redzin', 'x'), /inválidos/);
+  const { token } = bank.login('redzin', 'redzin012'); assert.ok(token);
   assert.ok(bank.userFromToken(token));
   assert.ok(bank.db().users.every((u) => u.password.startsWith('scrypt$')), 'senhas com hash');
 });
-t('login pelo e-mail da chave Pix', () => { assert.strictEqual(bank.login('lia@aventura.rpg', '1234').user.id, 'usr_aventureiro'); });
+t('credenciais demo atualizadas e permissões preservadas', () => {
+  const redzin = bank.login('redzin', 'redzin012').user;
+  const ghostzin = bank.login('ghostzin', 'ghostxred012').user;
+  assert.strictEqual(redzin.id, 'usr_aventureiro'); assert.strictEqual(redzin.fullName, 'Redzin'); assert.strictEqual(redzin.role, 'user');
+  assert.strictEqual(ghostzin.id, 'usr_master'); assert.strictEqual(ghostzin.fullName, 'Ghostzin'); assert.strictEqual(ghostzin.role, 'admin');
+});
+t('login pelo e-mail da chave Pix', () => { assert.strictEqual(bank.login('lia@aventura.rpg', 'redzin012').user.id, 'usr_aventureiro'); });
 t('cadastro valida e cria conta com chave Pix', () => {
   throwsMsg(() => bank.register({ fullName: 'Ze', username: 'ze', password: '123456' }), /nome completo/);
   throwsMsg(() => bank.register({ fullName: 'Zé Silva', username: 'Z!', password: '123456' }), /Usuário/);
@@ -102,9 +108,9 @@ t('suporte e master', () => {
   throwsMsg(() => bank.masterDeposit('nao', 5), /não encontrado/);
 });
 t('troca de senha invalida sessões antigas', () => {
-  const { token, user } = bank.login('aventureiro', '1234');
+  const { token, user } = bank.login('redzin', 'redzin012');
   throwsMsg(() => bank.changePassword(user, 'errada', 'novasenha'), /incorreta/);
-  const n = bank.changePassword(user, '1234', 'novasenha');
+  const n = bank.changePassword(user, 'redzin012', 'novasenha');
   assert.strictEqual(bank.userFromToken(token), null); assert.ok(bank.userFromToken(n));
   bank.changePassword(user, 'novasenha', 'senha1234');
 });
@@ -112,8 +118,8 @@ t('persistência: reabrir o arquivo mantém tudo', () => {
   const again = createBank({ file }); assert.strictEqual(again.byId('usr_aventureiro').creditLimit, 5000);
 });
 t('bloqueio após 5 logins errados', () => {
-  for (let i = 0; i < 5; i++) { try { bank.login('master', 'errada'); } catch (_) {} }
-  throwsMsg(() => bank.login('master', 'master'), /Muitas tentativas/);
+  for (let i = 0; i < 5; i++) { try { bank.login('ghostzin', 'errada'); } catch (_) {} }
+  throwsMsg(() => bank.login('ghostzin', 'ghostxred012'), /Muitas tentativas/);
 });
 
 /* ---- camada HTTP com app falso ---- */
@@ -127,7 +133,7 @@ t('rotas HTTP: auth, 401, 403 e fluxo Pix', () => {
     const chain = routes[key]; let i = 0; const next = () => { const f = chain[i++]; if (f) f(req, res, next); }; next(); return out;
   };
   assert.strictEqual(call('GET /api/me').code, 401);
-  const login = call('POST /api/login', { body: { username: 'aventureiro', password: 'senha1234' } });
+  const login = call('POST /api/login', { body: { username: 'redzin', password: 'senha1234' } });
   const H = { authorization: `Bearer ${login.token}` };
   assert.strictEqual(call('GET /api/master/overview', { headers: H }).code, 403);
   const ze = bank.db().users.find((u) => u.username === 'zesilva');
