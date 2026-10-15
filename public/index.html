@@ -316,6 +316,25 @@ body[data-theme="violeta"] .pill.p { color:#f1d8ff; background:rgba(168,85,247,.
 body[data-theme="rubi"] .pill.p { color:#ffd8de; background:rgba(225,29,72,.2); border-color:#e11d48; }
 body[data-theme="ciano"] .pill.p { color:#d5fdff; background:rgba(8,185,219,.2); border-color:#08b9db; }
 
+
+/* Correções de usabilidade: textos e painel de perfil respeitam o tema */
+body[data-theme] .hero-actions button:first-child { color:var(--theme-ink)!important; }
+body[data-theme="midia"] .hero-actions button:first-child { background:#f6f7f9!important; color:#09090b!important; }
+body[data-theme="violeta"] .hero-actions button:first-child { background:#f5e8ff!important; color:#4c1d95!important; }
+body[data-theme="rubi"] .hero-actions button:first-child { background:#fff1f3!important; color:#9f1239!important; }
+body[data-theme="ciano"] .hero-actions button:first-child { background:#e9feff!important; color:#004c61!important; }
+body[data-theme="midia"] .lnk { color:#d9dee6!important; }
+body[data-theme="violeta"] .lnk { color:#e879f9!important; }
+body[data-theme="rubi"] .lnk { color:#fb7185!important; }
+body[data-theme="ciano"] .lnk { color:#67f3ff!important; }
+body[data-theme] .sheet { position:fixed; left:50%; right:auto; bottom:0; width:min(100%,520px); transform:translate(-50%,100%); z-index:120; border:1px solid var(--ln); }
+body[data-theme] .sheet.open { transform:translate(-50%,0); }
+body[data-theme="midia"] .sheet { background:linear-gradient(180deg,#171a20,#0f1115); box-shadow:0 -12px 40px rgba(0,0,0,.72),0 0 0 1px rgba(255,255,255,.06); }
+body[data-theme="violeta"] .sheet { background:linear-gradient(180deg,#25103f,#10071c); box-shadow:0 -12px 40px rgba(76,29,149,.5); }
+body[data-theme="rubi"] .sheet { background:linear-gradient(180deg,#46101e,#1b050b); box-shadow:0 -12px 40px rgba(159,18,57,.5); }
+body[data-theme="ciano"] .sheet { background:linear-gradient(180deg,#0b2944,#020d1b); box-shadow:0 -12px 40px rgba(8,185,219,.42); }
+body[data-theme] .sheet .close { background:var(--card2); color:var(--tx); border:1px solid var(--ln); }
+
 </style>
 </head>
 <body>
