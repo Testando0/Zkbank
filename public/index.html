@@ -215,6 +215,53 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opa
 
 
 
+
+/* Sistema de temas GhsotBank inspirado no projetinp */
+html[data-theme="midia"], body[data-theme="midia"] { --theme-a:#e8e8e8; --theme-hot:#fff; --theme-deep:#8f8f8f; --theme-ink:#09090b; --theme-rgb:232,232,232; }
+html[data-theme="violeta"], body[data-theme="violeta"] { --theme-a:#b06bff; --theme-hot:#ead5ff; --theme-deep:#7c3aed; --theme-ink:#150726; --theme-rgb:176,107,255; }
+html[data-theme="rubi"], body[data-theme="rubi"] { --theme-a:#ff4d6d; --theme-hot:#ffc9d2; --theme-deep:#d71943; --theme-ink:#2b020a; --theme-rgb:255,77,109; }
+html[data-theme="ciano"], body[data-theme="ciano"] { --theme-a:#27e7ff; --theme-hot:#e9fdff; --theme-deep:#00a9c7; --theme-ink:#00151c; --theme-rgb:39,231,255; }
+body[data-theme="midia"] { background: radial-gradient(650px 420px at 50% -8%, rgba(255,255,255,.09), transparent 66%), #08080a; }
+body[data-theme="violeta"] { background: radial-gradient(ellipse at 20% 20%, rgba(176,107,255,.3), transparent 30%), linear-gradient(160deg,#05010d,#28104c 48%,#090313); }
+body[data-theme="rubi"] { background: radial-gradient(ellipse at 20% 20%, rgba(255,77,109,.28), transparent 30%), linear-gradient(160deg,#090103,#4a0b19 48%,#090103); }
+body[data-theme="ciano"] { background: radial-gradient(circle at 50% -12%, rgba(39,231,255,.34), transparent 34%), linear-gradient(180deg,#07101f 0%,#061126 46%,#01050e 100%); }
+body[data-theme="midia"] .hdr, body[data-theme="midia"] .tabs { background: rgba(10,10,12,.94); }
+body[data-theme="violeta"] .hdr, body[data-theme="violeta"] .tabs,
+body[data-theme="rubi"] .hdr, body[data-theme="rubi"] .tabs,
+body[data-theme="ciano"] .hdr, body[data-theme="ciano"] .tabs { background: rgba(3,8,20,.88); border-color: rgba(var(--theme-rgb),.58); box-shadow: 0 2px 26px rgba(var(--theme-rgb),.18); }
+body[data-theme="midia"] .home-hero { background: linear-gradient(135deg,#111215,#292b31 52%,#777b84); box-shadow: 0 18px 40px rgba(255,255,255,.12); }
+body[data-theme="rubi"] .home-hero { background: linear-gradient(135deg,#26030b,#a91635 52%,#ff7189); box-shadow: 0 18px 40px rgba(255,77,109,.3); }
+body[data-theme="ciano"] .home-hero { background: radial-gradient(circle at 75% 15%,#a6f8ff 0,#21ddff 12%,transparent 35%), linear-gradient(135deg,#03182c,#007eae 58%,#21ddff); box-shadow: 0 18px 40px rgba(39,231,255,.3); }
+body[data-theme="midia"] .more-toggle, body[data-theme="midia"] .btn:not(.sec):not(.dng) { background: linear-gradient(135deg,#777,#fff); color:#09090b; }
+body[data-theme="violeta"] .more-toggle, body[data-theme="violeta"] .btn:not(.sec):not(.dng) { background: linear-gradient(135deg,#7c3aed,#b06bff,#ead5ff); color:#150726; }
+body[data-theme="rubi"] .more-toggle, body[data-theme="rubi"] .btn:not(.sec):not(.dng) { background: linear-gradient(135deg,#d71943,#ff4d6d,#ffc9d2); color:#2b020a; }
+body[data-theme="ciano"] .more-toggle, body[data-theme="ciano"] .btn:not(.sec):not(.dng) { background: linear-gradient(135deg,#007d9f,#14dffb,#e9fdff); color:#00131d; }
+body[data-theme="midia"] .tab.on { color:#fff; }
+body[data-theme="violeta"] .tab.on, body[data-theme="rubi"] .tab.on, body[data-theme="ciano"] .tab.on { color:var(--theme-hot); text-shadow:0 0 14px rgba(var(--theme-rgb),.8); }
+body[data-theme="midia"] .card, body[data-theme="midia"] .shortcut, body[data-theme="midia"] .product-card, body[data-theme="midia"] .shop-balance, body[data-theme="midia"] .sheet, body[data-theme="midia"] .empty { box-shadow:0 12px 28px rgba(0,0,0,.3), inset 0 0 22px rgba(255,255,255,.025); }
+body[data-theme="violeta"] .card, body[data-theme="rubi"] .card, body[data-theme="ciano"] .card { box-shadow:0 0 18px rgba(var(--theme-rgb),.18), inset 0 0 22px rgba(var(--theme-rgb),.05); }
+body[data-theme="rubi"] .row .ic { color:#ffc9d2; background:linear-gradient(135deg,rgba(215,25,67,.35),rgba(255,113,137,.16)); }
+body[data-theme="ciano"] .row .ic, body[data-theme="ciano"] .shortcut .shortcut-icon { color:#e9fdff; background:linear-gradient(135deg,rgba(0,169,199,.38),rgba(39,231,255,.16)); }
+.theme-panel { padding:0 14px 20px; }
+.theme-hero { display:flex; align-items:center; gap:14px; padding:18px; margin-bottom:12px; }
+.theme-hero-icon { width:50px; height:50px; flex:0 0 50px; display:grid; place-items:center; border-radius:15px; font-size:25px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.28); box-shadow:0 0 18px rgba(255,255,255,.16); }
+.theme-hero h2 { margin:0 0 4px; font-size:18px; }
+.theme-hero p { margin:0; font-size:12px; color:var(--mu); line-height:1.45; }
+.theme-current { display:block; margin-top:6px; color:var(--theme-hot,#fff); font-size:11px; font-weight:800; }
+.theme-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.theme-option { position:relative; display:block; width:100%; padding:12px; border:1px solid rgba(255,255,255,.18); border-radius:17px; background:rgba(20,16,28,.82); color:#fff; text-align:left; cursor:pointer; transition:transform .18s,border-color .18s,box-shadow .18s; }
+.theme-option:hover { transform:translateY(-2px); }
+.theme-option.selected { border-color:var(--theme-a,#fff); box-shadow:0 0 24px rgba(var(--theme-rgb,255,255,255),.28), inset 0 0 18px rgba(255,255,255,.06); }
+.theme-option b { display:block; margin-top:8px; font-size:13px; }
+.theme-option small { display:block; margin-top:4px; color:#b9a9c8; font-size:10px; line-height:1.35; }
+.theme-swatch { height:60px; border:1px solid rgba(255,255,255,.24); border-radius:13px; box-shadow:inset 0 0 22px rgba(0,0,0,.35); }
+.theme-swatch.midia { background:linear-gradient(135deg,#050505,#151515 48%,#888); }
+.theme-swatch.violeta { background:linear-gradient(135deg,#05010d,#28104c 48%,#7c35c9); }
+.theme-swatch.rubi { background:linear-gradient(135deg,#26030b,#a91635 48%,#ff7189); }
+.theme-swatch.ciano { background:radial-gradient(circle at 50% 50%,#a6f8ff 0,#21ddff 16%,#007eae 48%,#03182c 100%); box-shadow:0 0 20px rgba(39,231,255,.55),inset 0 0 22px rgba(255,255,255,.18); }
+.theme-active { display:inline-block; margin-top:8px; padding:3px 8px; border-radius:999px; background:var(--theme-a,#fff); color:var(--theme-ink,#09090b); font-size:9px; font-weight:900; letter-spacing:.06em; }
+@media (max-width:400px) { .theme-grid { grid-template-columns:1fr; } }
+
 </style>
 </head>
 <body>
@@ -308,6 +355,7 @@ function render() {
   else if (S.page === 'card') renderCardPage();
   else if (S.page === 'shop') renderShop();
   else if (S.page === 'more') renderMore();
+  else if (S.page === 'themes') renderThemes();
   else renderHome();
 }
 function tabsHtml() {
@@ -454,13 +502,42 @@ function renderCardPage() {
       <button class="btn sec" data-act="openCredit">${ico('credit')} Crédito e fatura</button>
     </div></div>`;
 }
+
+/* ---------- temas ---------- */
+const THEME_KEY = 'ghsotbank_theme';
+const THEMES = [
+  { id:'midia', label:'Tema mídia', icon:'◐', desc:'Escuro elegante, neutro e minimalista.' },
+  { id:'violeta', label:'Tema violeta', icon:'✦', desc:'Roxo profundo com detalhes lilás.' },
+  { id:'rubi', label:'Tema rubi', icon:'◆', desc:'Vinho escuro com brilho vermelho.' },
+  { id:'ciano', label:'Tema ciano + neon', icon:'✧', desc:'Visual espacial com ciano neon.' }
+];
+function applyTheme(id) {
+  const theme = THEMES.some(t => t.id === id) ? id : 'midia';
+  document.documentElement.dataset.theme = theme;
+  if (document.body) document.body.dataset.theme = theme;
+  try { localStorage.setItem(THEME_KEY, theme); } catch (_) {}
+  document.querySelectorAll('.theme-option').forEach(el => el.classList.toggle('selected', el.dataset.theme === theme));
+  const current = document.querySelector('[data-theme-current]');
+  if (current) current.textContent = `Tema atual: ${THEMES.find(t => t.id === theme).label}`;
+}
+function loadTheme() {
+  let theme = 'midia';
+  try { theme = localStorage.getItem(THEME_KEY) || 'midia'; } catch (_) {}
+  applyTheme(theme);
+}
+function renderThemes() {
+  const active = document.documentElement.dataset.theme || 'midia';
+  const cards = THEMES.map(t => `<button type="button" class="theme-option ${t.id === active ? 'selected' : ''}" data-theme="${t.id}" data-act="setTheme"><div class="theme-swatch ${t.id}"></div><b>${t.icon} ${t.label}</b><small>${t.desc}</small>${t.id === active ? '<span class="theme-active">ATIVO</span>' : ''}</button>`).join('');
+  $('#view').innerHTML = `<div class="hdr"><div class="bar"><button class="ib" data-act="goPage" data-page="more">${ico('back')}</button><div class="tools"><span class="pill p">personalização</span></div></div><h1>Temas</h1><p>Escolha o clima visual do seu banco</p></div><div class="theme-panel"><div class="card theme-hero"><div class="theme-hero-icon">🎨</div><div><h2>Personalize sua experiência</h2><p>Quatro temas inspirados no projetinp, com bordas RGB e brilho próprio.</p><strong class="theme-current" data-theme-current>Tema atual: ${THEMES.find(t => t.id === active).label}</strong></div></div><div class="theme-grid">${cards}</div></div>`;
+}
+
 function renderMore() {
   const u = U();
   const item = (act, ic, label, extra='') => `<button class="row" data-act="${act}" ${extra}><div class="ic">${ico(ic)}</div><div class="mid"><b>${label}</b></div>${ico('chev')}</button>`;
   $('#view').innerHTML = `
   <div class="hdr"><div class="bar"><div class="av">${ini()}</div><div class="tools"><button class="ib" data-act="logout">${ico('logout')}</button></div></div><h1>Mais</h1><p>@${esc(u.username)}</p></div>
   <div class="wrap"><div class="card flush">
-    ${item('openContracts','credit','Contratar')}${item('openShop','gift','Loja e formas de pagamento')}${item('openMagic','gift','Moedas mágicas e virtuais')}${item('openPixHub','pix','Área Pix')}${item('goPage','pig','Cofrinho','data-page="savings"')}${item('openReferral','gift','Indique e ganhe')}${item('openCredit','credit','Crédito e fatura')}${item('openLoans','credit','Meus empréstimos')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
+    ${item('openThemes','gift','Temas')}${item('openContracts','credit','Contratar')}${item('openShop','gift','Loja e formas de pagamento')}${item('openMagic','gift','Moedas mágicas e virtuais')}${item('openPixHub','pix','Área Pix')}${item('goPage','pig','Cofrinho','data-page="savings"')}${item('openReferral','gift','Indique e ganhe')}${item('openCredit','credit','Crédito e fatura')}${item('openLoans','credit','Meus empréstimos')}${item('openKeys','lock','Minhas chaves Pix')}${item('openCharge','plus','Cobrar via Pix')}${item('openNotifs','bell','Notificações')}${item('openSupport','help','Suporte')}${item('openPassword','lock','Alterar senha')}${u.role==='admin' ? item('goPage','check','Painel Master','data-page="master"') : ''}
   </div><div class="btns"><button class="btn dng" data-act="logout">${ico('logout')} Sair da conta</button></div></div>`;
 }
 function isWearable(p) { return ['shirt','pants','shoes','accessory'].includes(p.category) || /camisa|blusa|calça|cueca|sapato|tênis|roupa|jaqueta|boné|vestido/i.test(`${p.name} ${p.description||''}`); }
@@ -642,6 +719,8 @@ const A = {
   openCharge: () => openCharge(),
   openNotifs: () => openNotifs(),
   openSupport: () => { S.page = 'support'; render(); },
+  openThemes: () => { S.page = 'themes'; render(); },
+  setTheme: (el) => { applyTheme(el.dataset.theme); renderThemes(); toast(`Tema ${THEMES.find(t => t.id === el.dataset.theme).label} ativado.`, 'ok'); },
   openPassword: () => openPassword(),
   openProfile: () => openProfile(),
   toggleHomeMenu: () => { S.homeMore = !S.homeMore; render(); },
@@ -742,6 +821,7 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) poll
 setInterval(poll, 25000);
 
 $('#root').innerHTML = shell();
+loadTheme();
 (async function boot() {
   render();
   if (!S.token) return;
